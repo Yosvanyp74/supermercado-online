@@ -92,42 +92,41 @@ export function BarcodeScannerPickingScreen({ navigation, route }: Props) {
           barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e', 'code128', 'code39'],
         }}
         onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-      >
-        <View style={styles.overlay}>
-          {/* Product Info */}
-          <View style={styles.productInfo}>
-            <Text style={styles.productName}>{productName}</Text>
-            {expectedBarcode && (
-              <Text style={styles.expectedCode}>
-                Código esperado: {expectedBarcode}
-              </Text>
-            )}
-          </View>
-
-          {/* Scan Area */}
-          <View style={styles.scanArea}>
-            <View style={[styles.corner, styles.topLeft]} />
-            <View style={[styles.corner, styles.topRight]} />
-            <View style={[styles.corner, styles.bottomLeft]} />
-            <View style={[styles.corner, styles.bottomRight]} />
-
-            {result === 'match' && (
-              <View style={styles.resultOverlay}>
-                <CheckCircle size={60} color={colors.primary[500]} />
-              </View>
-            )}
-            {result === 'mismatch' && (
-              <View style={styles.resultOverlay}>
-                <XCircle size={60} color={colors.destructive} />
-              </View>
-            )}
-          </View>
-
-          <Text style={styles.instruction}>
-            Aponte para o código de barras do produto
-          </Text>
+      />
+      <View style={[styles.overlay, StyleSheet.absoluteFill]}>
+        {/* Product Info */}
+        <View style={styles.productInfo}>
+          <Text style={styles.productName}>{productName}</Text>
+          {expectedBarcode && (
+            <Text style={styles.expectedCode}>
+              Código esperado: {expectedBarcode}
+            </Text>
+          )}
         </View>
-      </CameraView>
+
+        {/* Scan Area */}
+        <View style={styles.scanArea}>
+          <View style={[styles.corner, styles.topLeft]} />
+          <View style={[styles.corner, styles.topRight]} />
+          <View style={[styles.corner, styles.bottomLeft]} />
+          <View style={[styles.corner, styles.bottomRight]} />
+
+          {result === 'match' && (
+            <View style={styles.resultOverlay}>
+              <CheckCircle size={60} color={colors.primary[500]} />
+            </View>
+          )}
+          {result === 'mismatch' && (
+            <View style={styles.resultOverlay}>
+              <XCircle size={60} color={colors.destructive} />
+            </View>
+          )}
+        </View>
+
+        <Text style={styles.instruction}>
+          Aponte para o código de barras do produto
+        </Text>
+      </View>
     </View>
   );
 }

@@ -26,7 +26,8 @@ export function NotificationsScreen({ navigation }: Props) {
   const loadNotifications = async () => {
     try {
       const { data } = await notificationsApi.getAll();
-      setNotifications(data || []);
+      const items = data?.data || data;
+      setNotifications(Array.isArray(items) ? items : []);
     } catch {
       // Ignore
     } finally {

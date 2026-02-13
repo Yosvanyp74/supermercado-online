@@ -88,14 +88,15 @@ export function ProductScannerScreen({ navigation }: Props) {
     <View style={styles.container}>
       {!manualMode ? (
         <>
-          <CameraView
-            style={styles.camera}
-            barcodeScannerSettings={{
-              barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e', 'code128', 'code39'],
-            }}
-            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-          >
-            <View style={styles.overlay}>
+          <View style={{ flex: 1 }}>
+            <CameraView
+              style={StyleSheet.absoluteFill}
+              barcodeScannerSettings={{
+                barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e', 'code128', 'code39'],
+              }}
+              onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+            />
+            <View style={[styles.overlay, StyleSheet.absoluteFill]} pointerEvents="none">
               <View style={styles.scanArea}>
                 <View style={[styles.corner, styles.topLeft]} />
                 <View style={[styles.corner, styles.topRight]} />
@@ -106,7 +107,7 @@ export function ProductScannerScreen({ navigation }: Props) {
                 Aponte para o código de barras
               </Text>
             </View>
-          </CameraView>
+          </View>
           <TouchableOpacity
             style={styles.manualButton}
             onPress={() => setManualMode(true)}

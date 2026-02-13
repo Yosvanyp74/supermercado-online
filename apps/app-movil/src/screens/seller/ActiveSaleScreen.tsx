@@ -75,7 +75,7 @@ export function ActiveSaleScreen({ navigation }: Props) {
     return (
       <View style={styles.itemCard}>
         {item.image ? (
-          <Image source={{ uri: imageUri }} style={styles.itemImage} />
+          <Image source={{ uri: imageUri! }} style={styles.itemImage} />
         ) : (
           <View style={[styles.itemImage, styles.placeholder]}>
             <Text style={styles.placeholderText}>

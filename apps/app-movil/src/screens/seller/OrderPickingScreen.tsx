@@ -161,7 +161,7 @@ export function OrderPickingScreen({ navigation, route }: Props) {
         <View style={styles.statusIcon}>{getStatusIcon(item.status)}</View>
 
         {item.image ? (
-          <Image source={{ uri: imageUri }} style={styles.itemImage} />
+          <Image source={{ uri: imageUri! }} style={styles.itemImage} />
         ) : (
           <View style={[styles.itemImage, styles.placeholder]}>
             <Text style={styles.placeholderText}>

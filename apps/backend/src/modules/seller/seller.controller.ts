@@ -28,7 +28,7 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 @ApiTags('seller')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
-@Roles(Role.SELLER)
+@Roles(Role.SELLER, Role.ADMIN, Role.MANAGER)
 @Controller('seller')
 export class SellerController {
   constructor(private readonly sellerService: SellerService) {}

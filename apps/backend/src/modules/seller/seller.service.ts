@@ -4,7 +4,7 @@ import {
   BadRequestException,
   ConflictException,
 } from '@nestjs/common';
-import { PickingStatus, OrderStatus, OrderType, InventoryMovementType, PaymentMethod } from '@prisma/client';
+import { PickingStatus, OrderStatus, InventoryMovementType, PaymentMethod } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { QuickCreateCustomerDto } from './dto/quick-create-customer.dto';
@@ -286,6 +286,7 @@ export class SellerService {
     return {
       todaySales: Math.round(todaySales * 100) / 100,
       todayOrders,
+      todayTransactions: todayOrders,
       averageTicket:
         todayOrders > 0
           ? Math.round((todaySales / todayOrders) * 100) / 100
@@ -298,14 +299,15 @@ export class SellerService {
   // ==================== ORDER PICKING ====================
 
   async getPendingOrders() {
-    return this.prisma.pickingOrder.findMany({
+    const pickingOrders = await this.prisma.pickingOrder.findMany({
       where: { status: PickingStatus.PENDING },
       include: {
         order: {
           select: {
             id: true,
             orderNumber: true,
-            type: true,
+            fulfillmentType: true,
+            total: true,
             createdAt: true,
             customer: {
               select: { id: true, firstName: true, lastName: true },
@@ -318,6 +320,19 @@ export class SellerService {
       },
       orderBy: { createdAt: 'asc' },
     });
+
+    return pickingOrders.map((po) => ({
+      id: po.order.id,
+      orderNumber: po.order.orderNumber,
+      customerName: po.order.customer
+        ? `${po.order.customer.firstName} ${po.order.customer.lastName}`
+        : 'Cliente',
+      itemCount: po.order.items.length,
+      total: po.order.total,
+      deliveryMethod: po.order.fulfillmentType === 'DELIVERY' ? 'delivery' : 'pickup',
+      createdAt: po.createdAt.toISOString(),
+      status: po.status,
+    }));
   }
 
   async acceptOrder(orderId: string, sellerId: string) {

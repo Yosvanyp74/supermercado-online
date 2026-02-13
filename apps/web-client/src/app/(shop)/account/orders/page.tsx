@@ -13,10 +13,15 @@ const statusMap: Record<string, { label: string; variant: 'default' | 'secondary
   PENDING: { label: 'Pendente', variant: 'outline' },
   CONFIRMED: { label: 'Confirmado', variant: 'secondary' },
   PREPARING: { label: 'Preparando', variant: 'secondary' },
+  PICKING: { label: 'Separando', variant: 'secondary' },
   READY: { label: 'Pronto', variant: 'default' },
   OUT_FOR_DELIVERY: { label: 'Saiu para Entrega', variant: 'default' },
   DELIVERED: { label: 'Entregue', variant: 'default' },
   CANCELLED: { label: 'Cancelado', variant: 'destructive' },
+  PROCESSING: { label: 'Processando', variant: 'secondary' },
+  COMPLETED: { label: 'Concluído', variant: 'default' },
+  FAILED: { label: 'Falhou', variant: 'destructive' },
+  REFUNDED: { label: 'Reembolsado', variant: 'outline' },
 };
 
 export default function OrdersPage() {

@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "SuperMercado",
+    "slug": "supermercado",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#16a34a"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.supermercado.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "A câmera é usada para escanear códigos de barras dos produtos."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#16a34a"
+      },
+      "package": "com.supermercado.app",
+      "permissions": ["CAMERA"]
+    },
+    "plugins": [
+      "expo-camera",
+      "expo-secure-store",
+      "expo-image-picker"
+    ],
+    "scheme": "supermercado"
+  }
+}

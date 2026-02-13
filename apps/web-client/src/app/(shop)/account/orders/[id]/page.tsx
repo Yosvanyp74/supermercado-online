@@ -17,10 +17,15 @@ const statusMap: Record<string, { label: string; variant: 'default' | 'secondary
   PENDING: { label: 'Pendente', variant: 'outline', icon: <Clock className="h-4 w-4" /> },
   CONFIRMED: { label: 'Confirmado', variant: 'secondary', icon: <CheckCircle className="h-4 w-4" /> },
   PREPARING: { label: 'Preparando', variant: 'secondary', icon: <Package className="h-4 w-4" /> },
+  PICKING: { label: 'Separando', variant: 'secondary', icon: <Package className="h-4 w-4" /> },
   READY: { label: 'Pronto', variant: 'default', icon: <Package className="h-4 w-4" /> },
   OUT_FOR_DELIVERY: { label: 'Saiu para Entrega', variant: 'default', icon: <Truck className="h-4 w-4" /> },
   DELIVERED: { label: 'Entregue', variant: 'default', icon: <CheckCircle className="h-4 w-4" /> },
   CANCELLED: { label: 'Cancelado', variant: 'destructive', icon: <XCircle className="h-4 w-4" /> },
+  PROCESSING: { label: 'Processando', variant: 'secondary', icon: <Clock className="h-4 w-4" /> },
+  COMPLETED: { label: 'Concluído', variant: 'default', icon: <CheckCircle className="h-4 w-4" /> },
+  FAILED: { label: 'Falhou', variant: 'destructive', icon: <XCircle className="h-4 w-4" /> },
+  REFUNDED: { label: 'Reembolsado', variant: 'outline', icon: <Clock className="h-4 w-4" /> },
 };
 
 export default function OrderDetailPage() {
@@ -124,7 +129,7 @@ export default function OrderDetailPage() {
                 {order.deliveryAddress.neighborhood}, {order.deliveryAddress.city} - {order.deliveryAddress.state}
               </p>
             ) : (
-              <p className="text-sm">Delivery</p>
+              <p className="text-sm">Entrega a domicílio</p>
             )}
           </div>
 

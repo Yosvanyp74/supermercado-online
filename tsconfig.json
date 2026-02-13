@@ -2,7 +2,9 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "lib": ["ES2020"],
+    "lib": [
+      "ES2020"
+    ],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -14,9 +16,18 @@
   },
   "files": [],
   "references": [
-    { "path": "./packages/shared/types" },
-    { "path": "./packages/shared/utils" },
-    { "path": "./packages/shared/validations" },
-    { "path": "./packages/shared/constants" }
-  ]
+    {
+      "path": "./packages/shared/types"
+    },
+    {
+      "path": "./packages/shared/utils"
+    },
+    {
+      "path": "./packages/shared/validations"
+    },
+    {
+      "path": "./packages/shared/constants"
+    }
+  ],
+  "extends": "expo/tsconfig.base"
 }

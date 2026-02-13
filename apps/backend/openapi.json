@@ -1,0 +1,5048 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "summary": "Registrar novo usuário",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário registrado com sucesso"
+          },
+          "409": {
+            "description": "E-mail já cadastrado"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "summary": "Fazer login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso"
+          },
+          "401": {
+            "description": "Credenciais inválidas"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refreshTokens",
+        "summary": "Renovar token de acesso",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token renovado com sucesso"
+          },
+          "401": {
+            "description": "Token inválido"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "summary": "Fazer logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "operationId": "AuthController_getProfile",
+        "summary": "Obter perfil do usuário logado",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/users": {
+      "get": {
+        "operationId": "UsersController_findAll",
+        "summary": "Listar todos os usuários",
+        "parameters": [
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "role",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/users/me": {
+      "get": {
+        "operationId": "UsersController_getMe",
+        "summary": "Obter perfil próprio",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/users/me/change-password": {
+      "post": {
+        "operationId": "UsersController_changePassword",
+        "summary": "Alterar senha própria",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "operationId": "UsersController_findOne",
+        "summary": "Obter usuário por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UsersController_update",
+        "summary": "Atualizar usuário",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "UsersController_remove",
+        "summary": "Desativar usuário",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/users/{id}/addresses": {
+      "get": {
+        "operationId": "UsersController_getAddresses",
+        "summary": "Listar endereços do usuário",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "UsersController_createAddress",
+        "summary": "Adicionar endereço",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAddressDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/users/{id}/addresses/{addressId}": {
+      "patch": {
+        "operationId": "UsersController_updateAddress",
+        "summary": "Atualizar endereço",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "addressId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "UsersController_deleteAddress",
+        "summary": "Remover endereço",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "addressId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/products": {
+      "get": {
+        "operationId": "ProductsController_findAll",
+        "summary": "Listar produtos com filtros e paginação",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "brandId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "minPrice",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxPrice",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "ACTIVE",
+                "INACTIVE",
+                "OUT_OF_STOCK",
+                "DISCONTINUED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "isFeatured",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "isOrganic",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "createdAt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de produtos retornada com sucesso"
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      },
+      "post": {
+        "operationId": "ProductsController_create",
+        "summary": "Criar novo produto",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Produto criado com sucesso"
+          },
+          "409": {
+            "description": "SKU ou código de barras já cadastrado"
+          }
+        },
+        "tags": [
+          "products"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/products/featured": {
+      "get": {
+        "operationId": "ProductsController_findFeatured",
+        "summary": "Listar produtos em destaque",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de produtos em destaque retornada com sucesso"
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      }
+    },
+    "/api/products/search": {
+      "get": {
+        "operationId": "ProductsController_search",
+        "summary": "Pesquisar produtos por texto",
+        "parameters": [
+          {
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultados da pesquisa retornados com sucesso"
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      }
+    },
+    "/api/products/{id}": {
+      "get": {
+        "operationId": "ProductsController_findOne",
+        "summary": "Buscar produto por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto encontrado com sucesso"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      },
+      "patch": {
+        "operationId": "ProductsController_update",
+        "summary": "Atualizar produto",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Produto atualizado com sucesso"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        },
+        "tags": [
+          "products"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "ProductsController_remove",
+        "summary": "Remover produto",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto removido com sucesso"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        },
+        "tags": [
+          "products"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/products/slug/{slug}": {
+      "get": {
+        "operationId": "ProductsController_findBySlug",
+        "summary": "Buscar produto por slug",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto encontrado com sucesso"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      }
+    },
+    "/api/products/barcode/{barcode}": {
+      "get": {
+        "operationId": "ProductsController_findByBarcode",
+        "summary": "Buscar produto por código de barras",
+        "parameters": [
+          {
+            "name": "barcode",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto encontrado com sucesso"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        },
+        "tags": [
+          "products"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/categories": {
+      "get": {
+        "operationId": "CategoriesController_findAll",
+        "summary": "Listar todas as categorias em árvore",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de categorias retornada com sucesso"
+          }
+        },
+        "tags": [
+          "categories"
+        ]
+      },
+      "post": {
+        "operationId": "CategoriesController_create",
+        "summary": "Criar nova categoria",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Categoria criada com sucesso"
+          },
+          "409": {
+            "description": "Categoria com este nome já existe"
+          }
+        },
+        "tags": [
+          "categories"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/categories/{id}": {
+      "get": {
+        "operationId": "CategoriesController_findOne",
+        "summary": "Buscar categoria por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Categoria encontrada com sucesso"
+          },
+          "404": {
+            "description": "Categoria não encontrada"
+          }
+        },
+        "tags": [
+          "categories"
+        ]
+      },
+      "patch": {
+        "operationId": "CategoriesController_update",
+        "summary": "Atualizar categoria",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Categoria atualizada com sucesso"
+          },
+          "404": {
+            "description": "Categoria não encontrada"
+          }
+        },
+        "tags": [
+          "categories"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "CategoriesController_remove",
+        "summary": "Remover categoria",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Categoria removida com sucesso"
+          },
+          "404": {
+            "description": "Categoria não encontrada"
+          },
+          "409": {
+            "description": "Categoria possui produtos ou subcategorias associadas"
+          }
+        },
+        "tags": [
+          "categories"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/categories/{id}/products": {
+      "get": {
+        "operationId": "CategoriesController_getProductsByCategory",
+        "summary": "Listar produtos de uma categoria",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produtos da categoria retornados com sucesso"
+          },
+          "404": {
+            "description": "Categoria não encontrada"
+          }
+        },
+        "tags": [
+          "categories"
+        ]
+      }
+    },
+    "/api/cart": {
+      "get": {
+        "operationId": "CartController_getCart",
+        "summary": "Obter carrinho do usuário",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Carrinho retornado com sucesso"
+          }
+        },
+        "tags": [
+          "cart"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "CartController_clearCart",
+        "summary": "Limpar carrinho",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Carrinho limpo com sucesso"
+          }
+        },
+        "tags": [
+          "cart"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/cart/items": {
+      "post": {
+        "operationId": "CartController_addItem",
+        "summary": "Adicionar item ao carrinho",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddToCartDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Item adicionado com sucesso"
+          },
+          "400": {
+            "description": "Estoque insuficiente"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        },
+        "tags": [
+          "cart"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/cart/items/{itemId}": {
+      "patch": {
+        "operationId": "CartController_updateItem",
+        "summary": "Atualizar quantidade do item no carrinho",
+        "parameters": [
+          {
+            "name": "itemId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCartItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Item atualizado com sucesso"
+          },
+          "400": {
+            "description": "Estoque insuficiente"
+          },
+          "404": {
+            "description": "Item não encontrado"
+          }
+        },
+        "tags": [
+          "cart"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "CartController_removeItem",
+        "summary": "Remover item do carrinho",
+        "parameters": [
+          {
+            "name": "itemId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Item removido com sucesso"
+          },
+          "404": {
+            "description": "Item não encontrado"
+          }
+        },
+        "tags": [
+          "cart"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/cart/merge": {
+      "post": {
+        "operationId": "CartController_mergeGuestCart",
+        "summary": "Mesclar carrinho de visitante com carrinho do usuário",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Carrinhos mesclados com sucesso"
+          }
+        },
+        "tags": [
+          "cart"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/orders": {
+      "post": {
+        "operationId": "OrdersController_create",
+        "summary": "Criar novo pedido",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pedido criado com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos ou estoque insuficiente"
+          },
+          "404": {
+            "description": "Produto ou endereço não encontrado"
+          }
+        },
+        "tags": [
+          "orders"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "OrdersController_findAll",
+        "summary": "Listar todos os pedidos (admin/gerente/funcionário)",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "PENDING",
+                "CONFIRMED",
+                "PROCESSING",
+                "READY_FOR_PICKUP",
+                "OUT_FOR_DELIVERY",
+                "DELIVERED",
+                "CANCELLED",
+                "REFUNDED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "ONLINE",
+                "IN_STORE"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de pedidos retornada com sucesso"
+          }
+        },
+        "tags": [
+          "orders"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/orders/my-orders": {
+      "get": {
+        "operationId": "OrdersController_findMyOrders",
+        "summary": "Listar meus pedidos",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "PENDING",
+                "CONFIRMED",
+                "PROCESSING",
+                "READY_FOR_PICKUP",
+                "OUT_FOR_DELIVERY",
+                "DELIVERED",
+                "CANCELLED",
+                "REFUNDED"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pedidos do usuário retornados com sucesso"
+          }
+        },
+        "tags": [
+          "orders"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/orders/{id}": {
+      "get": {
+        "operationId": "OrdersController_findOne",
+        "summary": "Obter detalhes de um pedido",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pedido retornado com sucesso"
+          },
+          "403": {
+            "description": "Sem permissão para ver este pedido"
+          },
+          "404": {
+            "description": "Pedido não encontrado"
+          }
+        },
+        "tags": [
+          "orders"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/orders/{id}/status": {
+      "patch": {
+        "operationId": "OrdersController_updateStatus",
+        "summary": "Atualizar status do pedido",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status atualizado com sucesso"
+          },
+          "400": {
+            "description": "Transição de status não permitida"
+          },
+          "404": {
+            "description": "Pedido não encontrado"
+          }
+        },
+        "tags": [
+          "orders"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/orders/{id}/cancel": {
+      "post": {
+        "operationId": "OrdersController_cancel",
+        "summary": "Cancelar pedido",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pedido cancelado com sucesso"
+          },
+          "400": {
+            "description": "Pedido não pode ser cancelado"
+          },
+          "403": {
+            "description": "Sem permissão para cancelar este pedido"
+          },
+          "404": {
+            "description": "Pedido não encontrado"
+          }
+        },
+        "tags": [
+          "orders"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/orders/{id}/tracking": {
+      "get": {
+        "operationId": "OrdersController_getTracking",
+        "summary": "Rastrear pedido",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados de rastreamento retornados com sucesso"
+          },
+          "404": {
+            "description": "Pedido não encontrado"
+          }
+        },
+        "tags": [
+          "orders"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/inventory": {
+      "get": {
+        "operationId": "InventoryController_getInventory",
+        "summary": "Listar inventário com filtros",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lowStock",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inventário retornado com sucesso"
+          }
+        },
+        "tags": [
+          "inventory"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/inventory/low-stock": {
+      "get": {
+        "operationId": "InventoryController_getLowStock",
+        "summary": "Listar produtos com estoque baixo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Produtos com estoque baixo retornados com sucesso"
+          }
+        },
+        "tags": [
+          "inventory"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/inventory/movements": {
+      "get": {
+        "operationId": "InventoryController_getMovements",
+        "summary": "Histórico de movimentações de estoque",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "productId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "IN",
+                "OUT",
+                "ADJUSTMENT",
+                "RETURN",
+                "DAMAGE",
+                "TRANSFER"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Movimentações retornadas com sucesso"
+          }
+        },
+        "tags": [
+          "inventory"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "InventoryController_createMovement",
+        "summary": "Registrar movimentação de estoque",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMovementDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Movimentação registrada com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos ou estoque insuficiente"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        },
+        "tags": [
+          "inventory"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/inventory/{productId}": {
+      "get": {
+        "operationId": "InventoryController_getStock",
+        "summary": "Consultar estoque de um produto",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estoque retornado com sucesso"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        },
+        "tags": [
+          "inventory"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/inventory/adjust": {
+      "post": {
+        "operationId": "InventoryController_adjustStock",
+        "summary": "Ajustar estoque (gerente/admin)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdjustStockDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Estoque ajustado com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos ou ajuste resultaria em estoque negativo"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        },
+        "tags": [
+          "inventory"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/sales": {
+      "post": {
+        "operationId": "SellerController_createSale",
+        "summary": "Criar venda no PDV",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSaleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Venda criada com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos ou estoque insuficiente"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/sales/history": {
+      "get": {
+        "operationId": "SellerController_getSaleHistory",
+        "summary": "Histórico de vendas do vendedor",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Histórico retornado com sucesso"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/sales/suspended": {
+      "get": {
+        "operationId": "SellerController_getSuspendedSales",
+        "summary": "Listar vendas suspensas",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Vendas suspensas retornadas com sucesso"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/sales/{id}": {
+      "get": {
+        "operationId": "SellerController_getSaleById",
+        "summary": "Detalhes de uma venda",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Venda retornada com sucesso"
+          },
+          "404": {
+            "description": "Venda não encontrada"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/sales/{id}/suspend": {
+      "post": {
+        "operationId": "SellerController_suspendSale",
+        "summary": "Suspender uma venda",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Venda suspensa com sucesso"
+          },
+          "404": {
+            "description": "Venda não encontrada"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/sales/{id}/resume": {
+      "post": {
+        "operationId": "SellerController_resumeSale",
+        "summary": "Retomar uma venda suspensa",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Venda retomada com sucesso"
+          },
+          "404": {
+            "description": "Venda não encontrada"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/stats": {
+      "get": {
+        "operationId": "SellerController_getSellerStats",
+        "summary": "Estatísticas do vendedor (hoje)",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Estatísticas retornadas com sucesso"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/orders/pending": {
+      "get": {
+        "operationId": "SellerController_getPendingOrders",
+        "summary": "Pedidos pendentes para picking",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Pedidos pendentes retornados com sucesso"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/orders/{orderId}/accept": {
+      "post": {
+        "operationId": "SellerController_acceptOrder",
+        "summary": "Aceitar pedido para picking",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pedido aceito com sucesso"
+          },
+          "404": {
+            "description": "Pedido não encontrado"
+          },
+          "409": {
+            "description": "Pedido já aceito por outro vendedor"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/picking": {
+      "get": {
+        "operationId": "SellerController_getMyPickingOrders",
+        "summary": "Minhas ordens de picking ativas",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Ordens retornadas com sucesso"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/picking/{id}": {
+      "get": {
+        "operationId": "SellerController_getPickingOrder",
+        "summary": "Detalhes de ordem de picking",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ordem retornada com sucesso"
+          },
+          "404": {
+            "description": "Ordem não encontrada"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/picking/{pickingOrderId}/scan": {
+      "post": {
+        "operationId": "SellerController_scanItem",
+        "summary": "Escanear item no picking",
+        "parameters": [
+          {
+            "name": "pickingOrderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScanItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Item escaneado"
+          },
+          "404": {
+            "description": "Ordem de picking não encontrada"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/picking/{pickingItemId}/manual-pick": {
+      "post": {
+        "operationId": "SellerController_markItemPicked",
+        "summary": "Marcar item como coletado manualmente",
+        "parameters": [
+          {
+            "name": "pickingItemId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Item marcado como coletado"
+          },
+          "404": {
+            "description": "Item não encontrado"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/picking/{pickingOrderId}/complete": {
+      "post": {
+        "operationId": "SellerController_completePickingOrder",
+        "summary": "Concluir ordem de picking",
+        "parameters": [
+          {
+            "name": "pickingOrderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ordem concluída com sucesso"
+          },
+          "404": {
+            "description": "Ordem não encontrada"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/products/barcode/{barcode}": {
+      "get": {
+        "operationId": "SellerController_getProductByBarcode",
+        "summary": "Buscar produto por código de barras",
+        "parameters": [
+          {
+            "name": "barcode",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto encontrado"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/customers/search": {
+      "get": {
+        "operationId": "SellerController_searchCustomers",
+        "summary": "Buscar clientes",
+        "parameters": [
+          {
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "description": "Termo de busca",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Clientes encontrados"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/seller/customers/quick": {
+      "post": {
+        "operationId": "SellerController_quickCreateCustomer",
+        "summary": "Criar cliente rápido",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuickCreateCustomerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cliente criado com sucesso"
+          },
+          "409": {
+            "description": "Telefone já cadastrado"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/delivery/assign": {
+      "post": {
+        "operationId": "DeliveryController_assignDelivery",
+        "summary": "Atribuir entregador a um pedido",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignDeliveryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Entrega atribuída com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "404": {
+            "description": "Pedido não encontrado"
+          }
+        },
+        "tags": [
+          "delivery"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/delivery/active": {
+      "get": {
+        "operationId": "DeliveryController_getActiveDeliveries",
+        "summary": "Obter entregas ativas do entregador",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de entregas ativas"
+          }
+        },
+        "tags": [
+          "delivery"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/delivery/{id}/location": {
+      "patch": {
+        "operationId": "DeliveryController_updateLocation",
+        "summary": "Atualizar localização da entrega",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLocationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Localização atualizada com sucesso"
+          },
+          "404": {
+            "description": "Entrega não encontrada"
+          }
+        },
+        "tags": [
+          "delivery"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/delivery/{id}/status": {
+      "patch": {
+        "operationId": "DeliveryController_updateStatus",
+        "summary": "Atualizar status da entrega",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDeliveryStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status atualizado com sucesso"
+          },
+          "400": {
+            "description": "Status inválido"
+          },
+          "404": {
+            "description": "Entrega não encontrada"
+          }
+        },
+        "tags": [
+          "delivery"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/delivery/order/{orderId}": {
+      "get": {
+        "operationId": "DeliveryController_getDeliveryByOrder",
+        "summary": "Obter informações de entrega por pedido",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados da entrega retornados"
+          },
+          "404": {
+            "description": "Entrega não encontrada"
+          }
+        },
+        "tags": [
+          "delivery"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/delivery/{id}/rate": {
+      "post": {
+        "operationId": "DeliveryController_rateDelivery",
+        "summary": "Avaliar uma entrega",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RateDeliveryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Avaliação registrada com sucesso"
+          },
+          "400": {
+            "description": "Entrega não pode ser avaliada"
+          },
+          "404": {
+            "description": "Entrega não encontrada"
+          }
+        },
+        "tags": [
+          "delivery"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/reviews": {
+      "post": {
+        "operationId": "ReviewsController_create",
+        "summary": "Criar avaliação de produto",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Avaliação criada com sucesso"
+          },
+          "400": {
+            "description": "Produto já avaliado por este usuário"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        },
+        "tags": [
+          "reviews"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/reviews/product/{productId}": {
+      "get": {
+        "operationId": "ReviewsController_findByProduct",
+        "summary": "Listar avaliações de um produto",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de avaliações retornada"
+          }
+        },
+        "tags": [
+          "reviews"
+        ]
+      }
+    },
+    "/api/reviews/product/{productId}/summary": {
+      "get": {
+        "operationId": "ReviewsController_getReviewSummary",
+        "summary": "Obter resumo das avaliações de um produto",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resumo das avaliações retornado"
+          }
+        },
+        "tags": [
+          "reviews"
+        ]
+      }
+    },
+    "/api/reviews/{id}": {
+      "patch": {
+        "operationId": "ReviewsController_update",
+        "summary": "Atualizar própria avaliação",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Avaliação atualizada com sucesso"
+          },
+          "403": {
+            "description": "Sem permissão para editar"
+          },
+          "404": {
+            "description": "Avaliação não encontrada"
+          }
+        },
+        "tags": [
+          "reviews"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "ReviewsController_remove",
+        "summary": "Excluir avaliação (própria ou admin)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Avaliação removida com sucesso"
+          },
+          "403": {
+            "description": "Sem permissão para excluir"
+          },
+          "404": {
+            "description": "Avaliação não encontrada"
+          }
+        },
+        "tags": [
+          "reviews"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/reviews/{id}/approve": {
+      "patch": {
+        "operationId": "ReviewsController_approve",
+        "summary": "Aprovar avaliação (admin)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Avaliação aprovada com sucesso"
+          },
+          "404": {
+            "description": "Avaliação não encontrada"
+          }
+        },
+        "tags": [
+          "reviews"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/coupons/validate": {
+      "post": {
+        "operationId": "CouponsController_validate",
+        "summary": "Validar código de cupom",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateCouponDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cupom validado com sucesso"
+          },
+          "400": {
+            "description": "Cupom inválido ou expirado"
+          },
+          "404": {
+            "description": "Cupom não encontrado"
+          }
+        },
+        "tags": [
+          "coupons"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/coupons": {
+      "get": {
+        "operationId": "CouponsController_findAll",
+        "summary": "Listar todos os cupons (admin)",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de cupons retornada"
+          }
+        },
+        "tags": [
+          "coupons"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "CouponsController_create",
+        "summary": "Criar novo cupom (admin)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCouponDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cupom criado com sucesso"
+          },
+          "400": {
+            "description": "Código já existe"
+          }
+        },
+        "tags": [
+          "coupons"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/coupons/{id}": {
+      "patch": {
+        "operationId": "CouponsController_update",
+        "summary": "Atualizar cupom (admin)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCouponDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cupom atualizado com sucesso"
+          },
+          "404": {
+            "description": "Cupom não encontrado"
+          }
+        },
+        "tags": [
+          "coupons"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "CouponsController_remove",
+        "summary": "Excluir cupom (admin)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cupom removido com sucesso"
+          },
+          "404": {
+            "description": "Cupom não encontrado"
+          }
+        },
+        "tags": [
+          "coupons"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/loyalty/points": {
+      "get": {
+        "operationId": "LoyaltyController_getAccount",
+        "summary": "Obter conta de fidelidade do usuário",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Conta retornada com sucesso"
+          }
+        },
+        "tags": [
+          "loyalty"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/loyalty/history": {
+      "get": {
+        "operationId": "LoyaltyController_getTransactions",
+        "summary": "Obter histórico de transações de pontos",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Histórico retornado com sucesso"
+          }
+        },
+        "tags": [
+          "loyalty"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/loyalty/redeem": {
+      "post": {
+        "operationId": "LoyaltyController_redeemPoints",
+        "summary": "Resgatar recompensa com pontos",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RedeemRewardDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recompensa resgatada com sucesso"
+          },
+          "400": {
+            "description": "Pontos insuficientes"
+          },
+          "404": {
+            "description": "Recompensa não encontrada"
+          }
+        },
+        "tags": [
+          "loyalty"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/loyalty/rewards": {
+      "get": {
+        "operationId": "LoyaltyController_getRewards",
+        "summary": "Listar recompensas disponíveis",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de recompensas retornada"
+          }
+        },
+        "tags": [
+          "loyalty"
+        ]
+      }
+    },
+    "/api/notifications": {
+      "get": {
+        "operationId": "NotificationsController_findAll",
+        "summary": "Listar notificações do usuário",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "isRead",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de notificações retornada"
+          }
+        },
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/notifications/unread-count": {
+      "get": {
+        "operationId": "NotificationsController_getUnreadCount",
+        "summary": "Obter contagem de notificações não lidas",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Contagem retornada com sucesso"
+          }
+        },
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationsController_markAsRead",
+        "summary": "Marcar notificação como lida",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notificação marcada como lida"
+          },
+          "404": {
+            "description": "Notificação não encontrada"
+          }
+        },
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/notifications/read-all": {
+      "patch": {
+        "operationId": "NotificationsController_markAllAsRead",
+        "summary": "Marcar todas as notificações como lidas",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Todas marcadas como lidas"
+          }
+        },
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/notifications/preferences": {
+      "get": {
+        "operationId": "NotificationsController_getPreferences",
+        "summary": "Obter preferências de notificação",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Preferências retornadas"
+          }
+        },
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "NotificationsController_updatePreferences",
+        "summary": "Atualizar preferências de notificação",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePreferencesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preferências atualizadas"
+          }
+        },
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/analytics/dashboard": {
+      "get": {
+        "operationId": "AnalyticsController_getAdminDashboard",
+        "summary": "Obter dashboard geral (admin/gerente)",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Dashboard retornado com sucesso"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/analytics/sales": {
+      "get": {
+        "operationId": "AnalyticsController_getSalesDashboard",
+        "summary": "Obter dados de vendas por período",
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados de vendas retornados"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/analytics/products": {
+      "get": {
+        "operationId": "AnalyticsController_getTopProducts",
+        "summary": "Obter produtos mais vendidos",
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produtos mais vendidos retornados"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/analytics/customers": {
+      "get": {
+        "operationId": "AnalyticsController_getCustomerAnalytics",
+        "summary": "Obter análise de clientes",
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Análise de clientes retornada"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/analytics/revenue": {
+      "get": {
+        "operationId": "AnalyticsController_getRevenueByDay",
+        "summary": "Obter receita diária (dados para gráfico)",
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados de receita retornados"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/analytics/sellers": {
+      "get": {
+        "operationId": "AnalyticsController_getSellerPerformance",
+        "summary": "Obter desempenho dos vendedores",
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Desempenho dos vendedores retornado"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/wishlist": {
+      "get": {
+        "operationId": "WishlistController_getWishlist",
+        "summary": "Obter lista de desejos do usuário",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de desejos retornada"
+          }
+        },
+        "tags": [
+          "wishlist"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/wishlist/{productId}": {
+      "post": {
+        "operationId": "WishlistController_addItem",
+        "summary": "Adicionar/remover produto da lista de desejos (toggle)",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto adicionado/removido com sucesso"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        },
+        "tags": [
+          "wishlist"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "WishlistController_removeItem",
+        "summary": "Remover produto da lista de desejos",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto removido com sucesso"
+          },
+          "404": {
+            "description": "Produto não encontrado na lista"
+          }
+        },
+        "tags": [
+          "wishlist"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/wishlist/{productId}/check": {
+      "get": {
+        "operationId": "WishlistController_isInWishlist",
+        "summary": "Verificar se produto está na lista de desejos",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status retornado"
+          }
+        },
+        "tags": [
+          "wishlist"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/suppliers": {
+      "get": {
+        "operationId": "SuppliersController_findAll",
+        "summary": "Listar fornecedores",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de fornecedores retornada"
+          }
+        },
+        "tags": [
+          "suppliers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "SuppliersController_create",
+        "summary": "Criar fornecedor",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSupplierDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Fornecedor criado com sucesso"
+          },
+          "400": {
+            "description": "CNPJ já cadastrado"
+          }
+        },
+        "tags": [
+          "suppliers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/suppliers/purchase-orders": {
+      "get": {
+        "operationId": "SuppliersController_getPurchaseOrders",
+        "summary": "Listar pedidos de compra",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "DRAFT",
+                "SENT",
+                "CONFIRMED",
+                "RECEIVED",
+                "CANCELLED"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de pedidos de compra"
+          }
+        },
+        "tags": [
+          "suppliers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "SuppliersController_createPurchaseOrder",
+        "summary": "Criar pedido de compra",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePurchaseOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pedido de compra criado com sucesso"
+          },
+          "404": {
+            "description": "Fornecedor não encontrado"
+          }
+        },
+        "tags": [
+          "suppliers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/suppliers/{id}": {
+      "get": {
+        "operationId": "SuppliersController_findOne",
+        "summary": "Obter fornecedor por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fornecedor retornado"
+          },
+          "404": {
+            "description": "Fornecedor não encontrado"
+          }
+        },
+        "tags": [
+          "suppliers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "SuppliersController_update",
+        "summary": "Atualizar fornecedor",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSupplierDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Fornecedor atualizado com sucesso"
+          },
+          "404": {
+            "description": "Fornecedor não encontrado"
+          }
+        },
+        "tags": [
+          "suppliers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "SuppliersController_remove",
+        "summary": "Desativar fornecedor",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fornecedor desativado com sucesso"
+          },
+          "404": {
+            "description": "Fornecedor não encontrado"
+          }
+        },
+        "tags": [
+          "suppliers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/suppliers/purchase-orders/{id}/receive": {
+      "patch": {
+        "operationId": "SuppliersController_receivePurchaseOrder",
+        "summary": "Receber pedido de compra e atualizar estoque",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pedido recebido com sucesso"
+          },
+          "400": {
+            "description": "Pedido já recebido"
+          },
+          "404": {
+            "description": "Pedido de compra não encontrado"
+          }
+        },
+        "tags": [
+          "suppliers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/uploads/image": {
+      "post": {
+        "operationId": "UploadsController_uploadImage",
+        "summary": "Upload de imagem de produto",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "uploads"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/uploads/files/{folder}/{filename}": {
+      "get": {
+        "operationId": "UploadsController_serveFile",
+        "summary": "Servir arquivo de imagem",
+        "parameters": [
+          {
+            "name": "folder",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "uploads"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Supermercado API",
+    "description": "API completa para plataforma de supermercado - Venâncio Aires, RS",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Autenticação"
+    },
+    {
+      "name": "users",
+      "description": "Gestão de usuários"
+    },
+    {
+      "name": "products",
+      "description": "Gestão de produtos"
+    },
+    {
+      "name": "categories",
+      "description": "Categorias de produtos"
+    },
+    {
+      "name": "cart",
+      "description": "Carrinho de compras"
+    },
+    {
+      "name": "orders",
+      "description": "Gestão de pedidos"
+    },
+    {
+      "name": "payments",
+      "description": "Pagamentos"
+    },
+    {
+      "name": "inventory",
+      "description": "Controle de estoque"
+    },
+    {
+      "name": "delivery",
+      "description": "Entregas"
+    },
+    {
+      "name": "seller",
+      "description": "POS Móvel / Vendedor"
+    },
+    {
+      "name": "reviews",
+      "description": "Avaliações"
+    },
+    {
+      "name": "coupons",
+      "description": "Cupons de desconto"
+    },
+    {
+      "name": "loyalty",
+      "description": "Programa de fidelidade"
+    },
+    {
+      "name": "notifications",
+      "description": "Notificações"
+    },
+    {
+      "name": "analytics",
+      "description": "Analytics e relatórios"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "joao@email.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "Senha@123"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "João"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Silva"
+          },
+          "phone": {
+            "type": "string",
+            "example": "51999998888"
+          },
+          "cpf": {
+            "type": "string",
+            "example": "12345678901"
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "firstName",
+          "lastName"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "joao@email.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "Senha@123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "RefreshTokenDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateAddressDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "complement": {
+            "type": "string"
+          },
+          "neighborhood": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "zipCode": {
+            "type": "string"
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          },
+          "isDefault": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "label",
+          "street",
+          "number",
+          "neighborhood",
+          "city",
+          "state",
+          "zipCode"
+        ]
+      },
+      "CreateProductDto": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string",
+            "example": "SKU-001"
+          },
+          "barcode": {
+            "type": "string",
+            "example": "7891234567890"
+          },
+          "name": {
+            "type": "string",
+            "example": "Arroz Integral Orgânico 1kg"
+          },
+          "description": {
+            "type": "string",
+            "example": "Arroz integral orgânico de alta qualidade"
+          },
+          "shortDescription": {
+            "type": "string",
+            "example": "Arroz integral orgânico"
+          },
+          "categoryId": {
+            "type": "string",
+            "example": "uuid-da-categoria"
+          },
+          "brandId": {
+            "type": "string",
+            "example": "uuid-da-marca"
+          },
+          "price": {
+            "type": "number",
+            "example": 12.9
+          },
+          "costPrice": {
+            "type": "number",
+            "example": 8.5
+          },
+          "compareAtPrice": {
+            "type": "number",
+            "example": 15.9
+          },
+          "stock": {
+            "type": "number",
+            "example": 100,
+            "default": 0
+          },
+          "minStock": {
+            "type": "number",
+            "example": 5,
+            "default": 5
+          },
+          "maxStock": {
+            "type": "number",
+            "example": 500
+          },
+          "unit": {
+            "type": "string",
+            "example": "kg",
+            "default": "un"
+          },
+          "weight": {
+            "type": "number",
+            "example": 1
+          },
+          "volume": {
+            "type": "number",
+            "example": 0.5
+          },
+          "mainImageUrl": {
+            "type": "string",
+            "example": "https://example.com/image.jpg"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "OUT_OF_STOCK",
+              "DISCONTINUED"
+            ],
+            "default": "ACTIVE"
+          },
+          "isFeatured": {
+            "type": "boolean",
+            "example": false,
+            "default": false
+          },
+          "isOrganic": {
+            "type": "boolean",
+            "example": false,
+            "default": false
+          },
+          "taxRate": {
+            "type": "number",
+            "example": 0,
+            "default": 0
+          },
+          "tags": {
+            "example": [
+              "orgânico",
+              "integral"
+            ],
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "aisleLocation": {
+            "type": "string",
+            "example": "Corredor 3"
+          },
+          "shelfPosition": {
+            "type": "string",
+            "example": "Prateleira B2"
+          }
+        },
+        "required": [
+          "sku",
+          "name",
+          "categoryId",
+          "price"
+        ]
+      },
+      "UpdateProductDto": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string",
+            "example": "SKU-001"
+          },
+          "barcode": {
+            "type": "string",
+            "example": "7891234567890"
+          },
+          "name": {
+            "type": "string",
+            "example": "Arroz Integral Orgânico 1kg"
+          },
+          "description": {
+            "type": "string",
+            "example": "Arroz integral orgânico de alta qualidade"
+          },
+          "shortDescription": {
+            "type": "string",
+            "example": "Arroz integral orgânico"
+          },
+          "categoryId": {
+            "type": "string",
+            "example": "uuid-da-categoria"
+          },
+          "brandId": {
+            "type": "string",
+            "example": "uuid-da-marca"
+          },
+          "price": {
+            "type": "number",
+            "example": 12.9
+          },
+          "costPrice": {
+            "type": "number",
+            "example": 8.5
+          },
+          "compareAtPrice": {
+            "type": "number",
+            "example": 15.9
+          },
+          "stock": {
+            "type": "number",
+            "example": 100,
+            "default": 0
+          },
+          "minStock": {
+            "type": "number",
+            "example": 5,
+            "default": 5
+          },
+          "maxStock": {
+            "type": "number",
+            "example": 500
+          },
+          "unit": {
+            "type": "string",
+            "example": "kg",
+            "default": "un"
+          },
+          "weight": {
+            "type": "number",
+            "example": 1
+          },
+          "volume": {
+            "type": "number",
+            "example": 0.5
+          },
+          "mainImageUrl": {
+            "type": "string",
+            "example": "https://example.com/image.jpg"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "OUT_OF_STOCK",
+              "DISCONTINUED"
+            ],
+            "default": "ACTIVE"
+          },
+          "isFeatured": {
+            "type": "boolean",
+            "example": false,
+            "default": false
+          },
+          "isOrganic": {
+            "type": "boolean",
+            "example": false,
+            "default": false
+          },
+          "taxRate": {
+            "type": "number",
+            "example": 0,
+            "default": 0
+          },
+          "tags": {
+            "example": [
+              "orgânico",
+              "integral"
+            ],
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "aisleLocation": {
+            "type": "string",
+            "example": "Corredor 3"
+          },
+          "shelfPosition": {
+            "type": "string",
+            "example": "Prateleira B2"
+          }
+        }
+      },
+      "CreateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Frutas e Verduras"
+          },
+          "description": {
+            "type": "string",
+            "example": "Frutas, verduras e legumes frescos"
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "https://example.com/image.jpg"
+          },
+          "parentId": {
+            "type": "string",
+            "example": "uuid-da-categoria-pai"
+          },
+          "position": {
+            "type": "number",
+            "example": 0,
+            "default": 0
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "default": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Frutas e Verduras"
+          },
+          "description": {
+            "type": "string",
+            "example": "Frutas, verduras e legumes frescos"
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "https://example.com/image.jpg"
+          },
+          "parentId": {
+            "type": "string",
+            "example": "uuid-da-categoria-pai"
+          },
+          "position": {
+            "type": "number",
+            "example": 0,
+            "default": 0
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "default": true
+          }
+        }
+      },
+      "AddToCartDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "example": "uuid-do-produto",
+            "description": "ID do produto"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 1,
+            "description": "Quantidade do produto",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "productId",
+          "quantity"
+        ]
+      },
+      "UpdateCartItemDto": {
+        "type": "object",
+        "properties": {
+          "quantity": {
+            "type": "number",
+            "example": 2,
+            "description": "Nova quantidade do item",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "quantity"
+        ]
+      },
+      "CreateOrderItemDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "example": "uuid-do-produto",
+            "description": "ID do produto"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 1,
+            "description": "Quantidade do produto",
+            "minimum": 1
+          },
+          "notes": {
+            "type": "string",
+            "description": "Observações sobre o item"
+          }
+        },
+        "required": [
+          "productId",
+          "quantity"
+        ]
+      },
+      "CreateOrderDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "Itens do pedido",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateOrderItemDto"
+            }
+          },
+          "fulfillmentType": {
+            "type": "string",
+            "enum": [
+              "DELIVERY",
+              "PICKUP"
+            ],
+            "example": "DELIVERY",
+            "description": "Tipo de entrega"
+          },
+          "deliveryAddressId": {
+            "type": "string",
+            "example": "uuid-do-endereco",
+            "description": "ID do endereço de entrega (obrigatório para DELIVERY)"
+          },
+          "couponCode": {
+            "type": "string",
+            "example": "CUPOM10",
+            "description": "Código do cupom de desconto"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Observações sobre o pedido"
+          }
+        },
+        "required": [
+          "items",
+          "fulfillmentType"
+        ]
+      },
+      "UpdateOrderStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "PROCESSING",
+              "READY_FOR_PICKUP",
+              "OUT_FOR_DELIVERY",
+              "DELIVERED",
+              "CANCELLED",
+              "REFUNDED"
+            ],
+            "example": "CONFIRMED",
+            "description": "Novo status do pedido"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Observações sobre a mudança de status"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "CreateMovementDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "example": "uuid-do-produto"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "IN",
+              "OUT",
+              "ADJUSTMENT",
+              "RETURN",
+              "DAMAGE",
+              "TRANSFER"
+            ],
+            "example": "IN"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 10
+          },
+          "reason": {
+            "type": "string",
+            "example": "Reposição de estoque semanal"
+          }
+        },
+        "required": [
+          "productId",
+          "type",
+          "quantity"
+        ]
+      },
+      "AdjustStockDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "example": "uuid-do-produto"
+          },
+          "quantity": {
+            "type": "number",
+            "example": -5,
+            "description": "Pode ser negativo para redução"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Correção após contagem física"
+          }
+        },
+        "required": [
+          "productId",
+          "quantity",
+          "reason"
+        ]
+      },
+      "SaleItemDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "ID do produto"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade",
+            "minimum": 1
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Preço unitário"
+          },
+          "discount": {
+            "type": "number",
+            "description": "Desconto do item"
+          }
+        },
+        "required": [
+          "productId",
+          "quantity",
+          "unitPrice"
+        ]
+      },
+      "CreateSaleDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "Itens da venda",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SaleItemDto"
+            }
+          },
+          "customerId": {
+            "type": "string",
+            "description": "ID do cliente"
+          },
+          "discount": {
+            "type": "number",
+            "description": "Desconto geral da venda"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "description": "Método de pagamento",
+            "enum": [
+              "CASH",
+              "CREDIT_CARD",
+              "DEBIT_CARD",
+              "PIX",
+              "TRANSFER"
+            ]
+          },
+          "paidAmount": {
+            "type": "number",
+            "description": "Valor pago (para cálculo de troco)"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Observações da venda"
+          }
+        },
+        "required": [
+          "items",
+          "paymentMethod"
+        ]
+      },
+      "ScanItemDto": {
+        "type": "object",
+        "properties": {
+          "barcode": {
+            "type": "string",
+            "description": "Código de barras do produto"
+          }
+        },
+        "required": [
+          "barcode"
+        ]
+      },
+      "QuickCreateCustomerDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nome do cliente"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Telefone do cliente"
+          },
+          "email": {
+            "type": "string",
+            "description": "E-mail do cliente"
+          }
+        },
+        "required": [
+          "name",
+          "phone"
+        ]
+      },
+      "AssignDeliveryDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "ID do pedido",
+            "example": "uuid"
+          },
+          "deliveryPersonId": {
+            "type": "string",
+            "description": "ID do entregador",
+            "example": "uuid"
+          }
+        },
+        "required": [
+          "orderId",
+          "deliveryPersonId"
+        ]
+      },
+      "UpdateLocationDto": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "description": "Latitude",
+            "example": -23.5505
+          },
+          "longitude": {
+            "type": "number",
+            "description": "Longitude",
+            "example": -46.6333
+          }
+        },
+        "required": [
+          "latitude",
+          "longitude"
+        ]
+      },
+      "UpdateDeliveryStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Status da entrega",
+            "enum": [
+              "PENDING",
+              "ASSIGNED",
+              "PICKED_UP",
+              "IN_TRANSIT",
+              "DELIVERED",
+              "FAILED",
+              "RETURNED"
+            ],
+            "example": "IN_TRANSIT"
+          },
+          "failureReason": {
+            "type": "string",
+            "description": "Motivo da falha (se aplicável)"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "RateDeliveryDto": {
+        "type": "object",
+        "properties": {
+          "rating": {
+            "type": "number",
+            "description": "Avaliação de 1 a 5",
+            "example": 5
+          },
+          "comment": {
+            "type": "string",
+            "description": "Comentário sobre a entrega"
+          }
+        },
+        "required": [
+          "rating"
+        ]
+      },
+      "CreateReviewDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "ID do produto",
+            "example": "uuid"
+          },
+          "rating": {
+            "type": "number",
+            "description": "Avaliação de 1 a 5",
+            "example": 5
+          },
+          "title": {
+            "type": "string",
+            "description": "Título da avaliação"
+          },
+          "comment": {
+            "type": "string",
+            "description": "Comentário da avaliação"
+          },
+          "images": {
+            "description": "URLs das imagens",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "productId",
+          "rating"
+        ]
+      },
+      "ValidateCouponDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Código do cupom",
+            "example": "DESCONTO10"
+          },
+          "orderTotal": {
+            "type": "number",
+            "description": "Total do pedido",
+            "example": 150
+          }
+        },
+        "required": [
+          "code",
+          "orderTotal"
+        ]
+      },
+      "CreateCouponDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Código do cupom",
+            "example": "DESCONTO10"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descrição do cupom"
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo do cupom",
+            "enum": [
+              "PERCENTAGE",
+              "FIXED_AMOUNT",
+              "FREE_SHIPPING"
+            ]
+          },
+          "value": {
+            "type": "number",
+            "description": "Valor do desconto",
+            "example": 10
+          },
+          "minOrderValue": {
+            "type": "number",
+            "description": "Valor mínimo do pedido"
+          },
+          "maxDiscountValue": {
+            "type": "number",
+            "description": "Valor máximo de desconto"
+          },
+          "maxUses": {
+            "type": "number",
+            "description": "Número máximo de usos"
+          },
+          "startsAt": {
+            "type": "string",
+            "description": "Data de início do cupom"
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "Data de expiração do cupom"
+          }
+        },
+        "required": [
+          "code",
+          "type",
+          "value"
+        ]
+      },
+      "RedeemRewardDto": {
+        "type": "object",
+        "properties": {
+          "rewardId": {
+            "type": "string",
+            "description": "ID da recompensa",
+            "example": "uuid"
+          }
+        },
+        "required": [
+          "rewardId"
+        ]
+      },
+      "UpdatePreferencesDto": {
+        "type": "object",
+        "properties": {
+          "orderUpdates": {
+            "type": "boolean",
+            "description": "Receber atualizações de pedidos"
+          },
+          "promotions": {
+            "type": "boolean",
+            "description": "Receber promoções"
+          },
+          "deliveryUpdates": {
+            "type": "boolean",
+            "description": "Receber atualizações de entrega"
+          },
+          "loyaltyUpdates": {
+            "type": "boolean",
+            "description": "Receber atualizações de fidelidade"
+          },
+          "pushEnabled": {
+            "type": "boolean",
+            "description": "Habilitar notificações push"
+          },
+          "emailEnabled": {
+            "type": "boolean",
+            "description": "Habilitar notificações por e-mail"
+          },
+          "smsEnabled": {
+            "type": "boolean",
+            "description": "Habilitar notificações por SMS"
+          }
+        }
+      },
+      "CreateSupplierDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nome do fornecedor",
+            "example": "Distribuidora ABC"
+          },
+          "contactName": {
+            "type": "string",
+            "description": "Nome do contato"
+          },
+          "email": {
+            "type": "string",
+            "description": "E-mail do fornecedor"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Telefone do fornecedor"
+          },
+          "address": {
+            "type": "string",
+            "description": "Endereço do fornecedor"
+          },
+          "cnpj": {
+            "type": "string",
+            "description": "CNPJ do fornecedor"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Observações"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "PurchaseOrderItemDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "ID do produto"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantidade",
+            "example": 100
+          },
+          "unitCost": {
+            "type": "number",
+            "description": "Custo unitário",
+            "example": 5.5
+          }
+        },
+        "required": [
+          "productId",
+          "quantity",
+          "unitCost"
+        ]
+      },
+      "CreatePurchaseOrderDto": {
+        "type": "object",
+        "properties": {
+          "supplierId": {
+            "type": "string",
+            "description": "ID do fornecedor"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Observações"
+          },
+          "expectedDeliveryDate": {
+            "type": "string",
+            "description": "Data prevista de entrega"
+          },
+          "items": {
+            "description": "Itens do pedido de compra",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurchaseOrderItemDto"
+            }
+          }
+        },
+        "required": [
+          "supplierId",
+          "items"
+        ]
+      }
+    }
+  }
+}

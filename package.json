@@ -1,0 +1,37 @@
+{
+  "name": "supermercado-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plataforma completa de supermercado online - Venâncio Aires, RS, Brasil",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "type-check": "turbo run type-check",
+    "backend:dev": "turbo run dev --filter=backend",
+    "backend:build": "turbo run build --filter=backend",
+    "backend:test": "turbo run test --filter=backend",
+    "web:dev": "turbo run dev --filter=web-client",
+    "web:build": "turbo run build --filter=web-client",
+    "admin:dev": "turbo run dev --filter=web-admin",
+    "admin:build": "turbo run build --filter=web-admin",
+    "prisma:generate": "cd apps/backend && pnpm prisma generate",
+    "prisma:migrate": "cd apps/backend && pnpm prisma migrate dev",
+    "prisma:studio": "cd apps/backend && pnpm prisma studio",
+    "prisma:seed": "cd apps/backend && pnpm prisma db seed"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "turbo": "^2.3.0",
+    "typescript": "^5.3.3",
+    "prettier": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

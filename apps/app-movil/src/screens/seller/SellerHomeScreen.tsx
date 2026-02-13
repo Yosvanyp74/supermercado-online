@@ -17,7 +17,9 @@ import {
   Package,
   TrendingUp,
   DollarSign,
+  ArrowLeftCircle,
 } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
 import { SellerStackParamList } from '@/navigation/types';
 import { Loading } from '@/components';
 import { sellerApi } from '@/api';
@@ -27,8 +29,13 @@ import { colors, shadow } from '@/theme';
 type Props = NativeStackScreenProps<SellerStackParamList, 'SellerHome'>;
 
 export function SellerHomeScreen({ navigation }: Props) {
+  const rootNavigation = useNavigation<any>();
   const { user } = useAuthStore();
   const { activeItems } = useSellerStore();
+
+  const handleExitSellerMode = () => {
+    rootNavigation.navigate('Main');
+  };
   const [stats, setStats] = useState<any>(null);
   const [pendingOrders, setPendingOrders] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -142,6 +149,16 @@ export function SellerHomeScreen({ navigation }: Props) {
         </View>
       </View>
 
+      {/* Exit seller mode */}
+      <TouchableOpacity
+        style={styles.exitButton}
+        onPress={handleExitSellerMode}
+        activeOpacity={0.7}
+      >
+        <ArrowLeftCircle size={20} color={colors.primary[600]} />
+        <Text style={styles.exitButtonText}>Voltar ao modo cliente</Text>
+      </TouchableOpacity>
+
       {/* Menu Grid */}
       <View style={styles.menuGrid}>
         {menuItems.map((item, index) => (
@@ -248,5 +265,24 @@ const styles = StyleSheet.create({
     color: colors.gray[400],
     marginTop: 2,
     textAlign: 'center',
+  },
+  exitButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 16,
+    marginBottom: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: colors.primary[50],
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.primary[200],
+    gap: 8,
+  },
+  exitButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.primary[600],
   },
 });

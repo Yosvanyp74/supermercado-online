@@ -16,6 +16,15 @@ import { AdminInventoryScreen } from '@/screens/admin/AdminInventoryScreen';
 import { AdminInventoryAdjustScreen } from '@/screens/admin/AdminInventoryAdjustScreen';
 import { AdminCouponsScreen } from '@/screens/admin/AdminCouponsScreen';
 import { AdminCouponFormScreen } from '@/screens/admin/AdminCouponFormScreen';
+import { AdminAnalyticsScreen } from '@/screens/admin/AdminAnalyticsScreen';
+import { AdminDeliveriesScreen } from '@/screens/admin/AdminDeliveriesScreen';
+import { AdminDeliveryDetailScreen } from '@/screens/admin/AdminDeliveryDetailScreen';
+import { AdminSuppliersScreen } from '@/screens/admin/AdminSuppliersScreen';
+import { AdminSupplierFormScreen } from '@/screens/admin/AdminSupplierFormScreen';
+import { AdminPurchaseOrdersScreen } from '@/screens/admin/AdminPurchaseOrdersScreen';
+import { AdminReviewsScreen } from '@/screens/admin/AdminReviewsScreen';
+import { AdminNotificationsScreen } from '@/screens/admin/AdminNotificationsScreen';
+import { AdminSettingsScreen } from '@/screens/admin/AdminSettingsScreen';
 
 const Stack = createNativeStackNavigator<AdminStackParamList>();
 
@@ -99,6 +108,53 @@ export function AdminNavigator() {
         options={({ route }) => ({
           title: route.params?.couponId ? 'Editar Cupom' : 'Novo Cupom',
         })}
+      />
+      <Stack.Screen
+        name="AdminAnalytics"
+        component={AdminAnalyticsScreen}
+        options={{ title: 'Analytics' }}
+      />
+      <Stack.Screen
+        name="AdminDeliveries"
+        component={AdminDeliveriesScreen}
+        options={{ title: 'Entregas' }}
+      />
+      <Stack.Screen
+        name="AdminDeliveryDetail"
+        component={AdminDeliveryDetailScreen}
+        options={{ title: 'Detalhes da Entrega' }}
+      />
+      <Stack.Screen
+        name="AdminSuppliers"
+        component={AdminSuppliersScreen}
+        options={{ title: 'Fornecedores' }}
+      />
+      <Stack.Screen
+        name="AdminSupplierForm"
+        component={AdminSupplierFormScreen}
+        options={({ route }) => ({
+          title: route.params?.supplierId ? 'Editar Fornecedor' : 'Novo Fornecedor',
+        })}
+      />
+      <Stack.Screen
+        name="AdminPurchaseOrders"
+        component={AdminPurchaseOrdersScreen}
+        options={{ title: 'Ordens de Compra' }}
+      />
+      <Stack.Screen
+        name="AdminReviews"
+        component={AdminReviewsScreen}
+        options={{ title: 'Avaliações' }}
+      />
+      <Stack.Screen
+        name="AdminNotifications"
+        component={AdminNotificationsScreen}
+        options={{ title: 'Notificações' }}
+      />
+      <Stack.Screen
+        name="AdminSettings"
+        component={AdminSettingsScreen}
+        options={{ title: 'Configurações' }}
       />
     </Stack.Navigator>
   );

@@ -384,4 +384,56 @@ export const adminApi = {
     apiClient.post('/uploads/image', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
+
+  // Analytics (extended)
+  getSellerPerformance: (params?: { startDate?: string; endDate?: string }) =>
+    apiClient.get('/analytics/sellers', { params }),
+
+  // Delivery management
+  getDeliveries: () => apiClient.get('/delivery/active'),
+  assignDelivery: (data: { orderId: string; deliveryPersonId: string }) =>
+    apiClient.post('/delivery/assign', data),
+  getDeliveryByOrder: (orderId: string) =>
+    apiClient.get(`/delivery/order/${orderId}`),
+  updateDeliveryStatus: (id: string, data: { status: string }) =>
+    apiClient.patch(`/delivery/${id}/status`, data),
+
+  // Suppliers
+  getSuppliers: (params?: { page?: number; limit?: number; search?: string }) =>
+    apiClient.get('/suppliers', { params }),
+  getSupplier: (id: string) => apiClient.get(`/suppliers/${id}`),
+  createSupplier: (data: Record<string, unknown>) =>
+    apiClient.post('/suppliers', data),
+  updateSupplier: (id: string, data: Record<string, unknown>) =>
+    apiClient.patch(`/suppliers/${id}`, data),
+  deleteSupplier: (id: string) =>
+    apiClient.delete(`/suppliers/${id}`),
+  getPurchaseOrders: (params?: { page?: number; limit?: number; status?: string }) =>
+    apiClient.get('/suppliers/purchase-orders', { params }),
+  createPurchaseOrder: (data: Record<string, unknown>) =>
+    apiClient.post('/suppliers/purchase-orders', data),
+  receivePurchaseOrder: (id: string) =>
+    apiClient.patch(`/suppliers/purchase-orders/${id}/receive`),
+
+  // Reviews (admin moderation)
+  getReviews: (productId: string, params?: { page?: number; limit?: number }) =>
+    apiClient.get(`/reviews/product/${productId}`, { params }),
+  approveReview: (id: string) =>
+    apiClient.patch(`/reviews/${id}/approve`),
+  deleteReview: (id: string) =>
+    apiClient.delete(`/reviews/${id}`),
+
+  // Notifications (admin)
+  getNotifications: (params?: { page?: number; limit?: number; isRead?: boolean }) =>
+    apiClient.get('/notifications', { params }),
+  getUnreadCount: () =>
+    apiClient.get('/notifications/unread-count'),
+  markNotificationRead: (id: string) =>
+    apiClient.patch(`/notifications/${id}/read`),
+  markAllNotificationsRead: () =>
+    apiClient.patch('/notifications/read-all'),
+  getNotificationPreferences: () =>
+    apiClient.get('/notifications/preferences'),
+  updateNotificationPreferences: (data: Record<string, unknown>) =>
+    apiClient.patch('/notifications/preferences', data),
 };

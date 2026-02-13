@@ -99,4 +99,13 @@ export type AdminStackParamList = {
   AdminInventoryAdjust: { productId: string; productName: string; currentStock: number };
   AdminCoupons: undefined;
   AdminCouponForm: { couponId?: string };
+  AdminAnalytics: undefined;
+  AdminDeliveries: undefined;
+  AdminDeliveryDetail: { orderId: string };
+  AdminSuppliers: undefined;
+  AdminSupplierForm: { supplierId?: string };
+  AdminPurchaseOrders: undefined;
+  AdminReviews: undefined;
+  AdminNotifications: undefined;
+  AdminSettings: undefined;
 };

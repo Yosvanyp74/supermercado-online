@@ -21,6 +21,11 @@ import {
   DollarSign,
   AlertTriangle,
   ArrowLeftCircle,
+  Truck,
+  Building2,
+  Star,
+  Bell,
+  Settings,
 } from 'lucide-react-native';
 import { AdminStackParamList } from '@/navigation/types';
 import { Loading } from '@/components';
@@ -32,13 +37,20 @@ type Props = NativeStackScreenProps<AdminStackParamList, 'AdminHome'>;
 export function AdminHomeScreen({ navigation }: Props) {
   const rootNavigation = useNavigation<any>();
   const [stats, setStats] = useState<any>(null);
+  const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadData = async () => {
     try {
-      const { data } = await adminApi.getDashboard();
-      setStats(data);
+      const [dashRes, notifRes] = await Promise.allSettled([
+        adminApi.getDashboard(),
+        adminApi.getUnreadCount(),
+      ]);
+      if (dashRes.status === 'fulfilled') setStats(dashRes.value.data);
+      if (notifRes.status === 'fulfilled') {
+        setUnreadNotifs(notifRes.value.data?.count || notifRes.value.data || 0);
+      }
     } catch {
       // Ignore
     } finally {
@@ -106,6 +118,55 @@ export function AdminHomeScreen({ navigation }: Props) {
       color: '#8b5cf6',
       bg: '#ede9fe',
       onPress: () => navigation.navigate('AdminCoupons'),
+    },
+    {
+      icon: BarChart3,
+      label: 'Analytics',
+      subtitle: 'Relatórios detalhados',
+      color: '#06b6d4',
+      bg: '#cffafe',
+      onPress: () => navigation.navigate('AdminAnalytics'),
+    },
+    {
+      icon: Truck,
+      label: 'Entregas',
+      subtitle: 'Gerenciar entregas',
+      color: '#0284c7',
+      bg: '#e0f2fe',
+      onPress: () => navigation.navigate('AdminDeliveries'),
+    },
+    {
+      icon: Building2,
+      label: 'Fornecedores',
+      subtitle: 'Gestão de fornecedores',
+      color: '#7c3aed',
+      bg: '#ede9fe',
+      onPress: () => navigation.navigate('AdminSuppliers'),
+    },
+    {
+      icon: Star,
+      label: 'Avaliações',
+      subtitle: 'Moderar avaliações',
+      color: '#eab308',
+      bg: '#fef9c3',
+      onPress: () => navigation.navigate('AdminReviews'),
+    },
+    {
+      icon: Bell,
+      label: 'Notificações',
+      subtitle: `${unreadNotifs} não lidas`,
+      color: '#f97316',
+      bg: '#ffedd5',
+      onPress: () => navigation.navigate('AdminNotifications'),
+      badge: unreadNotifs > 0 ? unreadNotifs : undefined,
+    },
+    {
+      icon: Settings,
+      label: 'Configurações',
+      subtitle: 'Preferências',
+      color: '#64748b',
+      bg: '#f1f5f9',
+      onPress: () => navigation.navigate('AdminSettings'),
     },
   ];
 

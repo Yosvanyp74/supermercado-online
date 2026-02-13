@@ -74,7 +74,7 @@ export function SearchScreen({ navigation }: Props) {
                 name={item.name}
                 price={item.price}
                 originalPrice={item.originalPrice}
-                image={item.images?.[0]?.url || item.images?.[0]}
+                image={item.images?.[0]?.url || item.mainImageUrl}
                 category={item.category?.name}
                 inStock={item.stock > 0}
                 onPress={() =>
@@ -86,7 +86,7 @@ export function SearchScreen({ navigation }: Props) {
                     name: item.name,
                     price: item.price,
                     quantity: 1,
-                    image: item.images?.[0]?.url || item.images?.[0],
+                    image: item.images?.[0]?.url || item.mainImageUrl,
                   });
                   Toast.show({ type: 'success', text1: 'Adicionado ao carrinho!' });
                 }}

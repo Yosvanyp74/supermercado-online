@@ -37,7 +37,7 @@ export function ProductScannerScreen({ navigation }: Props) {
         name: product.name,
         price: product.price,
         barcode: data,
-        image: product.images?.[0],
+        image: product.images?.[0]?.url || product.mainImageUrl,
       });
       Toast.show({ type: 'success', text1: `${product.name} adicionado` });
       setTimeout(() => setScanned(false), 1500);
@@ -56,7 +56,7 @@ export function ProductScannerScreen({ navigation }: Props) {
         name: product.name,
         price: product.price,
         barcode: barcode.trim(),
-        image: product.images?.[0],
+        image: product.images?.[0]?.url || product.mainImageUrl,
       });
       Toast.show({ type: 'success', text1: `${product.name} adicionado` });
       setBarcode('');

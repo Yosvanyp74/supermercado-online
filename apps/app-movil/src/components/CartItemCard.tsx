@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Minus, Plus, Trash2 } from 'lucide-react-native';
+import { getImageUrl } from '@/config';
 import { colors } from '@/theme';
 
 interface CartItemProps {
@@ -23,8 +24,9 @@ export function CartItemCard({
   onUpdateQuantity,
   onRemove,
 }: CartItemProps) {
-  const imageSource = image
-    ? { uri: image.startsWith('http') ? image : `http://localhost:3000${image}` }
+  const imgUri = getImageUrl(image);
+  const imageSource = imgUri
+    ? { uri: imgUri }
     : require('@/assets/placeholder.png');
 
   return (

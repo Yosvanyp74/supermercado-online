@@ -62,7 +62,7 @@ export function OrderPickingScreen({ navigation, route }: Props) {
         productId: item.productId,
         name: item.product?.name || 'Produto',
         quantity: item.quantity,
-        image: item.product?.mainImageUrl,
+        image: item.product?.images?.[0]?.url || item.product?.mainImageUrl,
         barcode: item.product?.barcode,
         status: item.isPicked ? 'picked' : 'pending',
         notes: item.notes,

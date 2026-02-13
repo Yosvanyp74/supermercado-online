@@ -84,8 +84,8 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
       setSelectedCategoryId(data.categoryId || '');
       if (data.images?.[0]?.url) {
         setImageUri(getImageUrl(data.images[0].url));
-      } else if (data.imageUrl) {
-        setImageUri(getImageUrl(data.imageUrl));
+      } else if (data.mainImageUrl) {
+        setImageUri(getImageUrl(data.mainImageUrl));
       }
     } catch {
       Alert.alert('Erro', 'Não foi possível carregar o produto');
@@ -177,7 +177,7 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
       };
 
       if (uploadedImageUrl) {
-        productData.imageUrl = uploadedImageUrl;
+        productData.mainImageUrl = uploadedImageUrl;
       }
 
       if (isEdit) {

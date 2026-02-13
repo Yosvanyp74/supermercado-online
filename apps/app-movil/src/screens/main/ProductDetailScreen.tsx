@@ -59,7 +59,7 @@ export function ProductDetailScreen({ route, navigation }: Props) {
 
   const handleAddToCart = () => {
     if (!product) return;
-    const imgUrl = product.images?.[0]?.url || product.images?.[0];
+    const imgUrl = product.images?.[0]?.url || product.mainImageUrl;
     useCartStore.getState().addItem({
       productId: product.id,
       name: product.name,
@@ -88,7 +88,7 @@ export function ProductDetailScreen({ route, navigation }: Props) {
 
   const imageUrls: (string | null)[] = product.images?.length
     ? product.images.map((img: any) => (typeof img === 'object' ? img.url : img))
-    : [null];
+    : product.mainImageUrl ? [product.mainImageUrl] : [null];
   const discount = product.originalPrice
     ? Math.round(
         ((product.originalPrice - product.price) / product.originalPrice) * 100,

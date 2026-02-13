@@ -70,7 +70,7 @@ export function WishlistScreen({ navigation }: Props) {
               id={product.id}
               name={product.name}
               price={product.price}
-              image={product.images?.[0]?.url || product.images?.[0]}
+              image={product.images?.[0]?.url || product.mainImageUrl}
               onPress={() =>
                 (navigation as any).navigate('HomeTab', {
                   screen: 'ProductDetail',
@@ -83,7 +83,7 @@ export function WishlistScreen({ navigation }: Props) {
                   name: product.name,
                   price: product.price,
                   quantity: 1,
-                  image: product.images?.[0]?.url || product.images?.[0],
+                  image: product.images?.[0]?.url || product.mainImageUrl,
                 });
                 Toast.show({ type: 'success', text1: 'Adicionado!' });
               }}

@@ -132,7 +132,7 @@ export function AdminOrderDetailScreen({ navigation, route }: Props) {
       <View style={[styles.card, shadow.sm]}>
         <Text style={styles.sectionTitle}>Itens ({order.items?.length || 0})</Text>
         {order.items?.map((item: any) => {
-          const imgUri = getImageUrl(item.product?.images?.[0]?.url || item.product?.imageUrl);
+          const imgUri = getImageUrl(item.product?.images?.[0]?.url || item.product?.mainImageUrl);
           return (
             <View key={item.id} style={styles.itemRow}>
               {imgUri ? (

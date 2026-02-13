@@ -73,7 +73,7 @@ export function ProductListScreen({ route, navigation }: Props) {
   };
 
   const handleAddToCart = (product: any) => {
-    const imgUrl = product.images?.[0]?.url || product.images?.[0];
+    const imgUrl = product.images?.[0]?.url || product.mainImageUrl;
     useCartStore.getState().addItem({
       productId: product.id,
       name: product.name,
@@ -107,7 +107,7 @@ export function ProductListScreen({ route, navigation }: Props) {
             name={item.name}
             price={item.price}
             originalPrice={item.originalPrice}
-            image={item.images?.[0]?.url || item.images?.[0]}
+            image={item.images?.[0]?.url || item.mainImageUrl}
             category={item.category?.name}
             inStock={item.stock > 0}
             onPress={() =>

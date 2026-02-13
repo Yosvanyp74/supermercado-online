@@ -85,7 +85,7 @@ export function AdminProductsScreen({ navigation }: Props) {
   };
 
   const renderProduct = ({ item }: { item: any }) => {
-    const imgUri = getImageUrl(item.images?.[0]?.url || item.imageUrl);
+    const imgUri = getImageUrl(item.images?.[0]?.url || item.mainImageUrl);
     return (
       <TouchableOpacity
         style={[styles.productCard, shadow.sm]}

@@ -7,6 +7,7 @@ import {
   Image,
   Alert,
 } from 'react-native';
+import { getImageUrl } from '@/config';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
 import { OrdersStackParamList } from '@/navigation/types';
@@ -105,11 +106,7 @@ export function OrderDetailScreen({ route, navigation }: Props) {
             <Image
               source={
                 imgUrl
-                  ? {
-                      uri: imgUrl.startsWith('http')
-                        ? imgUrl
-                        : `http://172.20.10.3:3000${imgUrl}`,
-                    }
+                  ? { uri: getImageUrl(imgUrl)! }
                   : require('@/assets/placeholder.png')
               }
               style={styles.itemImage}

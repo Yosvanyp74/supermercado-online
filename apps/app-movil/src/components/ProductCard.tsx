@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Heart, ShoppingCart } from 'lucide-react-native';
+import { getImageUrl } from '@/config';
 import { colors, shadow } from '@/theme';
 
 interface ProductCardProps {
@@ -38,7 +39,7 @@ export function ProductCard({
 
   const imgUrl = typeof image === 'object' && image !== null ? (image as any).url : image;
   const imageSource = imgUrl
-    ? { uri: imgUrl.startsWith('http') ? imgUrl : `http://172.20.10.3:3000${imgUrl}` }
+    ? { uri: getImageUrl(imgUrl)! }
     : require('@/assets/placeholder.png');
 
   if (compact) {

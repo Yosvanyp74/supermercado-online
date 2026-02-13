@@ -8,6 +8,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
+import { getImageUrl } from '@/config';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   Heart,
@@ -121,11 +122,7 @@ export function ProductDetailScreen({ route, navigation }: Props) {
               key={index}
               source={
                 img
-                  ? {
-                      uri: img.startsWith('http')
-                        ? img
-                        : `http://172.20.10.3:3000${img}`,
-                    }
+                  ? { uri: getImageUrl(img)! }
                   : require('@/assets/placeholder.png')
               }
               style={styles.image}

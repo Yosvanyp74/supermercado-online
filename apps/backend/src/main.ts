@@ -23,8 +23,8 @@ async function bootstrap() {
     origin: [
       'http://localhost:3001',
       'http://localhost:3002',
-      'http://172.20.10.3:3000',
-      'http://172.20.10.3:8081',
+      process.env.DEV_MACHINE_URL || 'http://172.20.10.3:3000',
+      process.env.DEV_EXPO_URL || 'http://172.20.10.3:8081',
       process.env.FRONTEND_URL,
       process.env.ADMIN_URL,
     ].filter((v): v is string => Boolean(v)),

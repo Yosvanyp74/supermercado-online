@@ -23,6 +23,7 @@ import { SellerStackParamList } from '@/navigation/types';
 import { Button } from '@/components';
 import { useSellerStore } from '@/store';
 import { sellerApi } from '@/api';
+import { getImageUrl } from '@/config';
 import { colors, shadow } from '@/theme';
 
 type Props = NativeStackScreenProps<SellerStackParamList, 'ActiveSale'>;
@@ -69,9 +70,7 @@ export function ActiveSaleScreen({ navigation }: Props) {
   };
 
   const renderItem = ({ item }: { item: (typeof activeItems)[0] }) => {
-    const imageUri = item.image?.startsWith('http')
-      ? item.image
-      : `http://172.20.10.3:3000${item.image}`;
+    const imageUri = getImageUrl(item.image);
 
     return (
       <View style={styles.itemCard}>

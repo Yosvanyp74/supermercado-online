@@ -8,6 +8,7 @@ import {
   Image,
   Alert,
 } from 'react-native';
+import { getImageUrl } from '@/config';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import {
@@ -148,9 +149,7 @@ export function OrderPickingScreen({ navigation, route }: Props) {
   if (loading) return <Loading />;
 
   const renderItem = ({ item }: { item: PickingItem }) => {
-    const imageUri = item.image?.startsWith('http')
-      ? item.image
-      : `http://172.20.10.3:3000${item.image}`;
+    const imageUri = getImageUrl(item.image);
 
     return (
       <View

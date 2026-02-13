@@ -1,9 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import * as SecureStore from 'expo-secure-store';
-
-const API_BASE_URL = __DEV__
-  ? 'http://172.20.10.3:3000/api'
-  : 'https://api.supermercado.com/api';
+import { API_BASE_URL } from '@/config';
 
 export const TOKEN_KEY = 'auth_token';
 export const REFRESH_TOKEN_KEY = 'refresh_token';

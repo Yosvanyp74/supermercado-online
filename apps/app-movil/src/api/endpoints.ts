@@ -260,3 +260,128 @@ export const deliveryApi = {
   getByOrder: (orderId: string) =>
     apiClient.get(`/delivery/order/${orderId}`),
 };
+
+// ==================== ADMIN ====================
+export const adminApi = {
+  // Analytics / Dashboard
+  getDashboard: () => apiClient.get('/analytics/dashboard'),
+
+  getSalesAnalytics: (params?: { startDate?: string; endDate?: string }) =>
+    apiClient.get('/analytics/sales', { params }),
+
+  getTopProducts: (params?: { startDate?: string; endDate?: string; limit?: number }) =>
+    apiClient.get('/analytics/products', { params }),
+
+  getCustomerAnalytics: (params?: { startDate?: string; endDate?: string }) =>
+    apiClient.get('/analytics/customers', { params }),
+
+  getRevenueByDay: (params?: { startDate?: string; endDate?: string }) =>
+    apiClient.get('/analytics/revenue', { params }),
+
+  // Products (admin CRUD)
+  getProducts: (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    categoryId?: string;
+    status?: string;
+    sortBy?: string;
+    sortOrder?: string;
+  }) => apiClient.get('/products', { params }),
+
+  createProduct: (data: Record<string, unknown>) =>
+    apiClient.post('/products', data),
+
+  updateProduct: (id: string, data: Record<string, unknown>) =>
+    apiClient.patch(`/products/${id}`, data),
+
+  deleteProduct: (id: string) =>
+    apiClient.delete(`/products/${id}`),
+
+  // Categories (admin CRUD)
+  getCategories: () => apiClient.get('/categories'),
+
+  createCategory: (data: { name: string; description?: string; imageUrl?: string; parentId?: string }) =>
+    apiClient.post('/categories', data),
+
+  updateCategory: (id: string, data: { name?: string; description?: string; imageUrl?: string }) =>
+    apiClient.patch(`/categories/${id}`, data),
+
+  deleteCategory: (id: string) =>
+    apiClient.delete(`/categories/${id}`),
+
+  // Orders (admin management)
+  getOrders: (params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    type?: string;
+    startDate?: string;
+    endDate?: string;
+    sortBy?: string;
+    sortOrder?: string;
+  }) => apiClient.get('/orders', { params }),
+
+  getOrder: (id: string) => apiClient.get(`/orders/${id}`),
+
+  updateOrderStatus: (id: string, data: { status: string }) =>
+    apiClient.patch(`/orders/${id}/status`, data),
+
+  // Users (admin management)
+  getUsers: (params?: { page?: number; limit?: number; search?: string; role?: string }) =>
+    apiClient.get('/users', { params }),
+
+  getUser: (id: string) => apiClient.get(`/users/${id}`),
+
+  updateUser: (id: string, data: Record<string, unknown>) =>
+    apiClient.patch(`/users/${id}`, data),
+
+  deleteUser: (id: string) =>
+    apiClient.delete(`/users/${id}`),
+
+  // Inventory
+  getInventory: (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    categoryId?: string;
+    lowStock?: boolean;
+  }) => apiClient.get('/inventory', { params }),
+
+  getLowStock: () => apiClient.get('/inventory/low-stock'),
+
+  getStock: (productId: string) =>
+    apiClient.get(`/inventory/${productId}`),
+
+  adjustStock: (data: { productId: string; quantity: number; reason: string }) =>
+    apiClient.post('/inventory/adjust', data),
+
+  createMovement: (data: { productId: string; type: string; quantity: number; reason?: string }) =>
+    apiClient.post('/inventory/movements', data),
+
+  getMovements: (params?: {
+    page?: number;
+    limit?: number;
+    productId?: string;
+    type?: string;
+  }) => apiClient.get('/inventory/movements', { params }),
+
+  // Coupons
+  getCoupons: (params?: { page?: number; limit?: number }) =>
+    apiClient.get('/coupons', { params }),
+
+  createCoupon: (data: Record<string, unknown>) =>
+    apiClient.post('/coupons', data),
+
+  updateCoupon: (id: string, data: Record<string, unknown>) =>
+    apiClient.patch(`/coupons/${id}`, data),
+
+  deleteCoupon: (id: string) =>
+    apiClient.delete(`/coupons/${id}`),
+
+  // Uploads
+  uploadImage: (formData: FormData) =>
+    apiClient.post('/uploads/image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+};

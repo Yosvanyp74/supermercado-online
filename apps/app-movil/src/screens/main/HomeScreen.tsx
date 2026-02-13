@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Search, Bell, Store } from 'lucide-react-native';
+import { Search, Bell, Store, Shield } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 import { HomeStackParamList } from '@/navigation/types';
 import { ProductCard, Loading } from '@/components';
@@ -26,7 +26,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export function HomeScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const { user, isSeller } = useAuthStore();
+  const { user, isSeller, isAdmin } = useAuthStore();
   const [categories, setCategories] = useState<any[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,6 +88,14 @@ export function HomeScreen({ navigation }: Props) {
           <Text style={styles.headerSubtitle}>O que vai querer hoje?</Text>
         </View>
         <View style={styles.headerActions}>
+          {isAdmin && (
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={() => (navigation as any).navigate('Admin')}
+            >
+              <Shield size={22} color={colors.admin.primary} />
+            </TouchableOpacity>
+          )}
           {isSeller && (
             <TouchableOpacity
               style={styles.headerButton}

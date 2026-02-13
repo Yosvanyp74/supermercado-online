@@ -2,6 +2,7 @@ export type RootStackParamList = {
   Auth: undefined;
   Main: undefined;
   Seller: undefined;
+  Admin: undefined;
 };
 
 export type AuthStackParamList = {
@@ -82,4 +83,20 @@ export type SellerStackParamList = {
     quantity: number;
   };
   OrderCompletion: { pickingOrderId: string };
+};
+
+export type AdminStackParamList = {
+  AdminHome: undefined;
+  AdminProducts: undefined;
+  AdminProductForm: { productId?: string };
+  AdminCategories: undefined;
+  AdminCategoryForm: { categoryId?: string };
+  AdminOrders: undefined;
+  AdminOrderDetail: { orderId: string };
+  AdminUsers: undefined;
+  AdminUserDetail: { userId: string };
+  AdminInventory: undefined;
+  AdminInventoryAdjust: { productId: string; productName: string; currentStock: number };
+  AdminCoupons: undefined;
+  AdminCouponForm: { couponId?: string };
 };

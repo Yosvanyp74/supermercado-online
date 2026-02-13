@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Store,
   Package,
+  Shield,
 } from 'lucide-react-native';
 import { ProfileStackParamList } from '@/navigation/types';
 import { useAuthStore } from '@/store';
@@ -27,7 +28,7 @@ import { colors, shadow } from '@/theme';
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Profile'>;
 
 export function ProfileScreen({ navigation }: Props) {
-  const { user, logout, isSeller } = useAuthStore();
+  const { user, logout, isSeller, isAdmin } = useAuthStore();
 
   const handleLogout = () => {
     Alert.alert('Sair', 'Deseja sair da sua conta?', [
@@ -74,6 +75,14 @@ export function ProfileScreen({ navigation }: Props) {
       icon: Store,
       label: 'Modo Vendedor',
       onPress: () => (navigation as any).navigate('Seller'),
+    });
+  }
+
+  if (isAdmin) {
+    menuItems.push({
+      icon: Shield,
+      label: 'Modo Administrador',
+      onPress: () => (navigation as any).navigate('Admin'),
     });
   }
 

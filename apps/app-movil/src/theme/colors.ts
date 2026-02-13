@@ -58,6 +58,14 @@ export const colors = {
     accent: '#dbeafe',
   },
 
+  // Admin mode
+  admin: {
+    primary: '#7c3aed',
+    light: '#ede9fe',
+    background: '#f5f3ff',
+    accent: '#ddd6fe',
+  },
+
   // Picking mode
   picking: {
     pending: '#f59e0b',

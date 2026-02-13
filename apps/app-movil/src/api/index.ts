@@ -13,4 +13,5 @@ export {
   notificationsApi,
   sellerApi,
   deliveryApi,
+  adminApi,
 } from './endpoints';

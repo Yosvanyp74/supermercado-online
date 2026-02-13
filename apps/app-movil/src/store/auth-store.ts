@@ -18,6 +18,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   isSeller: boolean;
+  isAdmin: boolean;
 
   login: (email: string, password: string) => Promise<void>;
   register: (data: {
@@ -37,6 +38,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isAuthenticated: false,
   isLoading: true,
   isSeller: false,
+  isAdmin: false,
 
   login: async (email, password) => {
     const { data } = await authApi.login({ email, password });
@@ -46,6 +48,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       user: data.user,
       isAuthenticated: true,
       isSeller: data.user.role === 'SELLER' || data.user.role === 'ADMIN',
+      isAdmin: data.user.role === 'ADMIN',
     });
   },
 
@@ -68,7 +71,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
     await SecureStore.deleteItemAsync(TOKEN_KEY);
     await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
-    set({ user: null, isAuthenticated: false, isSeller: false });
+    set({ user: null, isAuthenticated: false, isSeller: false, isAdmin: false });
   },
 
   loadUser: async () => {
@@ -83,6 +86,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: data,
         isAuthenticated: true,
         isSeller: data.role === 'SELLER' || data.role === 'ADMIN',
+        isAdmin: data.role === 'ADMIN',
         isLoading: false,
       });
     } catch {
@@ -96,5 +100,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({
       user,
       isSeller: user.role === 'SELLER' || user.role === 'ADMIN',
+      isAdmin: user.role === 'ADMIN',
     }),
 }));

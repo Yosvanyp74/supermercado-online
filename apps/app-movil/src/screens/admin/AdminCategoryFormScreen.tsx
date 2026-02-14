@@ -8,12 +8,15 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  Image,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Save } from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { Save, Camera, X, ImageIcon } from 'lucide-react-native';
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi, categoriesApi } from '@/api';
-import { colors } from '@/theme';
+import { getImageUrl } from '@/config';
+import { colors, shadow } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminCategoryForm'>;
 
@@ -25,6 +28,7 @@ export function AdminCategoryFormScreen({ navigation, route }: Props) {
   const [saving, setSaving] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [imageUri, setImageUri] = useState<string | null>(null);
 
   useEffect(() => {
     if (isEdit) loadCategory();
@@ -35,12 +39,52 @@ export function AdminCategoryFormScreen({ navigation, route }: Props) {
       const { data } = await categoriesApi.getById(categoryId!);
       setName(data.name || '');
       setDescription(data.description || '');
+      if (data.imageUrl) {
+        setImageUri(getImageUrl(data.imageUrl));
+      }
     } catch {
       Alert.alert('Erro', 'Não foi possível carregar a categoria');
       navigation.goBack();
     } finally {
       setLoading(false);
     }
+  };
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
+  const takePhoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert('Permissão necessária', 'Permita o acesso à câmera');
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
+  const handleImageAction = () => {
+    Alert.alert('Imagem da categoria', 'Escolha uma opção', [
+      { text: 'Câmera', onPress: takePhoto },
+      { text: 'Galeria', onPress: pickImage },
+      ...(imageUri ? [{ text: 'Remover', style: 'destructive' as const, onPress: () => setImageUri(null) }] : []),
+      { text: 'Cancelar', style: 'cancel' as const },
+    ]);
   };
 
   const handleSave = async () => {
@@ -50,7 +94,34 @@ export function AdminCategoryFormScreen({ navigation, route }: Props) {
     }
     setSaving(true);
     try {
-      const data = { name: name.trim(), description: description.trim() || undefined };
+      // Upload image if new local file
+      let uploadedImageUrl: string | undefined;
+      if (imageUri && !imageUri.startsWith('http')) {
+        const formData = new FormData();
+        const filename = imageUri.split('/').pop() || 'photo.jpg';
+        const ext = filename.split('.').pop()?.toLowerCase() || 'jpg';
+        const mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';
+        formData.append('file', {
+          uri: imageUri,
+          name: filename,
+          type: mimeType,
+        } as any);
+        const { data: uploadData } = await adminApi.uploadImage(formData);
+        uploadedImageUrl = uploadData.url || uploadData.path;
+      }
+
+      const data: { name: string; description?: string; imageUrl?: string } = {
+        name: name.trim(),
+        description: description.trim() || undefined,
+      };
+
+      if (uploadedImageUrl) {
+        data.imageUrl = uploadedImageUrl;
+      } else if (imageUri === null) {
+        // Image was removed
+        data.imageUrl = '';
+      }
+
       if (isEdit) {
         await adminApi.updateCategory(categoryId!, data);
         Alert.alert('Sucesso', 'Categoria atualizada');
@@ -77,6 +148,32 @@ export function AdminCategoryFormScreen({ navigation, route }: Props) {
   return (
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.form}>
+        {/* Image picker */}
+        <Text style={styles.label}>Imagem</Text>
+        <TouchableOpacity
+          style={[styles.imageContainer, shadow.sm]}
+          onPress={handleImageAction}
+          activeOpacity={0.7}
+        >
+          {imageUri ? (
+            <View style={styles.imageWrapper}>
+              <Image source={{ uri: imageUri }} style={styles.image} />
+              <TouchableOpacity
+                style={styles.removeImageButton}
+                onPress={() => setImageUri(null)}
+              >
+                <X size={16} color={colors.white} />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.imagePlaceholder}>
+              <Camera size={32} color={colors.gray[400]} />
+              <Text style={styles.imagePlaceholderText}>Toque para adicionar imagem</Text>
+              <Text style={styles.imagePlaceholderHint}>Câmera ou galeria</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+
         <Text style={styles.label}>Nome *</Text>
         <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Nome da categoria" />
 
@@ -125,6 +222,47 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   textArea: { minHeight: 80, textAlignVertical: 'top' },
+  imageContainer: {
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  imageWrapper: {
+    position: 'relative',
+  },
+  image: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 14,
+    width: 28,
+    height: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imagePlaceholder: {
+    height: 160,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  imagePlaceholderText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.gray[500],
+  },
+  imagePlaceholderHint: {
+    fontSize: 12,
+    color: colors.gray[400],
+  },
   saveButton: {
     flexDirection: 'row',
     alignItems: 'center',

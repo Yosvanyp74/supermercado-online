@@ -22,6 +22,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { TableLoading } from '@/components/ui/loading';
 import { categoriesApi } from '@/lib/api/client';
 
@@ -230,10 +231,10 @@ export default function CategoriesPage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>URL da Imagem</Label>
-              <Input
-                value={formData.imageUrl || ''}
-                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+              <Label>Imagem</Label>
+              <ImageUpload
+                value={formData.imageUrl}
+                onChange={(url) => setFormData({ ...formData, imageUrl: url })}
               />
             </div>
           </div>

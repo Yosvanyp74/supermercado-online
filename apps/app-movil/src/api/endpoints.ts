@@ -259,6 +259,11 @@ export const deliveryApi = {
 
   getByOrder: (orderId: string) =>
     apiClient.get(`/delivery/order/${orderId}`),
+
+  rate: (id: string, data: { rating: number; comment?: string }) =>
+    apiClient.post(`/delivery/${id}/rate`, data),
+
+  getHistory: () => apiClient.get('/delivery/history'),
 };
 
 // ==================== ADMIN ====================

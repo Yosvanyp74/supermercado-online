@@ -93,6 +93,39 @@ export class DeliveryService {
     });
   }
 
+  async getDeliveryHistory(deliveryPersonId: string) {
+    return this.prisma.delivery.findMany({
+      where: {
+        deliveryPersonId,
+        status: {
+          in: [
+            DeliveryStatus.DELIVERED,
+            DeliveryStatus.FAILED,
+            DeliveryStatus.RETURNED,
+          ],
+        },
+      },
+      include: {
+        order: {
+          include: {
+            items: true,
+            deliveryAddress: true,
+            customer: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                phone: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { deliveredAt: 'desc' },
+      take: 50,
+    });
+  }
+
   async updateLocation(deliveryId: string, latitude: number, longitude: number) {
     const delivery = await this.prisma.delivery.findUnique({
       where: { id: deliveryId },

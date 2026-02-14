@@ -2394,6 +2394,26 @@
         ]
       }
     },
+    "/api/delivery/history": {
+      "get": {
+        "operationId": "DeliveryController_getDeliveryHistory",
+        "summary": "Obter histórico de entregas do entregador",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Histórico de entregas"
+          }
+        },
+        "tags": [
+          "delivery"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/delivery/{id}/location": {
       "patch": {
         "operationId": "DeliveryController_updateLocation",

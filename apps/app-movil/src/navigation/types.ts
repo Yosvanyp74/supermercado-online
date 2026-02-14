@@ -3,6 +3,7 @@ export type RootStackParamList = {
   Main: undefined;
   Seller: undefined;
   Admin: undefined;
+  Delivery: undefined;
 };
 
 export type AuthStackParamList = {
@@ -83,6 +84,14 @@ export type SellerStackParamList = {
     quantity: number;
   };
   OrderCompletion: { pickingOrderId: string };
+};
+
+export type DeliveryStackParamList = {
+  DeliveryHome: undefined;
+  DeliveryActive: undefined;
+  DeliveryDetail: { deliveryId: string };
+  DeliveryHistory: undefined;
+  DeliveryProfile: undefined;
 };
 
 export type AdminStackParamList = {

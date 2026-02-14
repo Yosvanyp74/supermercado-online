@@ -49,6 +49,14 @@ export class DeliveryController {
     return this.deliveryService.getActiveDeliveries(userId);
   }
 
+  @Get('history')
+  @Roles(Role.DELIVERY)
+  @ApiOperation({ summary: 'Obter histórico de entregas do entregador' })
+  @ApiResponse({ status: 200, description: 'Histórico de entregas' })
+  getDeliveryHistory(@CurrentUser('id') userId: string) {
+    return this.deliveryService.getDeliveryHistory(userId);
+  }
+
   @Patch(':id/location')
   @Roles(Role.DELIVERY)
   @ApiOperation({ summary: 'Atualizar localização da entrega' })

@@ -66,6 +66,14 @@ export const colors = {
     accent: '#ddd6fe',
   },
 
+  // Delivery mode
+  delivery: {
+    primary: '#ea580c',
+    light: '#fed7aa',
+    background: '#fff7ed',
+    accent: '#fdba74',
+  },
+
   // Picking mode
   picking: {
     pending: '#f59e0b',

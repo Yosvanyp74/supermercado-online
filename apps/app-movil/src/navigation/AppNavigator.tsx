@@ -6,11 +6,12 @@ import { AuthNavigator } from './AuthNavigator';
 import { MainNavigator } from './MainNavigator';
 import { SellerNavigator } from './SellerNavigator';
 import { AdminNavigator } from './AdminNavigator';
+import { DeliveryNavigator } from './DeliveryNavigator';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function AppNavigator() {
-  const { isAuthenticated, isSeller, isAdmin } = useAuthStore();
+  const { isAuthenticated, isSeller, isAdmin, isDelivery } = useAuthStore();
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -24,6 +25,9 @@ export function AppNavigator() {
           )}
           {isAdmin && (
             <Stack.Screen name="Admin" component={AdminNavigator} />
+          )}
+          {isDelivery && (
+            <Stack.Screen name="Delivery" component={DeliveryNavigator} />
           )}
         </>
       )}

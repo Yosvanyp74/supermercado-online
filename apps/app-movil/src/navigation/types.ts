@@ -89,6 +89,7 @@ export type SellerStackParamList = {
 
 export type DeliveryStackParamList = {
   DeliveryHome: undefined;
+  DeliveryAvailableOrders: undefined;
   DeliveryActive: undefined;
   DeliveryDetail: { deliveryId: string };
   DeliveryHistory: undefined;

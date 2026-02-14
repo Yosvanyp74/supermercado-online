@@ -4,6 +4,7 @@ import { DeliveryStackParamList } from './types';
 import { colors } from '@/theme';
 
 import { DeliveryHomeScreen } from '@/screens/delivery/DeliveryHomeScreen';
+import { DeliveryAvailableOrdersScreen } from '@/screens/delivery/DeliveryAvailableOrdersScreen';
 import { DeliveryActiveScreen } from '@/screens/delivery/DeliveryActiveScreen';
 import { DeliveryDetailScreen } from '@/screens/delivery/DeliveryDetailScreen';
 import { DeliveryHistoryScreen } from '@/screens/delivery/DeliveryHistoryScreen';
@@ -25,6 +26,11 @@ export function DeliveryNavigator() {
         name="DeliveryHome"
         component={DeliveryHomeScreen}
         options={{ title: 'Modo Entregador' }}
+      />
+      <Stack.Screen
+        name="DeliveryAvailableOrders"
+        component={DeliveryAvailableOrdersScreen}
+        options={{ title: 'Pedidos Disponíveis' }}
       />
       <Stack.Screen
         name="DeliveryActive"

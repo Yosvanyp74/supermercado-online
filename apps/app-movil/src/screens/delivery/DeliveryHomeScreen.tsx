@@ -18,6 +18,7 @@ import {
   CheckCircle2,
   TrendingUp,
   Truck,
+  ClipboardList,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { DeliveryStackParamList } from '@/navigation/types';
@@ -70,6 +71,14 @@ export function DeliveryHomeScreen({ navigation }: Props) {
   ).length;
 
   const menuItems = [
+    {
+      icon: ClipboardList,
+      label: 'Pedidos Disponíveis',
+      subtitle: 'Aceitar entregas',
+      color: '#15803d',
+      bg: '#f0fdf4',
+      onPress: () => navigation.navigate('DeliveryAvailableOrders'),
+    },
     {
       icon: Package,
       label: 'Entregas Ativas',

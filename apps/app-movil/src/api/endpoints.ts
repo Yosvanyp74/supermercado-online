@@ -267,6 +267,11 @@ export const deliveryApi = {
     apiClient.post(`/delivery/${id}/rate`, data),
 
   getHistory: () => apiClient.get('/delivery/history'),
+
+  getAvailable: () => apiClient.get('/delivery/available'),
+
+  selfAssign: (orderId: string) =>
+    apiClient.post('/delivery/self-assign', { orderId }),
 };
 
 // ==================== ADMIN ====================

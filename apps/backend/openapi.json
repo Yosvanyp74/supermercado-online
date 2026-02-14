@@ -2394,6 +2394,52 @@
         ]
       }
     },
+    "/api/delivery/available": {
+      "get": {
+        "operationId": "DeliveryController_getAvailableOrders",
+        "summary": "Pedidos disponíveis para entrega",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de pedidos prontos para entrega"
+          }
+        },
+        "tags": [
+          "delivery"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/delivery/self-assign": {
+      "post": {
+        "operationId": "DeliveryController_selfAssignDelivery",
+        "summary": "Entregador aceita um pedido para entrega",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Entrega atribuída com sucesso"
+          },
+          "400": {
+            "description": "Pedido já atribuído ou limite atingido"
+          },
+          "404": {
+            "description": "Pedido não encontrado"
+          }
+        },
+        "tags": [
+          "delivery"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/delivery/active": {
       "get": {
         "operationId": "DeliveryController_getActiveDeliveries",

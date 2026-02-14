@@ -41,6 +41,27 @@ export class DeliveryController {
     return this.deliveryService.assignDelivery(dto);
   }
 
+  @Get('available')
+  @Roles(Role.DELIVERY)
+  @ApiOperation({ summary: 'Pedidos disponíveis para entrega' })
+  @ApiResponse({ status: 200, description: 'Lista de pedidos prontos para entrega' })
+  getAvailableOrders() {
+    return this.deliveryService.getAvailableOrders();
+  }
+
+  @Post('self-assign')
+  @Roles(Role.DELIVERY)
+  @ApiOperation({ summary: 'Entregador aceita um pedido para entrega' })
+  @ApiResponse({ status: 201, description: 'Entrega atribuída com sucesso' })
+  @ApiResponse({ status: 400, description: 'Pedido já atribuído ou limite atingido' })
+  @ApiResponse({ status: 404, description: 'Pedido não encontrado' })
+  selfAssignDelivery(
+    @Body('orderId', ParseUUIDPipe) orderId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.deliveryService.selfAssignDelivery(orderId, userId);
+  }
+
   @Get('active')
   @Roles(Role.DELIVERY)
   @ApiOperation({ summary: 'Obter entregas ativas do entregador' })

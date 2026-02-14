@@ -61,6 +61,106 @@ export class DeliveryService {
     return delivery;
   }
 
+  async getAvailableOrders() {
+    const orders = await this.prisma.order.findMany({
+      where: {
+        status: OrderStatus.READY_FOR_PICKUP,
+        delivery: null,
+        fulfillmentType: 'DELIVERY',
+      },
+      include: {
+        customer: {
+          select: { id: true, firstName: true, lastName: true, phone: true },
+        },
+        deliveryAddress: true,
+        items: {
+          include: {
+            product: {
+              select: { id: true, name: true, mainImageUrl: true },
+            },
+          },
+        },
+      },
+      orderBy: { updatedAt: 'asc' },
+    });
+
+    return orders.map((order) => ({
+      ...order,
+      customer: {
+        ...order.customer,
+        name: `${order.customer.firstName} ${order.customer.lastName}`,
+      },
+    }));
+  }
+
+  async selfAssignDelivery(orderId: string, deliveryPersonId: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { delivery: true },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Pedido não encontrado');
+    }
+
+    if (order.status !== OrderStatus.READY_FOR_PICKUP) {
+      throw new BadRequestException('Pedido não está pronto para entrega');
+    }
+
+    if (order.delivery) {
+      throw new BadRequestException('Pedido já possui entregador atribuído');
+    }
+
+    const deliveryPerson = await this.prisma.user.findUnique({
+      where: { id: deliveryPersonId },
+    });
+
+    if (!deliveryPerson || deliveryPerson.role !== 'DELIVERY') {
+      throw new BadRequestException('Usuário não é um entregador válido');
+    }
+
+    // Check if delivery person already has too many active deliveries
+    const activeCount = await this.prisma.delivery.count({
+      where: {
+        deliveryPersonId,
+        status: {
+          in: [DeliveryStatus.ASSIGNED, DeliveryStatus.PICKED_UP, DeliveryStatus.IN_TRANSIT],
+        },
+      },
+    });
+
+    if (activeCount >= 5) {
+      throw new BadRequestException('Você já possui 5 entregas ativas. Conclua alguma antes de aceitar novas.');
+    }
+
+    const [delivery] = await this.prisma.$transaction([
+      this.prisma.delivery.create({
+        data: {
+          orderId,
+          deliveryPersonId,
+          status: DeliveryStatus.ASSIGNED,
+        },
+      }),
+      this.prisma.order.update({
+        where: { id: orderId },
+        data: {
+          deliveryPersonId,
+          status: OrderStatus.OUT_FOR_DELIVERY,
+        },
+      }),
+      this.prisma.orderStatusHistory.create({
+        data: {
+          orderId,
+          status: OrderStatus.OUT_FOR_DELIVERY,
+          changedBy: deliveryPersonId,
+          notes: `Entregador ${deliveryPerson.firstName} ${deliveryPerson.lastName} aceitou a entrega`,
+        },
+      }),
+    ]);
+
+    return delivery;
+  }
+
   async getActiveDeliveries(deliveryPersonId: string) {
     return this.prisma.delivery.findMany({
       where: {

@@ -240,6 +240,9 @@ export const sellerApi = {
 
   completePicking: (pickingOrderId: string) =>
     apiClient.post(`/seller/picking/${pickingOrderId}/complete`),
+
+  getReadyForDeliveryOrders: () =>
+    apiClient.get('/seller/orders/ready'),
 };
 
 // ==================== DELIVERY ====================

@@ -639,6 +639,60 @@ export class SellerService {
     return updated;
   }
 
+  // ==================== READY FOR DELIVERY ====================
+
+  async getReadyForDeliveryOrders() {
+    const orders = await this.prisma.order.findMany({
+      where: { status: OrderStatus.READY_FOR_PICKUP },
+      include: {
+        customer: {
+          select: { id: true, firstName: true, lastName: true, phone: true },
+        },
+        deliveryAddress: true,
+        items: {
+          include: {
+            product: {
+              select: { id: true, name: true, mainImageUrl: true },
+            },
+          },
+        },
+        delivery: true,
+      },
+      orderBy: { updatedAt: 'asc' },
+    });
+
+    // Enrich with delivery person info
+    const enriched = await Promise.all(
+      orders.map(async (order) => {
+        let deliveryPerson = null;
+        if (order.delivery?.deliveryPersonId) {
+          deliveryPerson = await this.prisma.user.findUnique({
+            where: { id: order.delivery.deliveryPersonId },
+            select: { id: true, firstName: true, lastName: true },
+          });
+        }
+        return {
+          ...order,
+          customer: {
+            ...order.customer,
+            name: `${order.customer.firstName} ${order.customer.lastName}`,
+          },
+          address: order.deliveryAddress,
+          delivery: order.delivery
+            ? {
+                ...order.delivery,
+                deliveryPerson: deliveryPerson
+                  ? { id: deliveryPerson.id, name: `${deliveryPerson.firstName} ${deliveryPerson.lastName}` }
+                  : null,
+              }
+            : null,
+        };
+      }),
+    );
+
+    return enriched;
+  }
+
   // ==================== PRODUCTS ====================
 
   async getProductByBarcode(barcode: string) {

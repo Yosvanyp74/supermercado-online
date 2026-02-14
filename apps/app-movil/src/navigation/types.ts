@@ -84,6 +84,7 @@ export type SellerStackParamList = {
     quantity: number;
   };
   OrderCompletion: { pickingOrderId: string };
+  ReadyForDelivery: undefined;
 };
 
 export type DeliveryStackParamList = {

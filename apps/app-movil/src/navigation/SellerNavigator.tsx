@@ -16,6 +16,7 @@ import { OrderPickingScreen } from '@/screens/seller/OrderPickingScreen';
 import { BarcodeScannerPickingScreen } from '@/screens/seller/BarcodeScannerPickingScreen';
 import { ManualItemPickScreen } from '@/screens/seller/ManualItemPickScreen';
 import { OrderCompletionScreen } from '@/screens/seller/OrderCompletionScreen';
+import { ReadyForDeliveryScreen } from '@/screens/seller/ReadyForDeliveryScreen';
 
 const Stack = createNativeStackNavigator<SellerStackParamList>();
 
@@ -93,6 +94,11 @@ export function SellerNavigator() {
         name="OrderCompletion"
         component={OrderCompletionScreen}
         options={{ title: 'Pedido Finalizado' }}
+      />
+      <Stack.Screen
+        name="ReadyForDelivery"
+        component={ReadyForDeliveryScreen}
+        options={{ title: 'Prontos para Entrega' }}
       />
     </Stack.Navigator>
   );

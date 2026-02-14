@@ -115,6 +115,13 @@ export class SellerController {
     return this.sellerService.getPendingOrders();
   }
 
+  @Get('orders/ready')
+  @ApiOperation({ summary: 'Pedidos prontos para entrega' })
+  @ApiResponse({ status: 200, description: 'Pedidos prontos retornados com sucesso' })
+  getReadyForDeliveryOrders() {
+    return this.sellerService.getReadyForDeliveryOrders();
+  }
+
   @Post('orders/:orderId/accept')
   @ApiOperation({ summary: 'Aceitar pedido para picking' })
   @ApiResponse({ status: 200, description: 'Pedido aceito com sucesso' })

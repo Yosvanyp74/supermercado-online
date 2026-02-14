@@ -18,6 +18,7 @@ import {
   TrendingUp,
   DollarSign,
   ArrowLeftCircle,
+  Truck,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SellerStackParamList } from '@/navigation/types';
@@ -38,18 +39,23 @@ export function SellerHomeScreen({ navigation }: Props) {
   };
   const [stats, setStats] = useState<any>(null);
   const [pendingOrders, setPendingOrders] = useState(0);
+  const [readyOrders, setReadyOrders] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadData = async () => {
     try {
-      const [statsRes, ordersRes] = await Promise.all([
+      const [statsRes, ordersRes, readyRes] = await Promise.all([
         sellerApi.getStats().catch(() => ({ data: null })),
         sellerApi.getPendingOrders().catch(() => ({ data: [] })),
+        sellerApi.getReadyForDeliveryOrders().catch(() => ({ data: [] })),
       ]);
       setStats(statsRes.data);
       setPendingOrders(
         Array.isArray(ordersRes.data) ? ordersRes.data.length : ordersRes.data?.total || 0,
+      );
+      setReadyOrders(
+        Array.isArray(readyRes.data) ? readyRes.data.length : 0,
       );
     } catch {
       // Ignore
@@ -102,6 +108,15 @@ export function SellerHomeScreen({ navigation }: Props) {
       color: '#8b5cf6',
       bg: '#ede9fe',
       onPress: () => navigation.navigate('SuspendedSales'),
+    },
+    {
+      icon: Truck,
+      label: 'Prontos p/ Entrega',
+      subtitle: `${readyOrders} prontos`,
+      color: '#ea580c',
+      bg: '#fff7ed',
+      onPress: () => navigation.navigate('ReadyForDelivery'),
+      badge: readyOrders > 0 ? readyOrders : undefined,
     },
     {
       icon: History,

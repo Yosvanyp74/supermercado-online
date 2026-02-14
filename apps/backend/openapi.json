@@ -2050,6 +2050,26 @@
         ]
       }
     },
+    "/api/seller/orders/ready": {
+      "get": {
+        "operationId": "SellerController_getReadyForDeliveryOrders",
+        "summary": "Pedidos prontos para entrega",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Pedidos prontos retornados com sucesso"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/seller/orders/{orderId}/accept": {
       "post": {
         "operationId": "SellerController_acceptOrder",

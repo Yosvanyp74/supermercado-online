@@ -55,18 +55,24 @@ export default function CategoriesPage() {
       toast.success('Categoria criada com sucesso');
       resetForm();
     },
-    onError: () => toast.error('Erro ao criar categoria'),
+    onError: (err: any) => {
+      const msg = err?.response?.data?.message;
+      toast.error(Array.isArray(msg) ? msg[0] : msg || 'Erro ao criar categoria');
+    },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: CategoryFormData }) =>
+    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
       categoriesApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       toast.success('Categoria atualizada');
       resetForm();
     },
-    onError: () => toast.error('Erro ao atualizar categoria'),
+    onError: (err: any) => {
+      const msg = err?.response?.data?.message;
+      toast.error(Array.isArray(msg) ? msg[0] : msg || 'Erro ao atualizar categoria');
+    },
   });
 
   const deleteMutation = useMutation({
@@ -97,10 +103,17 @@ export default function CategoriesPage() {
   }
 
   function handleSubmit() {
+    const raw: Record<string, unknown> = {
+      name: formData.name,
+    };
+    if (formData.description) raw.description = formData.description;
+    if (formData.imageUrl) raw.imageUrl = formData.imageUrl;
+    if (formData.parentId) raw.parentId = formData.parentId;
+
     if (editCategory) {
-      updateMutation.mutate({ id: editCategory.id, data: formData });
+      updateMutation.mutate({ id: editCategory.id, data: raw });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(raw as any);
     }
   }
 

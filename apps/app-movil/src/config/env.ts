@@ -2,11 +2,11 @@
  * Configuración de entorno de la app.
  *
  * ⚠️  Cambia DEV_MACHINE_IP a la IP de tu Mac cuando cambies de red:
- *   - Casa:    192.168.0.3
- *   - Trabajo: (tu IP del trabajo)
- *   - iPhone:  172.20.10.3
+ *   - Casa:        192.168.0.3
+ *   - Stok Center: 10.43.101.157
+ *   - iPhone:      172.20.10.3
  */
-export const DEV_MACHINE_IP = '192.168.0.3';
+export const DEV_MACHINE_IP = '10.43.101.157';
 
 export const DEV_API_URL = `http://${DEV_MACHINE_IP}:3000/api`;
 export const DEV_SERVER_URL = `http://${DEV_MACHINE_IP}:3000`;

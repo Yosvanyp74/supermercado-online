@@ -13,6 +13,7 @@ import { Loading, EmptyState } from '@/components';
 import { categoriesApi } from '@/api';
 import { colors, shadow } from '@/theme';
 import { Grid3X3 } from 'lucide-react-native';
+import { getImageUrl } from '@/config/env';
 
 type Props = NativeStackScreenProps<CategoriesStackParamList, 'Categories'>;
 
@@ -64,7 +65,15 @@ export function CategoriesScreen({ navigation }: Props) {
           activeOpacity={0.7}
         >
           <View style={styles.iconContainer}>
-            <Text style={styles.emoji}>{item.icon || '📦'}</Text>
+            {item.imageUrl ? (
+              <Image
+                source={{ uri: getImageUrl(item.imageUrl)! }}
+                style={styles.categoryImage}
+                resizeMode="cover"
+              />
+            ) : (
+              <Text style={styles.emoji}>{item.icon || '📦'}</Text>
+            )}
           </View>
           <Text style={styles.name} numberOfLines={2}>
             {item.name}
@@ -105,6 +114,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
+    overflow: 'hidden',
+  },
+  categoryImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
   },
   emoji: {
     fontSize: 32,

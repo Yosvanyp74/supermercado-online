@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProductCard } from '@/components/product/ProductCard';
 import { productsApi, categoriesApi } from '@/lib/api/client';
+import { getImageUrl } from '@/lib/utils';
 
 export default function HomePage() {
   const { data: featuredProducts, isLoading: loadingFeatured } = useQuery({
@@ -105,7 +106,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold">Categorias</h2>
             <Button variant="ghost" asChild>
-              <Link href="/products">
+              <Link href="/categories">
                 Ver Todas <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </Button>
@@ -117,11 +118,21 @@ export default function HomePage() {
                 ))
               : (Array.isArray(categories) ? categories : []).slice(0, 6).map((cat: any) => (
                   <Link key={cat.id} href={`/products?categoryId=${cat.id}`}>
-                    <Card className="h-32 flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow cursor-pointer group">
+                    <Card className="h-40 flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow cursor-pointer group">
                       <CardContent className="p-4">
-                        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:bg-primary/20 transition-colors">
-                          <Tag className="h-6 w-6 text-primary" />
-                        </div>
+                        {cat.imageUrl ? (
+                          <div className="w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-2">
+                            <img
+                              src={getImageUrl(cat.imageUrl)}
+                              alt={cat.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-2 group-hover:bg-primary/20 transition-colors">
+                            <Tag className="h-8 w-8 text-primary" />
+                          </div>
+                        )}
                         <p className="text-sm font-medium line-clamp-2">{cat.name}</p>
                       </CardContent>
                     </Card>

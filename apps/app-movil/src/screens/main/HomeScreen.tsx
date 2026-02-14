@@ -19,6 +19,7 @@ import { ProductCard, Loading } from '@/components';
 import { useAuthStore, useCartStore } from '@/store';
 import { productsApi, categoriesApi } from '@/api';
 import { colors, shadow } from '@/theme';
+import { getImageUrl } from '@/config/env';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Home'>;
 
@@ -176,9 +177,17 @@ export function HomeScreen({ navigation }: Props) {
               }
             >
               <View style={styles.categoryIcon}>
-                <Text style={styles.categoryEmoji}>
-                  {cat.icon || '📦'}
-                </Text>
+                {cat.imageUrl ? (
+                  <Image
+                    source={{ uri: getImageUrl(cat.imageUrl)! }}
+                    style={styles.categoryImg}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Text style={styles.categoryEmoji}>
+                    {cat.icon || '📦'}
+                  </Text>
+                )}
               </View>
               <Text style={styles.categoryName} numberOfLines={1}>
                 {cat.name}
@@ -344,6 +353,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 6,
+    overflow: 'hidden',
+  },
+  categoryImg: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
   },
   categoryEmoji: {
     fontSize: 28,

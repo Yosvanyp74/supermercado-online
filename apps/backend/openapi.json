@@ -487,6 +487,83 @@
         ]
       }
     },
+    "/api/uploads/image": {
+      "post": {
+        "operationId": "UploadsController_uploadImage",
+        "summary": "Upload de imagem (produto, avatar, categoria)",
+        "parameters": [
+          {
+            "name": "folder",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "uploads"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/uploads/files/{folder}/{filename}": {
+      "get": {
+        "operationId": "UploadsController_serveFile",
+        "summary": "Servir arquivo de imagem",
+        "parameters": [
+          {
+            "name": "folder",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "uploads"
+        ]
+      }
+    },
     "/api/products": {
       "get": {
         "operationId": "ProductsController_findAll",
@@ -3948,83 +4025,6 @@
           {
             "bearer": []
           }
-        ]
-      }
-    },
-    "/api/uploads/image": {
-      "post": {
-        "operationId": "UploadsController_uploadImage",
-        "summary": "Upload de imagem (produto, avatar, categoria)",
-        "parameters": [
-          {
-            "name": "folder",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "uploads"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/uploads/files/{folder}/{filename}": {
-      "get": {
-        "operationId": "UploadsController_serveFile",
-        "summary": "Servir arquivo de imagem",
-        "parameters": [
-          {
-            "name": "folder",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "filename",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "uploads"
         ]
       }
     }

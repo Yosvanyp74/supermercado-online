@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { UploadsService } from '../uploads/uploads.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
@@ -20,7 +21,10 @@ function slugify(text: string): string {
 
 @Injectable()
 export class CategoriesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private uploadsService: UploadsService,
+  ) {}
 
   async findAll() {
     const categories = await this.prisma.category.findMany({
@@ -110,6 +114,11 @@ export class CategoriesService {
 
     const data: Prisma.CategoryUpdateInput = { ...dto };
 
+    // Delete old image if it changed
+    if (dto.imageUrl !== undefined && dto.imageUrl !== category.imageUrl) {
+      this.uploadsService.deleteFile(category.imageUrl);
+    }
+
     if (dto.name && dto.name !== category.name) {
       const slug = slugify(dto.name);
 
@@ -181,6 +190,9 @@ export class CategoriesService {
     }
 
     await this.prisma.category.delete({ where: { id } });
+
+    // Delete image file
+    this.uploadsService.deleteFile(category.imageUrl);
 
     return { message: 'Categoria removida com sucesso' };
   }

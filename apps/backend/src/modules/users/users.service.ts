@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { UploadsService } from '../uploads/uploads.service';
 import { UpdateUserDto, ChangePasswordDto } from './dto/update-user.dto';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { Prisma } from '@prisma/client';
@@ -7,7 +8,10 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private uploadsService: UploadsService,
+  ) {}
 
   async findAll(params: {
     page?: number;
@@ -92,7 +96,13 @@ export class UsersService {
   }
 
   async update(id: string, dto: UpdateUserDto) {
-    await this.findOne(id);
+    const existing = await this.findOne(id);
+
+    // Delete old avatar if it changed
+    if (dto.avatarUrl && dto.avatarUrl !== existing.avatarUrl) {
+      this.uploadsService.deleteFile(existing.avatarUrl);
+    }
+
     return this.prisma.user.update({
       where: { id },
       data: dto,

@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, ProductStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { UploadsService } from '../uploads/uploads.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
@@ -25,7 +26,10 @@ const productInclude = {
 
 @Injectable()
 export class ProductsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private uploadsService: UploadsService,
+  ) {}
 
   async findAll(params: {
     page?: number;
@@ -212,10 +216,16 @@ export class ProductsService {
   async update(id: string, dto: UpdateProductDto) {
     const existing = await this.prisma.product.findUnique({
       where: { id },
+      include: { images: true },
     });
 
     if (!existing) {
       throw new NotFoundException('Produto não encontrado');
+    }
+
+    // Delete old main image if it changed
+    if (dto.mainImageUrl && dto.mainImageUrl !== existing.mainImageUrl) {
+      this.uploadsService.deleteFile(existing.mainImageUrl);
     }
 
     // Check SKU uniqueness if changed
@@ -263,10 +273,17 @@ export class ProductsService {
   async remove(id: string) {
     const existing = await this.prisma.product.findUnique({
       where: { id },
+      include: { images: true },
     });
 
     if (!existing) {
       throw new NotFoundException('Produto não encontrado');
+    }
+
+    // Delete all associated image files
+    this.uploadsService.deleteFile(existing.mainImageUrl);
+    for (const img of existing.images) {
+      this.uploadsService.deleteFile(img.url);
     }
 
     await this.prisma.product.delete({

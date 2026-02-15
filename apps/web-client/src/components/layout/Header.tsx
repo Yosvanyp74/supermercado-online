@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   Search,
@@ -30,6 +31,7 @@ import {
 import { useAuthStore } from '@/store/auth-store';
 import { useCartStore } from '@/store/cart-store';
 import { useUIStore } from '@/store/ui-store';
+import { getImageUrl } from '@/lib/utils';
 import { useState } from 'react';
 
 export function Header() {
@@ -151,8 +153,16 @@ export function Header() {
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-1">
-                    <User className="h-4 w-4" />
+                  <Button variant="ghost" size="sm" className="gap-1.5">
+                    {user?.avatarUrl ? (
+                      <img
+                        src={getImageUrl(user.avatarUrl)}
+                        alt={user.firstName || ''}
+                        className="h-6 w-6 rounded-full object-cover"
+                      />
+                    ) : (
+                      <User className="h-4 w-4" />
+                    )}
                     <span className="hidden lg:inline text-sm">
                       {user?.firstName}
                     </span>

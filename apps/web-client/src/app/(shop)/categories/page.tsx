@@ -31,8 +31,12 @@ export default function CategoriesPage() {
           ? Array.from({ length: 12 }).map((_, i) => (
               <Skeleton key={i} className="h-40 rounded-lg" />
             ))
-          : (Array.isArray(categories) ? categories : []).map((cat: any) => (
-              <Link key={cat.id} href={`/products?categoryId=${cat.id}`}>
+          : (Array.isArray(categories) ? categories : []).map((cat: any) => {
+              const href = cat.children?.length > 0
+                ? `/categories/${cat.id}`
+                : `/products?categoryId=${cat.id}`;
+              return (
+              <Link key={cat.id} href={href}>
                 <Card className="h-44 flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow cursor-pointer group">
                   <CardContent className="p-4">
                     {cat.imageUrl ? (
@@ -57,7 +61,8 @@ export default function CategoriesPage() {
                   </CardContent>
                 </Card>
               </Link>
-            ))}
+              );
+            })}
       </div>
 
       {!isLoading && (!categories || (Array.isArray(categories) && categories.length === 0)) && (

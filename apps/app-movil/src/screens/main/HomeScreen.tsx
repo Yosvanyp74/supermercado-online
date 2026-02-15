@@ -169,12 +169,22 @@ export function HomeScreen({ navigation }: Props) {
             <TouchableOpacity
               key={cat.id}
               style={styles.categoryItem}
-              onPress={() =>
-                navigation.navigate('ProductList', {
-                  categoryId: cat.id,
-                  title: cat.name,
-                })
-              }
+              onPress={() => {
+                if (cat.children && cat.children.length > 0) {
+                  (navigation as any).navigate('CategoriesTab', {
+                    screen: 'Subcategories',
+                    params: {
+                      categoryId: cat.id,
+                      categoryName: cat.name,
+                    },
+                  });
+                } else {
+                  navigation.navigate('ProductList', {
+                    categoryId: cat.id,
+                    title: cat.name,
+                  });
+                }
+              }}
             >
               <View style={styles.categoryIcon}>
                 {cat.imageUrl ? (

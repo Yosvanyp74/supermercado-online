@@ -116,8 +116,12 @@ export default function HomePage() {
               ? Array.from({ length: 6 }).map((_, i) => (
                   <Skeleton key={i} className="h-32 rounded-lg" />
                 ))
-              : (Array.isArray(categories) ? categories : []).slice(0, 6).map((cat: any) => (
-                  <Link key={cat.id} href={`/products?categoryId=${cat.id}`}>
+              : (Array.isArray(categories) ? categories : []).slice(0, 6).map((cat: any) => {
+                  const href = cat.children?.length > 0
+                    ? `/categories/${cat.id}`
+                    : `/products?categoryId=${cat.id}`;
+                  return (
+                  <Link key={cat.id} href={href}>
                     <Card className="h-40 flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow cursor-pointer group">
                       <CardContent className="p-4">
                         {cat.imageUrl ? (
@@ -137,7 +141,8 @@ export default function HomePage() {
                       </CardContent>
                     </Card>
                   </Link>
-                ))}
+                  );
+                })}
           </div>
         </div>
       </section>

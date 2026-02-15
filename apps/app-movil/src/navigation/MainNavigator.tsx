@@ -25,6 +25,7 @@ import { ProductListScreen } from '@/screens/main/ProductListScreen';
 import { ProductDetailScreen } from '@/screens/main/ProductDetailScreen';
 import { SearchScreen } from '@/screens/main/SearchScreen';
 import { CategoriesScreen } from '@/screens/main/CategoriesScreen';
+import { SubcategoriesScreen } from '@/screens/main/SubcategoriesScreen';
 import { CartScreen } from '@/screens/main/CartScreen';
 import { CheckoutScreen } from '@/screens/main/CheckoutScreen';
 import { OrdersScreen } from '@/screens/main/OrdersScreen';
@@ -90,6 +91,13 @@ function CategoriesStackNavigator() {
         name="Categories"
         component={CategoriesScreen}
         options={{ title: 'Categorias' }}
+      />
+      <CategoriesStack.Screen
+        name="Subcategories"
+        component={SubcategoriesScreen}
+        options={({ route }) => ({
+          title: route.params?.categoryName || 'Subcategorias',
+        })}
       />
       <CategoriesStack.Screen
         name="CategoryProducts"

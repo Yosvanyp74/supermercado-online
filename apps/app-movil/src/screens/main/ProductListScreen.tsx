@@ -1,10 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
+  Text,
   StyleSheet,
   FlatList,
   RefreshControl,
   Dimensions,
+  ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
@@ -26,13 +29,33 @@ export function ProductListScreen({ route, navigation }: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [subcategories, setSubcategories] = useState<any[]>([]);
+  const [activeCategoryId, setActiveCategoryId] = useState<string | undefined>(categoryId);
+  const [parentCategoryName, setParentCategoryName] = useState<string | undefined>();
+
+  // Load subcategories for the current category
+  useEffect(() => {
+    if (!categoryId) return;
+    categoriesApi.getById(categoryId).then(({ data }) => {
+      if (data?.children?.length > 0) {
+        setSubcategories(data.children);
+        setParentCategoryName(data.name);
+      } else if (data?.parent) {
+        // We're on a subcategory — load siblings from parent
+        categoriesApi.getById(data.parent.id).then(({ data: parentData }) => {
+          setSubcategories(parentData?.children || []);
+          setParentCategoryName(parentData?.name);
+        });
+      }
+    }).catch(() => {});
+  }, [categoryId]);
 
   const loadProducts = useCallback(
     async (pageNum = 1, append = false) => {
       try {
         let res;
-        if (categoryId) {
-          res = await categoriesApi.getProducts(categoryId, {
+        if (activeCategoryId) {
+          res = await categoriesApi.getProducts(activeCategoryId, {
             page: pageNum,
             limit: 20,
           });
@@ -54,7 +77,7 @@ export function ProductListScreen({ route, navigation }: Props) {
         setRefreshing(false);
       }
     },
-    [categoryId, search],
+    [activeCategoryId, search],
   );
 
   useEffect(() => {
@@ -96,10 +119,66 @@ export function ProductListScreen({ route, navigation }: Props) {
     );
   }
 
+  const handleSubcategoryPress = (subId: string) => {
+    setActiveCategoryId(subId === activeCategoryId ? categoryId : subId);
+    setLoading(true);
+    setProducts([]);
+  };
+
   return (
     <FlatList
       style={styles.container}
       data={products}
+      ListHeaderComponent={
+        subcategories.length > 0 ? (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.chipsContainer}
+            contentContainerStyle={styles.chipsContent}
+          >
+            <TouchableOpacity
+              style={[
+                styles.chip,
+                activeCategoryId === categoryId && styles.chipActive,
+              ]}
+              onPress={() => {
+                setActiveCategoryId(categoryId);
+                setLoading(true);
+                setProducts([]);
+              }}
+            >
+              <Text
+                style={[
+                  styles.chipText,
+                  activeCategoryId === categoryId && styles.chipTextActive,
+                ]}
+              >
+                Todos
+              </Text>
+            </TouchableOpacity>
+            {subcategories.map((sub) => (
+              <TouchableOpacity
+                key={sub.id}
+                style={[
+                  styles.chip,
+                  activeCategoryId === sub.id && styles.chipActive,
+                ]}
+                onPress={() => handleSubcategoryPress(sub.id)}
+              >
+                <Text
+                  style={[
+                    styles.chipText,
+                    activeCategoryId === sub.id && styles.chipTextActive,
+                  ]}
+                >
+                  {sub.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        ) : null
+      }
       renderItem={({ item }) => (
         <View style={{ width: (SCREEN_WIDTH - 48) / 2 }}>
           <ProductCard
@@ -134,6 +213,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.gray[50],
+  },
+  chipsContainer: {
+    backgroundColor: colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray[100],
+  },
+  chipsContent: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 8,
+  },
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+    backgroundColor: colors.gray[100],
+    marginRight: 8,
+  },
+  chipActive: {
+    backgroundColor: colors.primary[600],
+  },
+  chipText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.gray[600],
+  },
+  chipTextActive: {
+    color: colors.white,
   },
   list: {
     paddingBottom: 16,

@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { SlidersHorizontal, Grid, List, X } from 'lucide-react';
+import { SlidersHorizontal, Grid, List, X, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -13,10 +13,35 @@ import { Separator } from '@/components/ui/separator';
 import { ProductCard } from '@/components/product/ProductCard';
 import { productsApi, categoriesApi } from '@/lib/api/client';
 
+/** Recursively find a category by ID in the category tree */
+function findCategoryInTree(categories: any[], id: string): any | null {
+  for (const cat of categories) {
+    if (cat.id === id) return cat;
+    if (cat.children?.length) {
+      const found = findCategoryInTree(cat.children, id);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+/** Build breadcrumb path from root to target category */
+function buildCategoryPath(categories: any[], id: string, path: any[] = []): any[] | null {
+  for (const cat of categories) {
+    if (cat.id === id) return [...path, cat];
+    if (cat.children?.length) {
+      const found = buildCategoryPath(cat.children, id, [...path, cat]);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
 export default function ProductsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [showFilters, setShowFilters] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
   const page = Number(searchParams.get('page')) || 1;
   const categoryId = searchParams.get('categoryId') || undefined;
@@ -55,6 +80,27 @@ export default function ProductsPage() {
       return res.data;
     },
   });
+
+  const allCategories = Array.isArray(categories) ? categories : [];
+
+  // Auto-expand parent of currently selected category
+  const categoryPath = categoryId ? buildCategoryPath(allCategories, categoryId) : null;
+  const selectedCategoryName = categoryPath
+    ? categoryPath.map((c: any) => c.name).join(' › ')
+    : undefined;
+
+  // Auto-expand parent categories when a subcategory is selected
+  const effectiveExpanded = new Set(expandedCategories);
+  if (categoryPath && categoryPath.length > 1) {
+    categoryPath.slice(0, -1).forEach((c: any) => effectiveExpanded.add(c.id));
+  }
+
+  const toggleExpand = (id: string) => {
+    const next = new Set(expandedCategories);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setExpandedCategories(next);
+  };
 
   const products = Array.isArray(productsData) ? productsData : productsData?.data || [];
   const totalPages = productsData?.meta?.totalPages || 1;
@@ -139,21 +185,46 @@ export default function ProductsPage() {
             {/* Categories */}
             <div>
               <h4 className="font-medium mb-3 text-sm">Categorias</h4>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <button
                   className={`block w-full text-left text-sm py-1.5 px-2 rounded hover:bg-gray-100 ${!categoryId ? 'bg-primary/10 text-primary font-medium' : ''}`}
                   onClick={() => updateFilters({ categoryId: undefined })}
                 >
                   Todas
                 </button>
-                {(Array.isArray(categories) ? categories : []).map((cat: any) => (
-                  <button
-                    key={cat.id}
-                    className={`block w-full text-left text-sm py-1.5 px-2 rounded hover:bg-gray-100 ${categoryId === cat.id ? 'bg-primary/10 text-primary font-medium' : ''}`}
-                    onClick={() => updateFilters({ categoryId: cat.id })}
-                  >
-                    {cat.name}
-                  </button>
+                {allCategories.map((cat: any) => (
+                  <div key={cat.id}>
+                    <div className="flex items-center">
+                      <button
+                        className={`flex-1 text-left text-sm py-1.5 px-2 rounded hover:bg-gray-100 ${categoryId === cat.id ? 'bg-primary/10 text-primary font-medium' : ''}`}
+                        onClick={() => updateFilters({ categoryId: cat.id })}
+                      >
+                        {cat.name}
+                      </button>
+                      {cat.children?.length > 0 && (
+                        <button
+                          className="p-1 rounded hover:bg-gray-100"
+                          onClick={() => toggleExpand(cat.id)}
+                          aria-label={`Expandir ${cat.name}`}
+                        >
+                          <ChevronRight className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${effectiveExpanded.has(cat.id) ? 'rotate-90' : ''}`} />
+                        </button>
+                      )}
+                    </div>
+                    {cat.children?.length > 0 && effectiveExpanded.has(cat.id) && (
+                      <div className="ml-3 border-l pl-2 space-y-0.5">
+                        {cat.children.map((sub: any) => (
+                          <button
+                            key={sub.id}
+                            className={`block w-full text-left text-sm py-1 px-2 rounded hover:bg-gray-100 ${categoryId === sub.id ? 'bg-primary/10 text-primary font-medium' : ''}`}
+                            onClick={() => updateFilters({ categoryId: sub.id })}
+                          >
+                            {sub.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
@@ -216,9 +287,9 @@ export default function ProductsPage() {
           {/* Active filters */}
           {hasActiveFilters && (
             <div className="flex flex-wrap gap-2 mb-4">
-              {categoryId && (
+              {categoryId && selectedCategoryName && (
                 <Badge variant="secondary" className="gap-1">
-                  Categoria: {(Array.isArray(categories) ? categories : []).find((c: any) => c.id === categoryId)?.name}
+                  {selectedCategoryName}
                   <X className="h-3 w-3 cursor-pointer" onClick={() => updateFilters({ categoryId: undefined })} />
                 </Badge>
               )}

@@ -196,6 +196,34 @@
             "bearer": []
           }
         ]
+      },
+      "patch": {
+        "operationId": "UsersController_updateMe",
+        "summary": "Atualizar perfil próprio",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/users/me/change-password": {
@@ -3926,8 +3954,17 @@
     "/api/uploads/image": {
       "post": {
         "operationId": "UploadsController_uploadImage",
-        "summary": "Upload de imagem de produto",
-        "parameters": [],
+        "summary": "Upload de imagem (produto, avatar, categoria)",
+        "parameters": [
+          {
+            "name": "folder",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -4133,21 +4170,6 @@
           "refreshToken"
         ]
       },
-      "ChangePasswordDto": {
-        "type": "object",
-        "properties": {
-          "currentPassword": {
-            "type": "string"
-          },
-          "newPassword": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "currentPassword",
-          "newPassword"
-        ]
-      },
       "UpdateUserDto": {
         "type": "object",
         "properties": {
@@ -4164,6 +4186,21 @@
             "type": "string"
           }
         }
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
       },
       "CreateAddressDto": {
         "type": "object",

@@ -2,6 +2,7 @@ import React from 'react';
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -25,6 +26,7 @@ import {
 import { ProfileStackParamList } from '@/navigation/types';
 import { useAuthStore } from '@/store';
 import { colors, shadow } from '@/theme';
+import { getImageUrl } from '@/config/env';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Profile'>;
 
@@ -99,11 +101,18 @@ export function ProfileScreen({ navigation }: Props) {
     <ScrollView style={styles.container}>
       {/* Profile Header */}
       <View style={[styles.profileCard, shadow.sm]}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {user?.firstName?.charAt(0).toUpperCase() || 'U'}
-          </Text>
-        </View>
+        {user?.avatarUrl ? (
+          <Image
+            source={{ uri: getImageUrl(user.avatarUrl)! }}
+            style={styles.avatarImage}
+          />
+        ) : (
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>
+              {user?.firstName?.charAt(0).toUpperCase() || 'U'}
+            </Text>
+          </View>
+        )}
         <View style={styles.profileInfo}>
           <Text style={styles.name}>{user?.firstName} {user?.lastName}</Text>
           <Text style={styles.email}>{user?.email}</Text>
@@ -167,6 +176,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary[600],
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  avatarImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
   },
   avatarText: {
     fontSize: 24,

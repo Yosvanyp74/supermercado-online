@@ -28,6 +28,11 @@ export const usersApi = {
   updateProfile: (data: { firstName?: string; lastName?: string; phone?: string; avatarUrl?: string }) =>
     apiClient.patch('/users/me', data),
 
+  uploadAvatar: (formData: FormData) =>
+    apiClient.post('/uploads/image?folder=avatars', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+
   getAddresses: (userId: string) =>
     apiClient.get(`/users/${userId}/addresses`),
 

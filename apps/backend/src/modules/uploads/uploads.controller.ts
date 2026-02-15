@@ -7,6 +7,7 @@ import {
   UseGuards,
   Get,
   Param,
+  Query,
   Res,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -30,20 +31,25 @@ const imageFileFilter = (_req: any, file: any, callback: any) => {
   callback(null, true);
 };
 
-const storage = diskStorage({
-  destination: (_req, _file, cb) => {
-    const dir = join(UPLOADS_DIR, 'products');
-    const fs = require('fs');
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    cb(null, dir);
-  },
-  filename: (_req, file, cb) => {
-    const uniqueName = `${uuidv4()}${extname(file.originalname).toLowerCase()}`;
-    cb(null, uniqueName);
-  },
-});
+const ALLOWED_FOLDERS = ['products', 'avatars', 'categories'];
+
+const createStorage = (folder: string) =>
+  diskStorage({
+    destination: (_req, _file, cb) => {
+      const dir = join(UPLOADS_DIR, folder);
+      const fs = require('fs');
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      cb(null, dir);
+    },
+    filename: (_req, file, cb) => {
+      const uniqueName = `${uuidv4()}${extname(file.originalname).toLowerCase()}`;
+      cb(null, uniqueName);
+    },
+  });
+
+const storage = createStorage('products');
 
 @ApiTags('uploads')
 @Controller('uploads')
@@ -51,7 +57,7 @@ export class UploadsController {
   @Post('image')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Upload de imagem de produto' })
+  @ApiOperation({ summary: 'Upload de imagem (produto, avatar, categoria)' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -68,12 +74,29 @@ export class UploadsController {
       limits: { fileSize: 2 * 1024 * 1024 }, // 2MB max
     }),
   )
-  uploadImage(@UploadedFile() file: Express.Multer.File) {
+  async uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Query('folder') folder?: string,
+  ) {
     if (!file) {
       throw new BadRequestException('Nenhum arquivo enviado');
     }
 
-    const url = `/api/uploads/files/products/${file.filename}`;
+    const targetFolder = folder && ALLOWED_FOLDERS.includes(folder) ? folder : 'products';
+
+    // If target folder differs from default (products), move the file
+    if (targetFolder !== 'products') {
+      const fs = require('fs');
+      const targetDir = join(UPLOADS_DIR, targetFolder);
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+      const oldPath = file.path;
+      const newPath = join(targetDir, file.filename);
+      fs.renameSync(oldPath, newPath);
+    }
+
+    const url = `/api/uploads/files/${targetFolder}/${file.filename}`;
 
     return {
       url,

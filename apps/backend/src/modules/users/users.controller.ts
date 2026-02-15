@@ -43,6 +43,15 @@ export class UsersController {
     return this.usersService.findOne(userId);
   }
 
+  @Patch('me')
+  @ApiOperation({ summary: 'Atualizar perfil próprio' })
+  updateMe(
+    @CurrentUser('id') userId: string,
+    @Body() dto: UpdateUserDto,
+  ) {
+    return this.usersService.update(userId, dto);
+  }
+
   @Post('me/change-password')
   @ApiOperation({ summary: 'Alterar senha própria' })
   changePassword(

@@ -74,6 +74,12 @@ export const authApi = {
 // ============ USERS ============
 export const usersApi = {
   getMe: () => api.get('/users/me'),
+  updateMe: (data: {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    avatarUrl?: string;
+  }) => api.patch('/users/me', data),
   update: (id: string, data: {
     firstName?: string;
     lastName?: string;
@@ -98,6 +104,17 @@ export const usersApi = {
     api.patch(`/users/${id}/addresses/${addressId}`, data),
   deleteAddress: (id: string, addressId: string) =>
     api.delete(`/users/${id}/addresses/${addressId}`),
+};
+
+// ============ UPLOADS ============
+export const uploadsApi = {
+  uploadImage: (file: File, folder?: string) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post(`/uploads/image${folder ? `?folder=${folder}` : ''}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
 };
 
 // ============ PRODUCTS ============

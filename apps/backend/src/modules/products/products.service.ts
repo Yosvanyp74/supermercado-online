@@ -78,6 +78,15 @@ export class ProductsService {
     if (isFeatured !== undefined) where.isFeatured = isFeatured;
     if (isOrganic !== undefined) where.isOrganic = isOrganic;
 
+    // Exclude expired products from customer-facing queries (unless admin filters by specific status)
+    if (!status) {
+      where.status = { not: ProductStatus.EXPIRED };
+      where.AND = [
+        ...(Array.isArray(where.AND) ? where.AND : []),
+        { OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
+      ];
+    }
+
     if (minPrice !== undefined || maxPrice !== undefined) {
       where.price = {};
       if (minPrice !== undefined) where.price.gte = minPrice;
@@ -298,6 +307,7 @@ export class ProductsService {
       where: {
         isFeatured: true,
         status: ProductStatus.ACTIVE,
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
       },
       include: productInclude,
       take: limit,
@@ -318,6 +328,9 @@ export class ProductsService {
         { shortDescription: { contains: query, mode: 'insensitive' } },
         { sku: { contains: query, mode: 'insensitive' } },
         { tags: { has: query } },
+      ],
+      AND: [
+        { OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
       ],
     };
 

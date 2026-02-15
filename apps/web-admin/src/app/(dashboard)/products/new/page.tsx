@@ -35,9 +35,10 @@ const productSchema = z.object({
   unit: z.string().optional(),
   weight: z.coerce.number().optional().or(z.literal('')),
   mainImageUrl: z.string().optional(),
-  status: z.enum(['ACTIVE', 'INACTIVE', 'OUT_OF_STOCK', 'DISCONTINUED']).default('ACTIVE'),
+  status: z.enum(['ACTIVE', 'INACTIVE', 'OUT_OF_STOCK', 'DISCONTINUED', 'EXPIRED']).default('ACTIVE'),
   isFeatured: z.boolean().default(false),
   isOrganic: z.boolean().default(false),
+  expiresAt: z.string().optional().or(z.literal('')),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -76,6 +77,7 @@ export default function NewProductPage() {
       if (payload.costPrice === '' || payload.costPrice === undefined) delete payload.costPrice;
       if (payload.compareAtPrice === '' || payload.compareAtPrice === undefined) delete payload.compareAtPrice;
       if (payload.weight === '' || payload.weight === undefined) delete payload.weight;
+      if (payload.expiresAt === '' || payload.expiresAt === undefined) delete payload.expiresAt;
       return productsApi.create(payload);
     },
     onSuccess: () => {
@@ -156,6 +158,7 @@ export default function NewProductPage() {
                   <SelectItem value="INACTIVE">Inativo</SelectItem>
                   <SelectItem value="OUT_OF_STOCK">Sem Estoque</SelectItem>
                   <SelectItem value="DISCONTINUED">Descontinuado</SelectItem>
+                  <SelectItem value="EXPIRED">Expirado</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -199,6 +202,13 @@ export default function NewProductPage() {
             <div className="space-y-2">
               <Label htmlFor="weight">Peso (g)</Label>
               <Input id="weight" type="number" step="0.01" {...register('weight')} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="expiresAt">Data de Validade</Label>
+              <Input id="expiresAt" type="date" {...register('expiresAt')} />
+              {watch('expiresAt') && new Date(watch('expiresAt')!) < new Date() && (
+                <p className="text-sm text-destructive font-medium">⚠ Este produto já está vencido!</p>
+              )}
             </div>
           </CardContent>
         </Card>

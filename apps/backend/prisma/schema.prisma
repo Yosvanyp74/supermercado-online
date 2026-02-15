@@ -23,6 +23,7 @@ enum ProductStatus {
   INACTIVE
   OUT_OF_STOCK
   DISCONTINUED
+  EXPIRED
 }
 
 enum OrderStatus {
@@ -254,6 +255,7 @@ model Product {
   shelfPosition    String?       @map("shelf_position")
   salesCount       Int           @default(0) @map("sales_count")
   viewCount        Int           @default(0) @map("view_count")
+  expiresAt        DateTime?     @map("expires_at")
   createdAt        DateTime      @default(now()) @map("created_at")
   updatedAt        DateTime      @updatedAt @map("updated_at")
 
@@ -276,6 +278,7 @@ model Product {
   @@index([name])
   @@index([barcode])
   @@index([sku])
+  @@index([expiresAt])
   @@map("products")
 }
 

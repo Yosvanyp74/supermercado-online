@@ -215,6 +215,7 @@ export class CategoriesService {
     const where: Prisma.ProductWhereInput = {
       categoryId: id,
       status: 'ACTIVE',
+      OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
     };
 
     const [products, total] = await Promise.all([

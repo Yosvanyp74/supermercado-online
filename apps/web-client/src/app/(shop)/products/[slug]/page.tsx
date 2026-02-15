@@ -275,6 +275,11 @@ export default function ProductDetailPage() {
           {product.sku && (
             <p className="text-xs text-muted-foreground mt-4">SKU: {product.sku}</p>
           )}
+          {product.expiresAt && (
+            <p className="text-xs text-muted-foreground mt-1">
+              Validade: {new Date(product.expiresAt).toLocaleDateString('pt-BR')}
+            </p>
+          )}
         </div>
       </div>
 

@@ -6,6 +6,7 @@ import {
   IsArray,
   IsEnum,
   IsUUID,
+  IsDateString,
   Min,
   MinLength,
   MaxLength,
@@ -153,4 +154,9 @@ export class CreateProductDto {
   @IsOptional()
   @IsString({ message: 'Posição na prateleira deve ser uma string' })
   shelfPosition?: string;
+
+  @ApiPropertyOptional({ description: 'Data de validade do produto', example: '2026-06-15' })
+  @IsOptional()
+  @IsDateString({}, { message: 'Data de validade deve ser uma data válida' })
+  expiresAt?: string;
 }

@@ -46,6 +46,7 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
     isFeatured: false,
     isOrganic: false,
     status: 'ACTIVE',
+    expiresAt: '',
   });
 
   useEffect(() => {
@@ -80,6 +81,7 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
         isFeatured: data.isFeatured || false,
         isOrganic: data.isOrganic || false,
         status: data.status || 'ACTIVE',
+        expiresAt: data.expiresAt ? new Date(data.expiresAt).toISOString().split('T')[0] : '',
       });
       setSelectedCategoryId(data.categoryId || '');
       if (data.images?.[0]?.url) {
@@ -174,6 +176,7 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
         isOrganic: form.isOrganic,
         status: form.status,
         categoryId: selectedCategoryId || undefined,
+        expiresAt: form.expiresAt || undefined,
       };
 
       if (uploadedImageUrl) {
@@ -326,6 +329,21 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
             />
           </View>
         </View>
+
+        {/* Expiration date */}
+        <Text style={styles.label}>Data de Validade</Text>
+        <TextInput
+          style={styles.input}
+          value={form.expiresAt}
+          onChangeText={(v) => setForm({ ...form, expiresAt: v })}
+          placeholder="AAAA-MM-DD"
+          keyboardType="numbers-and-punctuation"
+        />
+        {form.expiresAt !== '' && new Date(form.expiresAt) < new Date() && (
+          <Text style={{ color: '#dc2626', fontSize: 13, marginTop: -8, marginBottom: 8 }}>
+            ⚠ Este produto já está vencido!
+          </Text>
+        )}
 
         {/* Category picker */}
         <Text style={styles.label}>Categoria</Text>

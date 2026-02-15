@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye } from 'lucide-react';
+import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,7 @@ const STATUS_MAP: Record<string, { label: string; variant: 'success' | 'secondar
   INACTIVE: { label: 'Inativo', variant: 'secondary' },
   OUT_OF_STOCK: { label: 'Sem Estoque', variant: 'destructive' },
   DISCONTINUED: { label: 'Descontinuado', variant: 'warning' },
+  EXPIRED: { label: 'Expirado', variant: 'destructive' },
 };
 
 export default function ProductsPage() {
@@ -114,6 +115,7 @@ export default function ProductsPage() {
                 <SelectItem value="INACTIVE">Inativo</SelectItem>
                 <SelectItem value="OUT_OF_STOCK">Sem Estoque</SelectItem>
                 <SelectItem value="DISCONTINUED">Descontinuado</SelectItem>
+                <SelectItem value="EXPIRED">Expirado</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -130,6 +132,7 @@ export default function ProductsPage() {
                     <TableHead>Nome</TableHead>
                     <TableHead>Preço</TableHead>
                     <TableHead>Estoque</TableHead>
+                    <TableHead>Validade</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="w-[70px]">Ações</TableHead>
                   </TableRow>
@@ -155,6 +158,16 @@ export default function ProductsPage() {
                           >
                             {product.stock}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {product.expiresAt ? (() => {
+                            const exp = new Date(product.expiresAt);
+                            const now = new Date();
+                            const daysLeft = Math.ceil((exp.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                            if (daysLeft < 0) return <Badge variant="destructive"><AlertTriangle className="h-3 w-3 mr-1" />Vencido</Badge>;
+                            if (daysLeft <= 30) return <Badge variant="warning"><AlertTriangle className="h-3 w-3 mr-1" />{daysLeft}d</Badge>;
+                            return <span className="text-sm text-muted-foreground">{exp.toLocaleDateString('pt-BR')}</span>;
+                          })() : <span className="text-sm text-muted-foreground">—</span>}
                         </TableCell>
                         <TableCell>
                           <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
@@ -189,7 +202,7 @@ export default function ProductsPage() {
                   })}
                   {(!Array.isArray(products) || products.length === 0) && (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                      <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                         Nenhum produto encontrado
                       </TableCell>
                     </TableRow>

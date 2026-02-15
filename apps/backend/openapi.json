@@ -636,7 +636,8 @@
                 "ACTIVE",
                 "INACTIVE",
                 "OUT_OF_STOCK",
-                "DISCONTINUED"
+                "DISCONTINUED",
+                "EXPIRED"
               ],
               "type": "string"
             }
@@ -4329,7 +4330,8 @@
               "ACTIVE",
               "INACTIVE",
               "OUT_OF_STOCK",
-              "DISCONTINUED"
+              "DISCONTINUED",
+              "EXPIRED"
             ],
             "default": "ACTIVE"
           },
@@ -4366,6 +4368,11 @@
           "shelfPosition": {
             "type": "string",
             "example": "Prateleira B2"
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "Data de validade do produto",
+            "example": "2026-06-15"
           }
         },
         "required": [
@@ -4455,7 +4462,8 @@
               "ACTIVE",
               "INACTIVE",
               "OUT_OF_STOCK",
-              "DISCONTINUED"
+              "DISCONTINUED",
+              "EXPIRED"
             ],
             "default": "ACTIVE"
           },
@@ -4492,6 +4500,11 @@
           "shelfPosition": {
             "type": "string",
             "example": "Prateleira B2"
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "Data de validade do produto",
+            "example": "2026-06-15"
           }
         }
       },

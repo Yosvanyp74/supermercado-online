@@ -10,8 +10,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ProductCard } from '@/components/product/ProductCard';
 import { productsApi, categoriesApi } from '@/lib/api/client';
 import { getImageUrl } from '@/lib/utils';
+import { useAuthStore } from '@/store/auth-store';
 
 export default function HomePage() {
+  const { isAuthenticated } = useAuthStore();
+
   const { data: featuredProducts, isLoading: loadingFeatured } = useQuery({
     queryKey: ['products', 'featured'],
     queryFn: async () => {
@@ -209,9 +212,15 @@ export default function HomePage() {
           <p className="text-lg mb-6 max-w-xl mx-auto opacity-90">
             Ganhe pontos a cada compra e troque por descontos e produtos exclusivos!
           </p>
-          <Button size="lg" variant="secondary" asChild>
-            <Link href="/register">Criar Conta Grátis</Link>
-          </Button>
+          {isAuthenticated ? (
+            <Button size="lg" variant="secondary" asChild>
+              <Link href="/account/loyalty">Ver Meus Pontos</Link>
+            </Button>
+          ) : (
+            <Button size="lg" variant="secondary" asChild>
+              <Link href="/register">Criar Conta Grátis</Link>
+            </Button>
+          )}
         </div>
       </section>
     </div>

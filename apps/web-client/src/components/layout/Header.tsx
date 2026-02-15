@@ -213,6 +213,9 @@ export function Header() {
               <Link href="/" className="hover:text-primary font-medium">Início</Link>
             </li>
             <li>
+              <Link href="/categories" className="hover:text-primary">Categorias</Link>
+            </li>
+            <li>
               <Link href="/products" className="hover:text-primary">Todos os Produtos</Link>
             </li>
             <li>
@@ -248,6 +251,13 @@ export function Header() {
                 onClick={() => setMobileMenu(false)}
               >
                 Início
+              </Link>
+              <Link
+                href="/categories"
+                className="block py-2 px-3 rounded-md hover:bg-gray-100"
+                onClick={() => setMobileMenu(false)}
+              >
+                Categorias
               </Link>
               <Link
                 href="/products"

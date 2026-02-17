@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -28,8 +28,8 @@ const productSchema = z.object({
   description: z.string().optional(),
   shortDescription: z.string().optional(),
   categoryId: z.string().min(1),
-  price: z.coerce.number().positive(),
-  costPrice: z.coerce.number().positive().optional().or(z.literal('')),
+  costPrice: z.coerce.number().positive('Custo obrigatório'),
+  productRole: z.enum(['ANCLA', 'CONVENIENCIA', 'IMPULSO', 'PREMIUM'], { required_error: 'Rol obrigatório' }),
   compareAtPrice: z.coerce.number().optional().or(z.literal('')),
   stock: z.coerce.number().int().min(0).default(0),
   minStock: z.coerce.number().int().min(0).default(0),
@@ -41,6 +41,27 @@ const productSchema = z.object({
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
+
+// Client-side pricing preview (mirrors backend PricingService v1.1 — safe rounding)
+function calcPricePreview(cost: number, role: string): { price: number; margin: number } | null {
+  if (!cost || cost <= 0 || !role) return null;
+  const bands = [{ max: 3, m: 0.30 }, { max: 15, m: 0.20 }, { max: 60, m: 0.15 }, { max: Infinity, m: 0.10 }];
+  const adj: Record<string, number> = { ANCLA: -0.05, CONVENIENCIA: 0, IMPULSO: 0.10, PREMIUM: 0.03 };
+  let margin = (bands.find(b => cost < b.max)?.m ?? 0.10) + (adj[role] ?? 0);
+  margin = Math.max(0.08, Math.min(0.40, margin));
+  const raw = cost * (1 + margin);
+  let rounded: number;
+  if (raw < 1) {
+    rounded = Math.ceil(raw * 10) / 10;
+  } else {
+    const decimal = raw % 1;
+    const intPart = Math.floor(raw);
+    rounded = decimal <= 0.49 ? intPart + 0.59 : intPart + 0.99;
+  }
+  if (rounded <= cost) rounded = Number((Math.ceil(cost * 100) / 100 + 0.05).toFixed(2));
+  rounded = Number(rounded.toFixed(2));
+  return { price: rounded, margin: Math.round(((rounded - cost) / cost) * 10000) / 10000 };
+}
 
 export default function EditProductPage() {
   const { id } = useParams<{ id: string }>();
@@ -80,8 +101,8 @@ export default function EditProductPage() {
         description: product.description || '',
         shortDescription: product.shortDescription || '',
         categoryId: product.categoryId,
-        price: product.price,
-        costPrice: product.costPrice || '',
+        costPrice: product.costPrice || 0,
+        productRole: product.productRole || 'CONVENIENCIA',
         compareAtPrice: product.compareAtPrice || '',
         stock: product.stock,
         minStock: product.minStock || 0,
@@ -97,10 +118,11 @@ export default function EditProductPage() {
   const updateMutation = useMutation({
     mutationFn: (data: ProductFormData) => {
       const payload: any = { ...data };
-      if (payload.costPrice === '' || payload.costPrice === undefined) delete payload.costPrice;
       if (payload.compareAtPrice === '' || payload.compareAtPrice === undefined) delete payload.compareAtPrice;
       if (payload.weight === '' || payload.weight === undefined) delete payload.weight;
       if (payload.expiresAt === '' || payload.expiresAt === undefined) delete payload.expiresAt;
+      // price is auto-calculated on backend
+      delete payload.price;
       return productsApi.update(id, payload);
     },
     onSuccess: () => {
@@ -115,6 +137,10 @@ export default function EditProductPage() {
   });
 
   const flatCategories = flattenCategories(Array.isArray(categories) ? categories : []);
+
+  const costValue = watch('costPrice');
+  const roleValue = watch('productRole');
+  const pricingPreview = calcPricePreview(Number(costValue) || 0, roleValue);
 
   if (isLoading) return <PageLoading />;
 
@@ -180,20 +206,55 @@ export default function EditProductPage() {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Preços e Estoque</CardTitle></CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-3">
+          <CardHeader><CardTitle className="flex items-center gap-2"><Calculator className="h-5 w-5" />Pricing Automático</CardTitle></CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label>Preço (R$) *</Label>
-              <Input type="number" step="0.01" {...register('price')} />
-            </div>
-            <div className="space-y-2">
-              <Label>Custo (R$)</Label>
+              <Label>Custo (R$) *</Label>
               <Input type="number" step="0.01" {...register('costPrice')} />
+              {errors.costPrice && <p className="text-sm text-destructive">{errors.costPrice.message}</p>}
             </div>
             <div className="space-y-2">
-              <Label>Preço Comparativo (R$)</Label>
-              <Input type="number" step="0.01" {...register('compareAtPrice')} />
+              <Label>Rol Estratégico *</Label>
+              <Select onValueChange={(v: any) => setValue('productRole', v)} value={watch('productRole')}>
+                <SelectTrigger><SelectValue placeholder="Selecionar rol" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ANCLA">⚓ Ancla (margen -5%)</SelectItem>
+                  <SelectItem value="CONVENIENCIA">🛒 Conveniencia (base)</SelectItem>
+                  <SelectItem value="IMPULSO">⚡ Impulso (margen +10%)</SelectItem>
+                  <SelectItem value="PREMIUM">⭐ Premium (margen +3%)</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.productRole && <p className="text-sm text-destructive">{errors.productRole.message}</p>}
             </div>
+            {pricingPreview ? (
+              <div className="md:col-span-2 rounded-lg border bg-muted/50 p-4 grid gap-4 sm:grid-cols-3">
+                <div>
+                  <p className="text-sm text-muted-foreground">Preço Final (auto)</p>
+                  <p className="text-2xl font-bold text-primary">R$ {pricingPreview.price.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Margem Aplicada</p>
+                  <p className="text-2xl font-bold">{(pricingPreview.margin * 100).toFixed(1)}%</p>
+                </div>
+                {product?.pricingRuleVersion && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Versión Regla</p>
+                    <p className="text-lg font-medium">{product.pricingRuleVersion}</p>
+                  </div>
+                )}
+              </div>
+            ) : product?.price ? (
+              <div className="md:col-span-2 rounded-lg border bg-muted/50 p-4">
+                <p className="text-sm text-muted-foreground">Preço Atual</p>
+                <p className="text-2xl font-bold text-primary">R$ {Number(product.price).toFixed(2)}</p>
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle>Estoque e Unidades</CardTitle></CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label>Estoque</Label>
               <Input type="number" {...register('stock')} />

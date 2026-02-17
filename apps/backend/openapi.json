@@ -4283,7 +4283,8 @@
           },
           "price": {
             "type": "number",
-            "example": 12.9
+            "example": 12.9,
+            "description": "Preço de venda (auto-calculado quando cost + role são informados)"
           },
           "costPrice": {
             "type": "number",
@@ -4292,6 +4293,16 @@
           "compareAtPrice": {
             "type": "number",
             "example": 15.9
+          },
+          "productRole": {
+            "type": "string",
+            "enum": [
+              "ANCLA",
+              "CONVENIENCIA",
+              "IMPULSO",
+              "PREMIUM"
+            ],
+            "description": "Rol estratégico do produto para pricing automático"
           },
           "stock": {
             "type": "number",
@@ -4378,8 +4389,7 @@
         "required": [
           "sku",
           "name",
-          "categoryId",
-          "price"
+          "categoryId"
         ]
       },
       "UpdateProductDto": {
@@ -4415,7 +4425,8 @@
           },
           "price": {
             "type": "number",
-            "example": 12.9
+            "example": 12.9,
+            "description": "Preço de venda (auto-calculado quando cost + role são informados)"
           },
           "costPrice": {
             "type": "number",
@@ -4424,6 +4435,16 @@
           "compareAtPrice": {
             "type": "number",
             "example": 15.9
+          },
+          "productRole": {
+            "type": "string",
+            "enum": [
+              "ANCLA",
+              "CONVENIENCIA",
+              "IMPULSO",
+              "PREMIUM"
+            ],
+            "description": "Rol estratégico do produto para pricing automático"
           },
           "stock": {
             "type": "number",

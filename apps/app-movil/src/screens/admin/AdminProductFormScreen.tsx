@@ -34,7 +34,8 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
   const [form, setForm] = useState({
     name: '',
     description: '',
-    price: '',
+    costPrice: '',
+    productRole: 'CONVENIENCIA',
     compareAtPrice: '',
     sku: '',
     barcode: '',
@@ -69,7 +70,8 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
       setForm({
         name: data.name || '',
         description: data.description || '',
-        price: String(data.price || ''),
+        costPrice: data.costPrice ? String(data.costPrice) : '',
+        productRole: data.productRole || 'CONVENIENCIA',
         compareAtPrice: data.compareAtPrice ? String(data.compareAtPrice) : '',
         sku: data.sku || '',
         barcode: data.barcode || '',
@@ -138,8 +140,12 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
       Alert.alert('Erro', 'Nome do produto é obrigatório');
       return;
     }
-    if (!form.price || isNaN(Number(form.price))) {
-      Alert.alert('Erro', 'Preço inválido');
+    if (!form.costPrice || isNaN(Number(form.costPrice))) {
+      Alert.alert('Erro', 'Custo inválido');
+      return;
+    }
+    if (!form.productRole) {
+      Alert.alert('Erro', 'Rol estratégico é obrigatório');
       return;
     }
 
@@ -164,7 +170,8 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
       const productData: Record<string, unknown> = {
         name: form.name.trim(),
         description: form.description.trim() || undefined,
-        price: Number(form.price),
+        costPrice: Number(form.costPrice),
+        productRole: form.productRole,
         compareAtPrice: form.compareAtPrice ? Number(form.compareAtPrice) : undefined,
         sku: form.sku.trim() || undefined,
         barcode: form.barcode.trim() || undefined,
@@ -242,26 +249,68 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
 
         <View style={styles.row}>
           <View style={styles.halfField}>
-            <Text style={styles.label}>Preço *</Text>
+            <Text style={styles.label}>Custo (R$) *</Text>
             <TextInput
               style={styles.input}
-              value={form.price}
-              onChangeText={(v) => setForm({ ...form, price: v })}
+              value={form.costPrice}
+              onChangeText={(v) => setForm({ ...form, costPrice: v })}
               placeholder="0.00"
               keyboardType="decimal-pad"
             />
           </View>
           <View style={styles.halfField}>
-            <Text style={styles.label}>Preço anterior</Text>
-            <TextInput
-              style={styles.input}
-              value={form.compareAtPrice}
-              onChangeText={(v) => setForm({ ...form, compareAtPrice: v })}
-              placeholder="0.00"
-              keyboardType="decimal-pad"
-            />
+            <Text style={styles.label}>Rol Estratégico *</Text>
+            <View style={styles.statusRow}>
+              {(['ANCLA', 'CONVENIENCIA', 'IMPULSO', 'PREMIUM'] as const).map((r) => (
+                <TouchableOpacity
+                  key={r}
+                  style={[styles.statusOption, form.productRole === r && styles.statusOptionActive, { flex: 1, marginHorizontal: 1 }]}
+                  onPress={() => setForm({ ...form, productRole: r })}
+                >
+                  <Text style={[styles.statusOptionText, form.productRole === r && styles.statusOptionTextActive, { fontSize: 9 }]}>
+                    {r === 'ANCLA' ? '⚓' : r === 'CONVENIENCIA' ? '🛒' : r === 'IMPULSO' ? '⚡' : '⭐'}
+                    {'\n'}{r.slice(0, 4)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
         </View>
+
+        {/* Pricing Preview (v1.1 — safe rounding) */}
+        {form.costPrice && Number(form.costPrice) > 0 && form.productRole ? (() => {
+          const cost = Number(form.costPrice);
+          const bands = [{ max: 3, m: 0.30 }, { max: 15, m: 0.20 }, { max: 60, m: 0.15 }, { max: Infinity, m: 0.10 }];
+          const adj: Record<string, number> = { ANCLA: -0.05, CONVENIENCIA: 0, IMPULSO: 0.10, PREMIUM: 0.03 };
+          let margin = (bands.find(b => cost < b.max)?.m ?? 0.10) + (adj[form.productRole] ?? 0);
+          margin = Math.max(0.08, Math.min(0.40, margin));
+          const raw = cost * (1 + margin);
+          let final: number;
+          if (raw < 1) {
+            final = Math.ceil(raw * 10) / 10;
+          } else {
+            const decimal = raw % 1;
+            const intPart = Math.floor(raw);
+            final = decimal <= 0.49 ? intPart + 0.59 : intPart + 0.99;
+          }
+          if (final <= cost) final = Number((Math.ceil(cost * 100) / 100 + 0.05).toFixed(2));
+          final = Number(final.toFixed(2));
+          const appliedMargin = ((final - cost) / cost) * 100;
+          return (
+            <View style={{ backgroundColor: '#f0fdf4', borderRadius: 10, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#bbf7d0' }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View>
+                  <Text style={{ fontSize: 12, color: '#6b7280' }}>Preço Final (auto)</Text>
+                  <Text style={{ fontSize: 22, fontWeight: '700', color: '#16a34a' }}>R$ {final.toFixed(2)}</Text>
+                </View>
+                <View style={{ alignItems: 'flex-end' }}>
+                  <Text style={{ fontSize: 12, color: '#6b7280' }}>Margem</Text>
+                  <Text style={{ fontSize: 22, fontWeight: '700' }}>{appliedMargin.toFixed(1)}%</Text>
+                </View>
+              </View>
+            </View>
+          );
+        })() : null}
 
         <View style={styles.row}>
           <View style={styles.halfField}>

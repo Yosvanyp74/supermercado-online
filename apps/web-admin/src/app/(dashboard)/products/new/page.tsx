@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,8 +27,8 @@ const productSchema = z.object({
   description: z.string().optional(),
   shortDescription: z.string().optional(),
   categoryId: z.string().min(1, 'Categoria obrigatória'),
-  price: z.coerce.number().positive('Preço deve ser positivo'),
-  costPrice: z.coerce.number().positive().optional().or(z.literal('')),
+  costPrice: z.coerce.number().positive('Custo deve ser positivo'),
+  productRole: z.enum(['ANCLA', 'CONVENIENCIA', 'IMPULSO', 'PREMIUM'], { required_error: 'Rol estratégico obrigatório' }),
   compareAtPrice: z.coerce.number().optional().or(z.literal('')),
   stock: z.coerce.number().int().min(0).default(0),
   minStock: z.coerce.number().int().min(0).default(0),
@@ -42,6 +42,27 @@ const productSchema = z.object({
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
+
+// Client-side pricing preview (mirrors backend PricingService v1.1 — safe rounding)
+function calcPricePreview(cost: number, role: string): { price: number; margin: number } | null {
+  if (!cost || cost <= 0 || !role) return null;
+  const bands = [{ max: 3, m: 0.30 }, { max: 15, m: 0.20 }, { max: 60, m: 0.15 }, { max: Infinity, m: 0.10 }];
+  const adj: Record<string, number> = { ANCLA: -0.05, CONVENIENCIA: 0, IMPULSO: 0.10, PREMIUM: 0.03 };
+  let margin = (bands.find(b => cost < b.max)?.m ?? 0.10) + (adj[role] ?? 0);
+  margin = Math.max(0.08, Math.min(0.40, margin));
+  const raw = cost * (1 + margin);
+  let rounded: number;
+  if (raw < 1) {
+    rounded = Math.ceil(raw * 10) / 10;
+  } else {
+    const decimal = raw % 1;
+    const intPart = Math.floor(raw);
+    rounded = decimal <= 0.49 ? intPart + 0.59 : intPart + 0.99;
+  }
+  if (rounded <= cost) rounded = Number((Math.ceil(cost * 100) / 100 + 0.05).toFixed(2));
+  rounded = Number(rounded.toFixed(2));
+  return { price: rounded, margin: Math.round(((rounded - cost) / cost) * 10000) / 10000 };
+}
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -74,10 +95,11 @@ export default function NewProductPage() {
   const createMutation = useMutation({
     mutationFn: (data: ProductFormData) => {
       const payload: any = { ...data };
-      if (payload.costPrice === '' || payload.costPrice === undefined) delete payload.costPrice;
       if (payload.compareAtPrice === '' || payload.compareAtPrice === undefined) delete payload.compareAtPrice;
       if (payload.weight === '' || payload.weight === undefined) delete payload.weight;
       if (payload.expiresAt === '' || payload.expiresAt === undefined) delete payload.expiresAt;
+      // price is auto-calculated on backend from costPrice + productRole
+      delete payload.price;
       return productsApi.create(payload);
     },
     onSuccess: () => {
@@ -91,6 +113,10 @@ export default function NewProductPage() {
   });
 
   const flatCategories = flattenCategories(Array.isArray(categories) ? categories : []);
+
+  const costValue = watch('costPrice');
+  const roleValue = watch('productRole');
+  const pricingPreview = calcPricePreview(Number(costValue) || 0, roleValue);
 
   return (
     <div className="space-y-6">
@@ -171,22 +197,49 @@ export default function NewProductPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Preços e Estoque</CardTitle>
+            <CardTitle className="flex items-center gap-2"><Calculator className="h-5 w-5" />Pricing Automático</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="costPrice">Custo (R$) *</Label>
+              <Input id="costPrice" type="number" step="0.01" {...register('costPrice')} />
+              {errors.costPrice && <p className="text-sm text-destructive">{errors.costPrice.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="productRole">Rol Estratégico *</Label>
+              <Select onValueChange={(v: any) => setValue('productRole', v)} value={watch('productRole')}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecionar rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ANCLA">⚓ Ancla (margen -5%)</SelectItem>
+                  <SelectItem value="CONVENIENCIA">🛒 Conveniencia (base)</SelectItem>
+                  <SelectItem value="IMPULSO">⚡ Impulso (margen +10%)</SelectItem>
+                  <SelectItem value="PREMIUM">⭐ Premium (margen +3%)</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.productRole && <p className="text-sm text-destructive">{errors.productRole.message}</p>}
+            </div>
+            {pricingPreview && (
+              <div className="md:col-span-2 rounded-lg border bg-muted/50 p-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="text-sm text-muted-foreground">Preço Final (auto)</p>
+                  <p className="text-2xl font-bold text-primary">R$ {pricingPreview.price.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Margem Aplicada</p>
+                  <p className="text-2xl font-bold">{(pricingPreview.margin * 100).toFixed(1)}%</p>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Estoque e Unidades</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-2">
-              <Label htmlFor="price">Preço (R$) *</Label>
-              <Input id="price" type="number" step="0.01" {...register('price')} />
-              {errors.price && <p className="text-sm text-destructive">{errors.price.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="costPrice">Preço de Custo (R$)</Label>
-              <Input id="costPrice" type="number" step="0.01" {...register('costPrice')} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="compareAtPrice">Preço Comparativo (R$)</Label>
-              <Input id="compareAtPrice" type="number" step="0.01" {...register('compareAtPrice')} />
-            </div>
             <div className="space-y-2">
               <Label htmlFor="stock">Estoque *</Label>
               <Input id="stock" type="number" {...register('stock')} />

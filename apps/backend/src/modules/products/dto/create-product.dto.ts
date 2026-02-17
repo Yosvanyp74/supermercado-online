@@ -13,7 +13,7 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ProductStatus } from '@prisma/client';
+import { ProductStatus, ProductRole } from '@prisma/client';
 
 export class CreateProductDto {
   @ApiProperty({ example: 'SKU-001' })
@@ -52,11 +52,12 @@ export class CreateProductDto {
   @IsUUID('4', { message: 'ID da marca deve ser um UUID válido' })
   brandId?: string;
 
-  @ApiProperty({ example: 12.9 })
+  @ApiPropertyOptional({ example: 12.9, description: 'Preço de venda (auto-calculado quando cost + role são informados)' })
+  @IsOptional()
   @IsNumber({}, { message: 'Preço deve ser um número' })
   @Min(0, { message: 'Preço deve ser maior ou igual a zero' })
   @Type(() => Number)
-  price: number;
+  price?: number;
 
   @ApiPropertyOptional({ example: 8.5 })
   @IsOptional()
@@ -71,6 +72,11 @@ export class CreateProductDto {
   @Min(0, { message: 'Preço comparativo deve ser maior ou igual a zero' })
   @Type(() => Number)
   compareAtPrice?: number;
+
+  @ApiPropertyOptional({ enum: ProductRole, description: 'Rol estratégico do produto para pricing automático' })
+  @IsOptional()
+  @IsEnum(ProductRole, { message: 'Rol de produto inválido' })
+  productRole?: ProductRole;
 
   @ApiPropertyOptional({ example: 100, default: 0 })
   @IsOptional()

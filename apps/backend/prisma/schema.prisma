@@ -26,6 +26,13 @@ enum ProductStatus {
   EXPIRED
 }
 
+enum ProductRole {
+  ANCLA
+  CONVENIENCIA
+  IMPULSO
+  PREMIUM
+}
+
 enum OrderStatus {
   PENDING
   CONFIRMED
@@ -246,10 +253,13 @@ model Product {
   weight           Float?
   volume           Float?
   mainImageUrl     String?       @map("main_image_url")
-  status           ProductStatus @default(ACTIVE)
-  isFeatured       Boolean       @default(false) @map("is_featured")
-  isOrganic        Boolean       @default(false) @map("is_organic")
-  taxRate          Float         @default(0) @map("tax_rate")
+  status              ProductStatus @default(ACTIVE)
+  productRole         ProductRole?  @map("product_role")
+  appliedMargin       Float?        @map("applied_margin")
+  pricingRuleVersion  String?       @map("pricing_rule_version")
+  isFeatured          Boolean       @default(false) @map("is_featured")
+  isOrganic           Boolean       @default(false) @map("is_organic")
+  taxRate             Float         @default(0) @map("tax_rate")
   tags             String[]      @default([])
   aisleLocation    String?       @map("aisle_location")
   shelfPosition    String?       @map("shelf_position")

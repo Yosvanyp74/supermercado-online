@@ -2,10 +2,12 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Prisma, ProductStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UploadsService } from '../uploads/uploads.service';
+import { PricingService } from '../pricing/pricing.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
@@ -29,6 +31,7 @@ export class ProductsService {
   constructor(
     private prisma: PrismaService,
     private uploadsService: UploadsService,
+    private pricingService: PricingService,
   ) {}
 
   async findAll(params: {
@@ -211,11 +214,23 @@ export class ProductsService {
       slug = `${slug}-${Date.now()}`;
     }
 
+    // Auto-calculate price if costPrice and productRole are provided
+    const createData: any = { ...dto, slug };
+    if (dto.costPrice != null && dto.productRole) {
+      const pricing = this.pricingService.calculatePrice(dto.costPrice, dto.productRole);
+      if (pricing.finalPrice <= dto.costPrice) {
+        throw new BadRequestException('Pricing calculation invalid: price below cost');
+      }
+      createData.price = pricing.finalPrice;
+      createData.appliedMargin = pricing.appliedMargin;
+      createData.pricingRuleVersion = pricing.ruleVersion;
+      createData.compareAtPrice = undefined; // auto-priced → no manual compare
+    } else if (dto.costPrice != null && !dto.productRole) {
+      throw new BadRequestException('Rol estratégico é obrigatório quando o custo é informado');
+    }
+
     const product = await this.prisma.product.create({
-      data: {
-        ...dto,
-        slug,
-      },
+      data: createData,
       include: productInclude,
     });
 
@@ -268,6 +283,19 @@ export class ProductsService {
         slug = `${slug}-${Date.now()}`;
       }
       data.slug = slug;
+    }
+
+    // Auto-recalculate price if cost or role changed
+    const effectiveCost = dto.costPrice ?? existing.costPrice;
+    const effectiveRole = dto.productRole ?? existing.productRole;
+    if (effectiveCost != null && effectiveRole) {
+      const pricing = this.pricingService.calculatePrice(effectiveCost, effectiveRole);
+      if (pricing.finalPrice <= effectiveCost) {
+        throw new BadRequestException('Pricing calculation invalid: price below cost');
+      }
+      data.price = pricing.finalPrice;
+      data.appliedMargin = pricing.appliedMargin;
+      data.pricingRuleVersion = pricing.ruleVersion;
     }
 
     const product = await this.prisma.product.update({

@@ -29,7 +29,7 @@ export function CartDrawer() {
       />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 z-50 h-full w-full max-w-md bg-white shadow-xl flex flex-col">
+      <div className="fixed right-0 top-0 z-50 h-full w-full max-w-md bg-background shadow-xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-lg font-semibold flex items-center gap-2">
@@ -59,7 +59,7 @@ export function CartDrawer() {
               <div className="space-y-4">
                 {items.map((item) => (
                   <div key={item.productId} className="flex gap-3">
-                    <div className="relative h-20 w-20 rounded-md overflow-hidden bg-gray-100 shrink-0">
+                    <div className="relative h-20 w-20 rounded-md overflow-hidden bg-muted shrink-0">
                       <Image
                         src={getImageUrl(item.imageUrl)}
                         alt={item.name}

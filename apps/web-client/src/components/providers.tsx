@@ -1,6 +1,7 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth-store';
@@ -35,11 +36,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
   if (!mounted) return null;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthHydrator>
-        {children}
-        <Toaster position="top-right" richColors />
-      </AuthHydrator>
-    </QueryClientProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <QueryClientProvider client={queryClient}>
+        <AuthHydrator>
+          {children}
+          <Toaster position="top-right" richColors />
+        </AuthHydrator>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }

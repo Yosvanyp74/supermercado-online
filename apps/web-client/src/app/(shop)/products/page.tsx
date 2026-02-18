@@ -170,7 +170,7 @@ export default function ProductsPage() {
       <div className="flex gap-6">
         {/* Filters sidebar */}
         <aside className={`${showFilters ? 'block' : 'hidden'} md:block w-full md:w-64 shrink-0`}>
-          <div className="space-y-6 p-4 border rounded-lg bg-white">
+          <div className="space-y-6 p-4 border rounded-lg bg-card">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold">Filtros</h3>
               {hasActiveFilters && (
@@ -187,7 +187,7 @@ export default function ProductsPage() {
               <h4 className="font-medium mb-3 text-sm">Categorias</h4>
               <div className="space-y-0.5">
                 <button
-                  className={`block w-full text-left text-sm py-1.5 px-2 rounded hover:bg-gray-100 ${!categoryId ? 'bg-primary/10 text-primary font-medium' : ''}`}
+                  className={`block w-full text-left text-sm py-1.5 px-2 rounded hover:bg-muted ${!categoryId ? 'bg-primary/10 text-primary font-medium' : ''}`}
                   onClick={() => updateFilters({ categoryId: undefined })}
                 >
                   Todas
@@ -196,14 +196,14 @@ export default function ProductsPage() {
                   <div key={cat.id}>
                     <div className="flex items-center">
                       <button
-                        className={`flex-1 text-left text-sm py-1.5 px-2 rounded hover:bg-gray-100 ${categoryId === cat.id ? 'bg-primary/10 text-primary font-medium' : ''}`}
+                        className={`flex-1 text-left text-sm py-1.5 px-2 rounded hover:bg-muted ${categoryId === cat.id ? 'bg-primary/10 text-primary font-medium' : ''}`}
                         onClick={() => updateFilters({ categoryId: cat.id })}
                       >
                         {cat.name}
                       </button>
                       {cat.children?.length > 0 && (
                         <button
-                          className="p-1 rounded hover:bg-gray-100"
+                          className="p-1 rounded hover:bg-muted"
                           onClick={() => toggleExpand(cat.id)}
                           aria-label={`Expandir ${cat.name}`}
                         >
@@ -216,7 +216,7 @@ export default function ProductsPage() {
                         {cat.children.map((sub: any) => (
                           <button
                             key={sub.id}
-                            className={`block w-full text-left text-sm py-1 px-2 rounded hover:bg-gray-100 ${categoryId === sub.id ? 'bg-primary/10 text-primary font-medium' : ''}`}
+                            className={`block w-full text-left text-sm py-1 px-2 rounded hover:bg-muted ${categoryId === sub.id ? 'bg-primary/10 text-primary font-medium' : ''}`}
                             onClick={() => updateFilters({ categoryId: sub.id })}
                           >
                             {sub.name}

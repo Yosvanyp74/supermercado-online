@@ -141,7 +141,7 @@ export default function OrderDetailPage() {
             <div className="space-y-3">
               {order.items?.map((item: any) => (
                 <div key={item.id} className="flex items-center gap-3">
-                  <div className="relative h-14 w-14 rounded bg-gray-100 overflow-hidden shrink-0">
+                  <div className="relative h-14 w-14 rounded bg-muted overflow-hidden shrink-0">
                     <Image
                       src={getImageUrl(item.product?.images?.[0]?.url)}
                       alt={item.product?.name || 'Produto'}

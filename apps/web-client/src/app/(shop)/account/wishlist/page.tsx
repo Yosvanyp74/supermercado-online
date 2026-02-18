@@ -64,7 +64,7 @@ export default function WishlistPage() {
               const product = item.product || item;
               return (
                 <div key={product.id} className="flex items-center gap-4 p-4 rounded-lg border">
-                  <div className="relative h-16 w-16 rounded bg-gray-100 overflow-hidden shrink-0">
+                  <div className="relative h-16 w-16 rounded bg-muted overflow-hidden shrink-0">
                     <Image
                       src={getImageUrl(product.images?.[0]?.url || product.imageUrl)}
                       alt={product.name}

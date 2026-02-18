@@ -448,7 +448,7 @@ export default function CheckoutPage() {
                     <div className="space-y-3">
                       {items.map((item) => (
                         <div key={item.productId} className="flex items-center gap-3">
-                          <div className="relative h-12 w-12 rounded bg-gray-100 overflow-hidden shrink-0">
+                          <div className="relative h-12 w-12 rounded bg-muted overflow-hidden shrink-0">
                             <Image
                               src={getImageUrl(item.imageUrl)}
                               alt={item.name}

@@ -70,7 +70,7 @@ export default function CartPage() {
             <Card key={item.productId}>
               <CardContent className="p-4">
                 <div className="flex gap-4">
-                  <div className="relative h-24 w-24 rounded-md overflow-hidden bg-gray-100 shrink-0">
+                  <div className="relative h-24 w-24 rounded-md overflow-hidden bg-muted shrink-0">
                     <Image
                       src={getImageUrl(item.imageUrl)}
                       alt={item.name}

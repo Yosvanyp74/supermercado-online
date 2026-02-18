@@ -151,7 +151,7 @@ export default function HomePage() {
       </section>
 
       {/* Featured Products */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-muted">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
             <div>

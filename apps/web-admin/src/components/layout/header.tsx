@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuthStore } from '@/store/auth-store';
 import { useUIStore } from '@/store/ui-store';
 import { useQuery } from '@tanstack/react-query';
@@ -46,6 +47,8 @@ export function Header() {
       <div className="flex-1" />
 
       <div className="flex items-center gap-2">
+        <ThemeToggle />
+
         <Button
           variant="ghost"
           size="icon"

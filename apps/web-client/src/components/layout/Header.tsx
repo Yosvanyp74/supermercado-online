@@ -28,6 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuthStore } from '@/store/auth-store';
 import { useCartStore } from '@/store/cart-store';
 import { useUIStore } from '@/store/ui-store';
@@ -56,7 +57,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b shadow-sm">
+    <header className="sticky top-0 z-50 bg-background border-b shadow-sm">
       {/* Top bar */}
       <div className="bg-primary text-primary-foreground text-xs py-1.5">
         <div className="container mx-auto flex items-center justify-between px-4">
@@ -112,6 +113,9 @@ export function Header() {
 
           {/* Right actions */}
           <div className="flex items-center gap-1 sm:gap-2">
+            {/* Theme toggle */}
+            <ThemeToggle />
+
             {/* Search mobile */}
             <Button
               variant="ghost"
@@ -216,7 +220,7 @@ export function Header() {
       </div>
 
       {/* Navigation bar */}
-      <nav className="hidden md:block border-t bg-gray-50">
+      <nav className="hidden md:block border-t bg-muted">
         <div className="container mx-auto px-4">
           <ul className="flex items-center gap-6 text-sm py-2">
             <li>
@@ -245,7 +249,7 @@ export function Header() {
 
       {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t bg-white">
+        <div className="md:hidden border-t bg-background">
           <div className="container mx-auto px-4 py-4">
             <form onSubmit={handleSearch} className="mb-4">
               <Input
@@ -257,35 +261,35 @@ export function Header() {
             <nav className="space-y-2">
               <Link
                 href="/"
-                className="block py-2 px-3 rounded-md hover:bg-gray-100"
+                className="block py-2 px-3 rounded-md hover:bg-muted"
                 onClick={() => setMobileMenu(false)}
               >
                 Início
               </Link>
               <Link
                 href="/categories"
-                className="block py-2 px-3 rounded-md hover:bg-gray-100"
+                className="block py-2 px-3 rounded-md hover:bg-muted"
                 onClick={() => setMobileMenu(false)}
               >
                 Categorias
               </Link>
               <Link
                 href="/products"
-                className="block py-2 px-3 rounded-md hover:bg-gray-100"
+                className="block py-2 px-3 rounded-md hover:bg-muted"
                 onClick={() => setMobileMenu(false)}
               >
                 Todos os Produtos
               </Link>
               <Link
                 href="/products?isFeatured=true"
-                className="block py-2 px-3 rounded-md hover:bg-gray-100"
+                className="block py-2 px-3 rounded-md hover:bg-muted"
                 onClick={() => setMobileMenu(false)}
               >
                 Destaques
               </Link>
               <Link
                 href="/products?isOrganic=true"
-                className="block py-2 px-3 rounded-md hover:bg-gray-100"
+                className="block py-2 px-3 rounded-md hover:bg-muted"
                 onClick={() => setMobileMenu(false)}
               >
                 Orgânicos

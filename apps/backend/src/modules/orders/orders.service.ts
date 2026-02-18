@@ -111,14 +111,22 @@ export class OrdersService {
       // 3. Calculate totals
       let subtotal = 0;
       let tax = 0;
+      let totalCost = 0;
       const orderItems: Prisma.OrderItemCreateWithoutOrderInput[] = [];
+      let pricingRuleVersion: string | null = null;
 
       for (const item of dto.items) {
         const product = productMap.get(item.productId)!;
         const itemTotal = product.price * item.quantity;
         const itemTax = itemTotal * product.taxRate;
+        const itemCost = (product.costPrice || 0) * item.quantity;
         subtotal += itemTotal;
         tax += itemTax;
+        totalCost += itemCost;
+
+        if (product.pricingRuleVersion && !pricingRuleVersion) {
+          pricingRuleVersion = product.pricingRuleVersion;
+        }
 
         orderItems.push({
           product: { connect: { id: product.id } },
@@ -126,6 +134,7 @@ export class OrdersService {
           productImage: product.mainImageUrl,
           quantity: item.quantity,
           unitPrice: product.price,
+          unitCost: product.costPrice || 0,
           total: Math.round(itemTotal * 100) / 100,
           notes: item.notes,
         });
@@ -133,6 +142,7 @@ export class OrdersService {
 
       subtotal = Math.round(subtotal * 100) / 100;
       tax = Math.round(tax * 100) / 100;
+      totalCost = Math.round(totalCost * 100) / 100;
 
       // 4. Apply coupon if provided
       let discount = 0;
@@ -190,7 +200,15 @@ export class OrdersService {
       const total =
         Math.round((subtotal + tax + deliveryFee - discount) * 100) / 100;
 
-      // 6. Create order
+      // 6. Calculate margin metrics (persisted at checkout time)
+      const orderTotalRevenue = subtotal; // revenue = item prices × quantities
+      const orderTotalCost = totalCost;
+      const grossMarginAmount = Math.round((orderTotalRevenue - orderTotalCost) * 100) / 100;
+      const grossMarginPercent = orderTotalRevenue > 0
+        ? Math.round((grossMarginAmount / orderTotalRevenue) * 10000) / 10000
+        : 0;
+
+      // 7. Create order
       const order = await tx.order.create({
         data: {
           orderNumber: this.generateOrderNumber(),
@@ -203,6 +221,11 @@ export class OrdersService {
           deliveryFee,
           discount,
           total,
+          orderTotalCost,
+          orderTotalRevenue,
+          orderGrossMarginAmount: grossMarginAmount,
+          orderGrossMarginPercent: grossMarginPercent,
+          pricingRuleVersionApplied: pricingRuleVersion,
           couponId,
           deliveryAddressId: dto.deliveryAddressId || null,
           notes: dto.notes,

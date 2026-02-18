@@ -231,4 +231,96 @@ export class AnalyticsService {
 
     return filter;
   }
+
+  // ============ MARGIN ANALYTICS ============
+
+  async getMarginDashboard() {
+    const now = new Date();
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
+
+    const weekStart = new Date(now);
+    weekStart.setDate(weekStart.getDate() - 7);
+    weekStart.setHours(0, 0, 0, 0);
+
+    const notCancelled = { status: { notIn: ['CANCELLED', 'REFUNDED'] as any } };
+
+    // Today's margin
+    const todayOrders = await this.prisma.order.findMany({
+      where: { createdAt: { gte: todayStart }, ...notCancelled },
+      select: {
+        orderTotalCost: true,
+        orderTotalRevenue: true,
+        orderGrossMarginAmount: true,
+        total: true,
+      },
+    });
+
+    const todayRevenue = todayOrders.reduce((s, o) => s + (o.orderTotalRevenue || o.total || 0), 0);
+    const todayCost = todayOrders.reduce((s, o) => s + (o.orderTotalCost || 0), 0);
+    const todayMarginAmount = Math.round((todayRevenue - todayCost) * 100) / 100;
+    const todayMarginPercent = todayRevenue > 0
+      ? Math.round((todayMarginAmount / todayRevenue) * 10000) / 10000
+      : 0;
+
+    // Week's margin
+    const weekOrders = await this.prisma.order.findMany({
+      where: { createdAt: { gte: weekStart }, ...notCancelled },
+      select: {
+        orderTotalCost: true,
+        orderTotalRevenue: true,
+        total: true,
+        createdAt: true,
+      },
+    });
+
+    const weekRevenue = weekOrders.reduce((s, o) => s + (o.orderTotalRevenue || o.total || 0), 0);
+    const weekCost = weekOrders.reduce((s, o) => s + (o.orderTotalCost || 0), 0);
+    const weekMarginAmount = Math.round((weekRevenue - weekCost) * 100) / 100;
+    const weekMarginPercent = weekRevenue > 0
+      ? Math.round((weekMarginAmount / weekRevenue) * 10000) / 10000
+      : 0;
+
+    // Daily trend (last 7 days)
+    const dailyTrend: { date: string; revenue: number; cost: number; margin: number }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const dayStart = new Date(now);
+      dayStart.setDate(dayStart.getDate() - i);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(dayStart);
+      dayEnd.setHours(23, 59, 59, 999);
+
+      const dayOrders = weekOrders.filter(
+        (o) => o.createdAt >= dayStart && o.createdAt <= dayEnd,
+      );
+
+      const dayRevenue = dayOrders.reduce((s, o) => s + (o.orderTotalRevenue || o.total || 0), 0);
+      const dayCost = dayOrders.reduce((s, o) => s + (o.orderTotalCost || 0), 0);
+
+      dailyTrend.push({
+        date: dayStart.toISOString().split('T')[0],
+        revenue: Math.round(dayRevenue * 100) / 100,
+        cost: Math.round(dayCost * 100) / 100,
+        margin: Math.round((dayRevenue - dayCost) * 100) / 100,
+      });
+    }
+
+    return {
+      today: {
+        revenue: Math.round(todayRevenue * 100) / 100,
+        cost: Math.round(todayCost * 100) / 100,
+        marginAmount: todayMarginAmount,
+        marginPercent: todayMarginPercent,
+        orderCount: todayOrders.length,
+      },
+      week: {
+        revenue: Math.round(weekRevenue * 100) / 100,
+        cost: Math.round(weekCost * 100) / 100,
+        marginAmount: weekMarginAmount,
+        marginPercent: weekMarginPercent,
+        orderCount: weekOrders.length,
+      },
+      dailyTrend,
+    };
+  }
 }

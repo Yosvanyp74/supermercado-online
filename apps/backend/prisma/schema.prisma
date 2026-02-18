@@ -366,6 +366,11 @@ model Order {
   deliveredAt        DateTime?      @map("delivered_at")
   cancelledAt        DateTime?      @map("cancelled_at")
   cancelReason       String?        @map("cancel_reason")
+  orderTotalCost     Float?         @map("order_total_cost")
+  orderTotalRevenue  Float?         @map("order_total_revenue")
+  orderGrossMarginAmount  Float?    @map("order_gross_margin_amount")
+  orderGrossMarginPercent Float?    @map("order_gross_margin_percent")
+  pricingRuleVersionApplied String? @map("pricing_rule_version_applied")
   createdAt          DateTime       @default(now()) @map("created_at")
   updatedAt          DateTime       @updatedAt @map("updated_at")
 
@@ -395,6 +400,7 @@ model OrderItem {
   productImage          String?  @map("product_image")
   quantity              Int
   unitPrice             Float    @map("unit_price")
+  unitCost              Float?   @map("unit_cost")
   discount              Float    @default(0)
   total                 Float
   notes                 String?
@@ -804,4 +810,19 @@ model Setting {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("settings")
+}
+
+model DailyMarginStats {
+  id                 String   @id @default(uuid())
+  date               DateTime @unique @db.Date
+  totalRevenue       Float    @default(0) @map("total_revenue")
+  totalCost          Float    @default(0) @map("total_cost")
+  totalMarginAmount  Float    @default(0) @map("total_margin_amount")
+  totalMarginPercent Float    @default(0) @map("total_margin_percent")
+  orderCount         Int      @default(0) @map("order_count")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@index([date])
+  @@map("daily_margin_stats")
 }

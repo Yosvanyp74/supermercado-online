@@ -37,20 +37,23 @@ type Props = NativeStackScreenProps<AdminStackParamList, 'AdminHome'>;
 export function AdminHomeScreen({ navigation }: Props) {
   const rootNavigation = useNavigation<any>();
   const [stats, setStats] = useState<any>(null);
+  const [marginStats, setMarginStats] = useState<any>(null);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadData = async () => {
     try {
-      const [dashRes, notifRes] = await Promise.allSettled([
+      const [dashRes, notifRes, marginRes] = await Promise.allSettled([
         adminApi.getDashboard(),
         adminApi.getUnreadCount(),
+        adminApi.getMarginDashboard(),
       ]);
       if (dashRes.status === 'fulfilled') setStats(dashRes.value.data);
       if (notifRes.status === 'fulfilled') {
         setUnreadNotifs(notifRes.value.data?.count || notifRes.value.data || 0);
       }
+      if (marginRes.status === 'fulfilled') setMarginStats(marginRes.value.data);
     } catch {
       // Ignore
     } finally {
@@ -205,6 +208,52 @@ export function AdminHomeScreen({ navigation }: Props) {
           <Text style={styles.statLabel}>Estoque Baixo</Text>
         </View>
       </View>
+
+      {/* Margin Indicators */}
+      {marginStats && (
+        <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 16, marginBottom: 8 }}>
+          <View style={{
+            flex: 1,
+            backgroundColor: (marginStats.today?.marginPercent || 0) >= 0.15 ? '#f0fdf4' : (marginStats.today?.marginPercent || 0) >= 0.10 ? '#fefce8' : '#fef2f2',
+            borderRadius: 12,
+            padding: 14,
+            borderWidth: 1,
+            borderColor: (marginStats.today?.marginPercent || 0) >= 0.15 ? '#bbf7d0' : (marginStats.today?.marginPercent || 0) >= 0.10 ? '#fde68a' : '#fecaca',
+          }}>
+            <Text style={{ fontSize: 11, color: '#6b7280', fontWeight: '600' }}>Margem Hoje</Text>
+            <Text style={{
+              fontSize: 22,
+              fontWeight: '700',
+              color: (marginStats.today?.marginPercent || 0) >= 0.15 ? '#16a34a' : (marginStats.today?.marginPercent || 0) >= 0.10 ? '#ca8a04' : '#dc2626',
+            }}>
+              {((marginStats.today?.marginPercent || 0) * 100).toFixed(1)}%
+            </Text>
+            <Text style={{ fontSize: 10, color: '#9ca3af' }}>
+              R$ {(marginStats.today?.marginAmount || 0).toFixed(2)}
+            </Text>
+          </View>
+          <View style={{
+            flex: 1,
+            backgroundColor: (marginStats.week?.marginPercent || 0) >= 0.15 ? '#f0fdf4' : (marginStats.week?.marginPercent || 0) >= 0.10 ? '#fefce8' : '#fef2f2',
+            borderRadius: 12,
+            padding: 14,
+            borderWidth: 1,
+            borderColor: (marginStats.week?.marginPercent || 0) >= 0.15 ? '#bbf7d0' : (marginStats.week?.marginPercent || 0) >= 0.10 ? '#fde68a' : '#fecaca',
+          }}>
+            <Text style={{ fontSize: 11, color: '#6b7280', fontWeight: '600' }}>Margem Semana</Text>
+            <Text style={{
+              fontSize: 22,
+              fontWeight: '700',
+              color: (marginStats.week?.marginPercent || 0) >= 0.15 ? '#16a34a' : (marginStats.week?.marginPercent || 0) >= 0.10 ? '#ca8a04' : '#dc2626',
+            }}>
+              {((marginStats.week?.marginPercent || 0) * 100).toFixed(1)}%
+            </Text>
+            <Text style={{ fontSize: 10, color: '#9ca3af' }}>
+              R$ {(marginStats.week?.marginAmount || 0).toFixed(2)}
+            </Text>
+          </View>
+        </View>
+      )}
 
       {/* Exit admin mode */}
       <TouchableOpacity

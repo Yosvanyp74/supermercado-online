@@ -407,6 +407,8 @@ export const adminApi = {
   getSellerPerformance: (params?: { startDate?: string; endDate?: string }) =>
     apiClient.get('/analytics/sellers', { params }),
 
+  getMarginDashboard: () => apiClient.get('/analytics/margin'),
+
   // Delivery management
   getDeliveries: () => apiClient.get('/delivery/active'),
   assignDelivery: (data: { orderId: string; deliveryPersonId: string }) =>

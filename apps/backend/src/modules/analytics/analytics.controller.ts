@@ -97,4 +97,11 @@ export class AnalyticsController {
   ) {
     return this.analyticsService.getSellerPerformance({ startDate, endDate });
   }
+
+  @Get('margin')
+  @ApiOperation({ summary: 'Obter métricas de margem (diário + semanal + tendência)' })
+  @ApiResponse({ status: 200, description: 'Métricas de margem retornadas' })
+  getMarginDashboard() {
+    return this.analyticsService.getMarginDashboard();
+  }
 }

@@ -196,6 +196,7 @@ export const analyticsApi = {
     api.get('/analytics/revenue', { params }),
   getSellerPerformance: (params?: { startDate?: string; endDate?: string }) =>
     api.get('/analytics/sellers', { params }),
+  getMarginDashboard: () => api.get('/analytics/margin'),
 };
 
 // ============ NOTIFICATIONS ============

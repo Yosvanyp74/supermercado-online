@@ -10,6 +10,7 @@ import {
   TrendingDown,
   Package,
   Truck,
+  Percent,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -124,11 +125,17 @@ export default function DashboardPage() {
     queryFn: () => analyticsApi.getTopProducts({ limit: 5 }),
   });
 
+  const { data: marginData } = useQuery({
+    queryKey: ['margin-dashboard'],
+    queryFn: () => analyticsApi.getMarginDashboard(),
+  });
+
   const stats = dashboard?.data;
   const orders = recentOrders?.data?.data || recentOrders?.data?.orders || [];
   const lowStockItems = lowStock?.data?.data || lowStock?.data || [];
   const revenueChartData = revenueData?.data?.data || revenueData?.data || [];
   const topProductsData = topProducts?.data?.data || topProducts?.data || [];
+  const margin = marginData?.data;
 
   if (dashLoading) return <PageLoading />;
 
@@ -165,6 +172,103 @@ export default function DashboardPage() {
           icon={Users}
         />
       </div>
+
+      {/* Rentabilidad Section */}
+      {margin && (
+        <>
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight flex items-center gap-2">
+              <Percent className="h-5 w-5 text-green-600" />
+              Rentabilidade
+            </h2>
+            <p className="text-sm text-muted-foreground">Margen real baseado em vendas efetivas</p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardContent className="p-6">
+                <p className="text-sm font-medium text-muted-foreground">Margem Bruta Hoje</p>
+                <p className={`text-2xl font-bold mt-1 ${(margin.today?.marginPercent || 0) >= 0.15 ? 'text-green-600' : (margin.today?.marginPercent || 0) >= 0.10 ? 'text-yellow-600' : 'text-red-600'}`}>
+                  {((margin.today?.marginPercent || 0) * 100).toFixed(1)}%
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {formatCurrency(margin.today?.marginAmount || 0)} de margem
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <p className="text-sm font-medium text-muted-foreground">Margem Bruta 7 Dias</p>
+                <p className={`text-2xl font-bold mt-1 ${(margin.week?.marginPercent || 0) >= 0.15 ? 'text-green-600' : (margin.week?.marginPercent || 0) >= 0.10 ? 'text-yellow-600' : 'text-red-600'}`}>
+                  {((margin.week?.marginPercent || 0) * 100).toFixed(1)}%
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {formatCurrency(margin.week?.marginAmount || 0)} de margem
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <p className="text-sm font-medium text-muted-foreground">Vendas Hoje</p>
+                <p className="text-2xl font-bold mt-1">
+                  {formatCurrency(margin.today?.revenue || 0)}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {margin.today?.orderCount || 0} pedidos
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <p className="text-sm font-medium text-muted-foreground">Vendas 7 Dias</p>
+                <p className="text-2xl font-bold mt-1">
+                  {formatCurrency(margin.week?.revenue || 0)}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {margin.week?.orderCount || 0} pedidos
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Margin Trend Chart */}
+          {Array.isArray(margin.dailyTrend) && margin.dailyTrend.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Tendência de Rentabilidade (7 Dias)</CardTitle>
+                <CardDescription>Receita vs Custo por dia</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={margin.dailyTrend}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="date"
+                      tickFormatter={(v) => {
+                        try { return new Date(v).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }); } catch { return v; }
+                      }}
+                      fontSize={12}
+                    />
+                    <YAxis tickFormatter={(v) => `R$${v}`} fontSize={12} />
+                    <Tooltip
+                      formatter={(value: number, name: string) => [
+                        formatCurrency(value),
+                        name === 'revenue' ? 'Receita' : name === 'cost' ? 'Custo' : 'Margem',
+                      ]}
+                      labelFormatter={(label) => {
+                        try { return new Date(label).toLocaleDateString('pt-BR'); } catch { return label; }
+                      }}
+                    />
+                    <Bar dataKey="revenue" fill="#3b82f6" name="revenue" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="cost" fill="#f59e0b" name="cost" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="margin" fill="#10b981" name="margin" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+        </>
+      )}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         {/* Revenue Chart */}

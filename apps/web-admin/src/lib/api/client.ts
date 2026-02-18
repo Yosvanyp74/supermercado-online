@@ -93,6 +93,7 @@ export const productsApi = {
   remove: (id: string) => api.delete(`/products/${id}`),
   search: (params: { q: string; page?: number; limit?: number }) =>
     api.get('/products/search', { params }),
+  getNextSku: () => api.get('/products/next-sku'),
 };
 
 // ============ CATEGORIES ============

@@ -788,6 +788,26 @@
         ]
       }
     },
+    "/api/products/next-sku": {
+      "get": {
+        "operationId": "ProductsController_getNextSku",
+        "summary": "Obter próximo SKU disponível",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Próximo SKU retornado"
+          }
+        },
+        "tags": [
+          "products"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/products/{id}": {
       "get": {
         "operationId": "ProductsController_findOne",
@@ -4275,7 +4295,8 @@
         "properties": {
           "sku": {
             "type": "string",
-            "example": "SKU-001"
+            "example": "SKU-00001",
+            "description": "Auto-gerado se não informado"
           },
           "barcode": {
             "type": "string",
@@ -4407,7 +4428,6 @@
           }
         },
         "required": [
-          "sku",
           "name",
           "categoryId"
         ]
@@ -4417,7 +4437,8 @@
         "properties": {
           "sku": {
             "type": "string",
-            "example": "SKU-001"
+            "example": "SKU-00001",
+            "description": "Auto-gerado se não informado"
           },
           "barcode": {
             "type": "string",

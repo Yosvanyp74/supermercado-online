@@ -105,6 +105,17 @@ export class ProductsController {
     return this.productsService.search(query, page, limit);
   }
 
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN, Role.MANAGER)
+  @Get('next-sku')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Obter próximo SKU disponível' })
+  @ApiResponse({ status: 200, description: 'Próximo SKU retornado' })
+  async getNextSku() {
+    const sku = await this.productsService.generateNextSku();
+    return { sku };
+  }
+
   @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Buscar produto por ID' })

@@ -55,7 +55,14 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
 
   useEffect(() => {
     loadCategories();
-    if (isEdit) loadProduct();
+    if (isEdit) {
+      loadProduct();
+    } else {
+      // Fetch next SKU for new products
+      adminApi.getNextSku().then(({ data }) => {
+        setForm((prev) => ({ ...prev, sku: data.sku }));
+      }).catch(() => {});
+    }
   }, []);
 
   // Pre-fill barcode from scanner
@@ -181,16 +188,13 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
         uploadedImageUrl = uploadData.url || uploadData.path;
       }
 
-      // Auto-generate SKU if not provided
-      const sku = form.sku.trim() || `SKU-${Date.now().toString(36).toUpperCase()}`;
-
       const productData: Record<string, unknown> = {
         name: form.name.trim(),
         description: form.description.trim() || undefined,
         costPrice: Number(form.costPrice),
         productRole: form.productRole,
         compareAtPrice: form.compareAtPrice ? Number(form.compareAtPrice) : undefined,
-        sku,
+        sku: form.sku.trim() || undefined,
         barcode: form.barcode.trim() || undefined,
         stock: form.stock ? Number(form.stock) : 0,
         minStock: form.minStock ? Number(form.minStock) : 5,

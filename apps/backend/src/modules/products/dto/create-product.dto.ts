@@ -16,10 +16,10 @@ import { Type } from 'class-transformer';
 import { ProductStatus, ProductRole } from '@prisma/client';
 
 export class CreateProductDto {
-  @ApiProperty({ example: 'SKU-001' })
+  @ApiPropertyOptional({ example: 'SKU-00001', description: 'Auto-gerado se não informado' })
+  @IsOptional()
   @IsString({ message: 'SKU deve ser uma string' })
-  @MinLength(1, { message: 'SKU é obrigatório' })
-  sku: string;
+  sku?: string;
 
   @ApiPropertyOptional({ example: '7891234567890' })
   @IsOptional()

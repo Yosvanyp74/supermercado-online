@@ -173,6 +173,32 @@ export class ProductsService {
     return product;
   }
 
+  async generateNextSku(): Promise<string> {
+    // Find the highest SKU-XXXXX number
+    const lastProduct = await this.prisma.product.findFirst({
+      where: { sku: { startsWith: 'SKU-' } },
+      orderBy: { sku: 'desc' },
+      select: { sku: true },
+    });
+
+    let nextNum = 1;
+    if (lastProduct?.sku) {
+      const match = lastProduct.sku.match(/^SKU-(\d+)$/);
+      if (match) {
+        nextNum = parseInt(match[1], 10) + 1;
+      }
+    }
+
+    // Ensure uniqueness
+    let sku = `SKU-${String(nextNum).padStart(5, '0')}`;
+    while (await this.prisma.product.findUnique({ where: { sku } })) {
+      nextNum++;
+      sku = `SKU-${String(nextNum).padStart(5, '0')}`;
+    }
+
+    return sku;
+  }
+
   async findByBarcode(barcode: string) {
     const product = await this.prisma.product.findUnique({
       where: { barcode },
@@ -187,6 +213,11 @@ export class ProductsService {
   }
 
   async create(dto: CreateProductDto) {
+    // Auto-generate SKU if not provided
+    if (!dto.sku) {
+      dto.sku = await this.generateNextSku();
+    }
+
     // Check SKU uniqueness
     const existingSku = await this.prisma.product.findUnique({
       where: { sku: dto.sku },

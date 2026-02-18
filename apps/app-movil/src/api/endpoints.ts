@@ -307,6 +307,8 @@ export const adminApi = {
     sortOrder?: string;
   }) => apiClient.get('/products', { params }),
 
+  getNextSku: () => apiClient.get('/products/next-sku'),
+
   createProduct: (data: Record<string, unknown>) =>
     apiClient.post('/products', data),
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -21,7 +21,7 @@ import { productsApi, categoriesApi } from '@/lib/api/client';
 import Link from 'next/link';
 
 const productSchema = z.object({
-  sku: z.string().min(1, 'SKU obrigatório'),
+  sku: z.string().optional().default(''),
   barcode: z.string().optional(),
   name: z.string().min(2, 'Nome deve ter no mínimo 2 caracteres'),
   description: z.string().optional(),
@@ -85,12 +85,24 @@ export default function NewProductPage() {
     resolver: zodResolver(productSchema),
     defaultValues: {
       status: 'ACTIVE',
-      stock: 0,
-      minStock: 0,
+      stock: '' as any,
+      minStock: '' as any,
       isFeatured: false,
       isOrganic: false,
     },
   });
+
+  // Fetch next SKU
+  const { data: nextSkuData } = useQuery({
+    queryKey: ['next-sku'],
+    queryFn: () => productsApi.getNextSku(),
+  });
+
+  useEffect(() => {
+    if (nextSkuData?.data?.sku) {
+      setValue('sku', nextSkuData.data.sku);
+    }
+  }, [nextSkuData, setValue]);
 
   const createMutation = useMutation({
     mutationFn: (data: ProductFormData) => {
@@ -242,11 +254,11 @@ export default function NewProductPage() {
           <CardContent className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="stock">Estoque *</Label>
-              <Input id="stock" type="number" {...register('stock')} />
+              <Input id="stock" type="number" placeholder="0" {...register('stock')} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="minStock">Estoque Mínimo</Label>
-              <Input id="minStock" type="number" {...register('minStock')} />
+              <Input id="minStock" type="number" placeholder="0" {...register('minStock')} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="unit">Unidade</Label>

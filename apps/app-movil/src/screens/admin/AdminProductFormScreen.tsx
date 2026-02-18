@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -10,10 +10,13 @@ import {
   Alert,
   Switch,
   ActivityIndicator,
+  Modal,
+  FlatList,
+  Platform,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as ImagePicker from 'expo-image-picker';
-import { Camera, Save, X } from 'lucide-react-native';
+import { Camera, ChevronDown, Save, Search, X } from 'lucide-react-native';
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi, productsApi, categoriesApi } from '@/api';
 import { getImageUrl } from '@/config';
@@ -33,6 +36,21 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [categorySearch, setCategorySearch] = useState('');
+
+  const flatCategories = useMemo(() => flattenCategories(categories), [categories]);
+
+  const filteredCategories = useMemo(() => {
+    if (!categorySearch.trim()) return flatCategories;
+    const q = categorySearch.toLowerCase().trim();
+    return flatCategories.filter((c) => c.name.toLowerCase().includes(q));
+  }, [flatCategories, categorySearch]);
+
+  const selectedCategoryName = useMemo(() => {
+    const found = flatCategories.find((c) => c.id === selectedCategoryId);
+    return found ? `${found.prefix}${found.name}` : '';
+  }, [flatCategories, selectedCategoryId]);
 
   const [form, setForm] = useState({
     name: '',
@@ -419,19 +437,71 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
 
         {/* Category picker */}
         <Text style={styles.label}>Categoria *</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
-          {flattenCategories(categories).map((cat) => (
-            <TouchableOpacity
-              key={cat.id}
-              style={[styles.categoryChip, selectedCategoryId === cat.id && styles.categoryChipActive]}
-              onPress={() => setSelectedCategoryId(cat.id)}
-            >
-              <Text style={[styles.categoryChipText, selectedCategoryId === cat.id && styles.categoryChipTextActive]}>
-                {cat.prefix}{cat.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+        <TouchableOpacity
+          style={styles.dropdownTrigger}
+          activeOpacity={0.7}
+          onPress={() => { setCategorySearch(''); setShowCategoryModal(true); }}
+        >
+          <Text style={[styles.dropdownTriggerText, !selectedCategoryId && { color: colors.gray[400] }]}>
+            {selectedCategoryName || 'Selecionar categoria...'}
+          </Text>
+          <ChevronDown size={18} color={colors.gray[400]} />
+        </TouchableOpacity>
+
+        {/* Category modal */}
+        <Modal visible={showCategoryModal} animationType="slide" transparent>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Selecionar Categoria</Text>
+                <TouchableOpacity onPress={() => setShowCategoryModal(false)} hitSlop={12}>
+                  <X size={22} color={colors.gray[500]} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.searchInputWrapper}>
+                <Search size={16} color={colors.gray[400]} />
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Buscar categoria..."
+                  placeholderTextColor={colors.gray[400]}
+                  value={categorySearch}
+                  onChangeText={setCategorySearch}
+                  autoFocus
+                />
+                {categorySearch !== '' && (
+                  <TouchableOpacity onPress={() => setCategorySearch('')} hitSlop={8}>
+                    <X size={16} color={colors.gray[400]} />
+                  </TouchableOpacity>
+                )}
+              </View>
+              <FlatList
+                data={filteredCategories}
+                keyExtractor={(item) => item.id}
+                keyboardShouldPersistTaps="handled"
+                style={styles.categoryList}
+                renderItem={({ item }) => {
+                  const isSelected = item.id === selectedCategoryId;
+                  return (
+                    <TouchableOpacity
+                      style={[styles.categoryOption, isSelected && styles.categoryOptionActive]}
+                      onPress={() => { setSelectedCategoryId(item.id); setShowCategoryModal(false); }}
+                    >
+                      <Text style={[styles.categoryOptionText, isSelected && styles.categoryOptionTextActive]}>
+                        {item.prefix}{item.name}
+                      </Text>
+                      {isSelected && (
+                        <View style={[styles.checkDot, { backgroundColor: colors.admin.primary }]} />
+                      )}
+                    </TouchableOpacity>
+                  );
+                }}
+                ListEmptyComponent={
+                  <Text style={styles.emptyText}>Nenhuma categoria encontrada</Text>
+                }
+              />
+            </View>
+          </View>
+        </Modal>
 
         {/* Status */}
         <Text style={styles.label}>Status</Text>
@@ -558,26 +628,97 @@ const createStyles = (colors: any) => StyleSheet.create({
   halfField: {
     flex: 1,
   },
-  categoryScroll: {
+  dropdownTrigger: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.white,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
     marginBottom: 4,
   },
-  categoryChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
+  dropdownTriggerText: {
+    fontSize: 15,
+    color: colors.foreground,
+    flex: 1,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContainer: {
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '80%',
+    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 12,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.foreground,
+  },
+  searchInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.gray[100],
-    marginRight: 8,
+    borderRadius: 10,
+    marginHorizontal: 20,
+    paddingHorizontal: 12,
+    marginBottom: 8,
+    gap: 8,
   },
-  categoryChipActive: {
-    backgroundColor: colors.admin.primary,
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    color: colors.foreground,
+    paddingVertical: 10,
   },
-  categoryChipText: {
-    fontSize: 13,
-    color: colors.gray[600],
+  categoryList: {
+    paddingHorizontal: 12,
   },
-  categoryChipTextActive: {
-    color: colors.white,
+  categoryOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 10,
+    marginVertical: 2,
+  },
+  categoryOptionActive: {
+    backgroundColor: colors.admin.primary + '15',
+  },
+  categoryOptionText: {
+    fontSize: 15,
+    color: colors.foreground,
+  },
+  categoryOptionTextActive: {
+    color: colors.admin.primary,
     fontWeight: '600',
+  },
+  checkDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: colors.gray[400],
+    fontSize: 14,
+    paddingVertical: 24,
   },
   statusRow: {
     flexDirection: 'row',

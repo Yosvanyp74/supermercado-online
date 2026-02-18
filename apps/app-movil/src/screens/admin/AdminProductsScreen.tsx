@@ -11,7 +11,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Plus, Search, Edit, Trash2 } from 'lucide-react-native';
+import { Plus, Search, Edit, Trash2, ScanBarcode } from 'lucide-react-native';
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi } from '@/api';
 import { getImageUrl } from '@/config';
@@ -158,6 +158,16 @@ export function AdminProductsScreen({ navigation }: Props) {
         </TouchableOpacity>
       </View>
 
+      {/* Barcode Scanner */}
+      <TouchableOpacity
+        style={styles.scanButton}
+        onPress={() => navigation.navigate('AdminBarcodeScanner')}
+        activeOpacity={0.7}
+      >
+        <ScanBarcode size={18} color={colors.admin.primary} />
+        <Text style={styles.scanButtonText}>Escanear Código de Barras</Text>
+      </TouchableOpacity>
+
       <FlatList
         data={products}
         keyExtractor={(item) => item.id}
@@ -224,6 +234,24 @@ const createStyles = (colors: any) => StyleSheet.create({
     backgroundColor: colors.admin.primary,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  scanButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 12,
+    marginBottom: 8,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: colors.admin.primary,
+    backgroundColor: colors.white,
+    gap: 8,
+  },
+  scanButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.admin.primary,
   },
   list: { paddingHorizontal: 12, paddingBottom: 20 },
   productCard: {

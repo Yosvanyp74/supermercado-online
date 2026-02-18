@@ -25,6 +25,7 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const productId = route.params?.productId;
+  const barcodeParam = route.params?.barcode;
   const isEdit = !!productId;
 
   const [loading, setLoading] = useState(isEdit);
@@ -56,6 +57,13 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
     loadCategories();
     if (isEdit) loadProduct();
   }, []);
+
+  // Pre-fill barcode from scanner
+  useEffect(() => {
+    if (barcodeParam && !isEdit) {
+      setForm((prev) => ({ ...prev, barcode: barcodeParam }));
+    }
+  }, [barcodeParam]);
 
   const loadCategories = async () => {
     try {
@@ -255,7 +263,7 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
             <TextInput
               style={styles.input}
               value={form.costPrice}
-              onChangeText={(v) => setForm({ ...form, costPrice: v })}
+              onChangeText={(v) => setForm({ ...form, costPrice: v.replace(',', '.') })}
               placeholder="0.00"
               keyboardType="decimal-pad"
             />

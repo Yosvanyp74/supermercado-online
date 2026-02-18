@@ -6,6 +6,7 @@ import { useTheme } from '@/theme';
 import { AdminHomeScreen } from '@/screens/admin/AdminHomeScreen';
 import { AdminProductsScreen } from '@/screens/admin/AdminProductsScreen';
 import { AdminProductFormScreen } from '@/screens/admin/AdminProductFormScreen';
+import { AdminBarcodeScannerScreen } from '@/screens/admin/AdminBarcodeScannerScreen';
 import { AdminCategoriesScreen } from '@/screens/admin/AdminCategoriesScreen';
 import { AdminCategoryFormScreen } from '@/screens/admin/AdminCategoryFormScreen';
 import { AdminOrdersScreen } from '@/screens/admin/AdminOrdersScreen';
@@ -54,6 +55,11 @@ export function AdminNavigator() {
         options={({ route }) => ({
           title: route.params?.productId ? 'Editar Produto' : 'Novo Produto',
         })}
+      />
+      <Stack.Screen
+        name="AdminBarcodeScanner"
+        component={AdminBarcodeScannerScreen}
+        options={{ title: 'Escanear Código', headerShown: false }}
       />
       <Stack.Screen
         name="AdminCategories"

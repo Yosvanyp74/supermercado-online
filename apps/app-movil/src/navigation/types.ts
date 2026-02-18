@@ -100,7 +100,8 @@ export type DeliveryStackParamList = {
 export type AdminStackParamList = {
   AdminHome: undefined;
   AdminProducts: undefined;
-  AdminProductForm: { productId?: string };
+  AdminProductForm: { productId?: string; barcode?: string };
+  AdminBarcodeScanner: undefined;
   AdminCategories: undefined;
   AdminCategoryForm: { categoryId?: string };
   AdminOrders: undefined;

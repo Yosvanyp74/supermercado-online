@@ -214,6 +214,11 @@ export class ProductsService {
       slug = `${slug}-${Date.now()}`;
     }
 
+    // Convert expiresAt date string to ISO DateTime
+    if (dto.expiresAt && typeof dto.expiresAt === 'string') {
+      (dto as any).expiresAt = new Date(dto.expiresAt).toISOString();
+    }
+
     // Auto-calculate price if costPrice and productRole are provided
     const createData: any = { ...dto, slug };
     if (dto.costPrice != null && dto.productRole) {
@@ -270,6 +275,11 @@ export class ProductsService {
       if (existingBarcode) {
         throw new ConflictException('Código de barras já cadastrado');
       }
+    }
+
+    // Convert expiresAt date string to ISO DateTime
+    if (dto.expiresAt && typeof dto.expiresAt === 'string') {
+      (dto as any).expiresAt = new Date(dto.expiresAt).toISOString();
     }
 
     // Regenerate slug if name changed

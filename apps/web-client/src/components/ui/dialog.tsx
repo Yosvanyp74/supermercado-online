@@ -2,8 +2,10 @@
 
 import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { X } from 'lucide-react';
+import { X as XIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+const X = XIcon as React.ElementType;
 
 const Dialog = DialogPrimitive.Root;
 const DialogTrigger = DialogPrimitive.Trigger;

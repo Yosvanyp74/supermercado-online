@@ -3622,6 +3622,26 @@
         ]
       }
     },
+    "/api/analytics/margin": {
+      "get": {
+        "operationId": "AnalyticsController_getMarginDashboard",
+        "summary": "Obter métricas de margem (diário + semanal + tendência)",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Métricas de margem retornadas"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/wishlist": {
       "get": {
         "operationId": "WishlistController_getWishlist",

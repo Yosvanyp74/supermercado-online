@@ -8,6 +8,7 @@ import { Prisma, OrderStatus, OrderType, FulfillmentType } from '@prisma/client'
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 const ALLOWED_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
@@ -57,7 +58,10 @@ const orderDetailInclude = {
 
 @Injectable()
 export class OrdersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   private generateOrderNumber(): string {
     const timestamp = Date.now().toString(36).toUpperCase();
@@ -66,7 +70,7 @@ export class OrdersService {
   }
 
   async create(userId: string, dto: CreateOrderDto) {
-    return this.prisma.$transaction(async (tx) => {
+    const createdOrder = await this.prisma.$transaction(async (tx) => {
       // 1. Validate delivery address for DELIVERY orders
       if (dto.fulfillmentType === FulfillmentType.DELIVERY) {
         if (!dto.deliveryAddressId) {
@@ -275,6 +279,21 @@ export class OrdersService {
 
       return order;
     });
+
+    // 10. Send real-time notification to admin/manager/seller
+    const customer = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { firstName: true, lastName: true },
+    });
+
+    this.notificationsService.notifyNewOrder({
+      id: createdOrder.id,
+      orderNumber: createdOrder.orderNumber,
+      total: createdOrder.total,
+      customer: { firstName: customer?.firstName || '', lastName: customer?.lastName || '' },
+    }).catch(() => {}); // fire-and-forget
+
+    return createdOrder;
   }
 
   async findAll(params: {
@@ -433,6 +452,23 @@ export class OrdersService {
       },
       include: orderInclude,
     });
+
+    // Notify customer of status change
+    this.notificationsService.notifyOrderStatusChanged({
+      id: updated.id,
+      orderNumber: updated.orderNumber,
+      customerId: updated.customerId,
+      status: updated.status,
+    }).catch(() => {});
+
+    // If READY_FOR_PICKUP, also notify delivery persons + customer
+    if (dto.status === OrderStatus.READY_FOR_PICKUP) {
+      this.notificationsService.notifyOrderReadyForPickup({
+        id: updated.id,
+        orderNumber: updated.orderNumber,
+        customerId: updated.customerId,
+      }).catch(() => {});
+    }
 
     return updated;
   }

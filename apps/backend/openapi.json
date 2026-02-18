@@ -1674,6 +1674,171 @@
         ]
       }
     },
+    "/api/notifications": {
+      "get": {
+        "operationId": "NotificationsController_findAll",
+        "summary": "Listar notificações do usuário",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "isRead",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de notificações retornada"
+          }
+        },
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/notifications/unread-count": {
+      "get": {
+        "operationId": "NotificationsController_getUnreadCount",
+        "summary": "Obter contagem de notificações não lidas",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Contagem retornada com sucesso"
+          }
+        },
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationsController_markAsRead",
+        "summary": "Marcar notificação como lida",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notificação marcada como lida"
+          },
+          "404": {
+            "description": "Notificação não encontrada"
+          }
+        },
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/notifications/read-all": {
+      "patch": {
+        "operationId": "NotificationsController_markAllAsRead",
+        "summary": "Marcar todas as notificações como lidas",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Todas marcadas como lidas"
+          }
+        },
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/notifications/preferences": {
+      "get": {
+        "operationId": "NotificationsController_getPreferences",
+        "summary": "Obter preferências de notificação",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Preferências retornadas"
+          }
+        },
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "NotificationsController_updatePreferences",
+        "summary": "Atualizar preferências de notificação",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePreferencesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preferências atualizadas"
+          }
+        },
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/inventory": {
       "get": {
         "operationId": "InventoryController_getInventory",
@@ -3264,171 +3429,6 @@
         ]
       }
     },
-    "/api/notifications": {
-      "get": {
-        "operationId": "NotificationsController_findAll",
-        "summary": "Listar notificações do usuário",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "isRead",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Lista de notificações retornada"
-          }
-        },
-        "tags": [
-          "notifications"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/notifications/unread-count": {
-      "get": {
-        "operationId": "NotificationsController_getUnreadCount",
-        "summary": "Obter contagem de notificações não lidas",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Contagem retornada com sucesso"
-          }
-        },
-        "tags": [
-          "notifications"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/notifications/{id}/read": {
-      "patch": {
-        "operationId": "NotificationsController_markAsRead",
-        "summary": "Marcar notificação como lida",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Notificação marcada como lida"
-          },
-          "404": {
-            "description": "Notificação não encontrada"
-          }
-        },
-        "tags": [
-          "notifications"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/notifications/read-all": {
-      "patch": {
-        "operationId": "NotificationsController_markAllAsRead",
-        "summary": "Marcar todas as notificações como lidas",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Todas marcadas como lidas"
-          }
-        },
-        "tags": [
-          "notifications"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/notifications/preferences": {
-      "get": {
-        "operationId": "NotificationsController_getPreferences",
-        "summary": "Obter preferências de notificação",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Preferências retornadas"
-          }
-        },
-        "tags": [
-          "notifications"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "patch": {
-        "operationId": "NotificationsController_updatePreferences",
-        "summary": "Atualizar preferências de notificação",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdatePreferencesDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Preferências atualizadas"
-          }
-        },
-        "tags": [
-          "notifications"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
     "/api/analytics/dashboard": {
       "get": {
         "operationId": "AnalyticsController_getAdminDashboard",
@@ -4759,6 +4759,39 @@
           "status"
         ]
       },
+      "UpdatePreferencesDto": {
+        "type": "object",
+        "properties": {
+          "orderUpdates": {
+            "type": "boolean",
+            "description": "Receber atualizações de pedidos"
+          },
+          "promotions": {
+            "type": "boolean",
+            "description": "Receber promoções"
+          },
+          "deliveryUpdates": {
+            "type": "boolean",
+            "description": "Receber atualizações de entrega"
+          },
+          "loyaltyUpdates": {
+            "type": "boolean",
+            "description": "Receber atualizações de fidelidade"
+          },
+          "pushEnabled": {
+            "type": "boolean",
+            "description": "Habilitar notificações push"
+          },
+          "emailEnabled": {
+            "type": "boolean",
+            "description": "Habilitar notificações por e-mail"
+          },
+          "smsEnabled": {
+            "type": "boolean",
+            "description": "Habilitar notificações por SMS"
+          }
+        }
+      },
       "CreateMovementDto": {
         "type": "object",
         "properties": {
@@ -5118,39 +5151,6 @@
         "required": [
           "rewardId"
         ]
-      },
-      "UpdatePreferencesDto": {
-        "type": "object",
-        "properties": {
-          "orderUpdates": {
-            "type": "boolean",
-            "description": "Receber atualizações de pedidos"
-          },
-          "promotions": {
-            "type": "boolean",
-            "description": "Receber promoções"
-          },
-          "deliveryUpdates": {
-            "type": "boolean",
-            "description": "Receber atualizações de entrega"
-          },
-          "loyaltyUpdates": {
-            "type": "boolean",
-            "description": "Receber atualizações de fidelidade"
-          },
-          "pushEnabled": {
-            "type": "boolean",
-            "description": "Habilitar notificações push"
-          },
-          "emailEnabled": {
-            "type": "boolean",
-            "description": "Habilitar notificações por e-mail"
-          },
-          "smsEnabled": {
-            "type": "boolean",
-            "description": "Habilitar notificações por SMS"
-          }
-        }
       },
       "CreateSupplierDto": {
         "type": "object",

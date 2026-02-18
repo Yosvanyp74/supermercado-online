@@ -13,11 +13,13 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Search, AlertTriangle, Package, ArrowUpDown } from 'lucide-react-native';
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminInventory'>;
 
 export function AdminInventoryScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [items, setItems] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [lowStockOnly, setLowStockOnly] = useState(false);
@@ -161,7 +163,7 @@ export function AdminInventoryScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   searchRow: { padding: 12, paddingBottom: 0 },
   searchBox: {

@@ -25,11 +25,13 @@ import { SellerStackParamList } from '@/navigation/types';
 import { Loading } from '@/components';
 import { sellerApi } from '@/api';
 import { useAuthStore, useSellerStore } from '@/store';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<SellerStackParamList, 'SellerHome'>;
 
 export function SellerHomeScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const rootNavigation = useNavigation<any>();
   const { user } = useAuthStore();
   const { activeItems } = useSellerStore();
@@ -200,7 +202,7 @@ export function SellerHomeScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.gray[50],

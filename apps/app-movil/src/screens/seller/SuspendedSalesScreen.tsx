@@ -16,7 +16,7 @@ import { SellerStackParamList } from '@/navigation/types';
 import { Loading, EmptyState } from '@/components';
 import { sellerApi } from '@/api';
 import { useSellerStore } from '@/store';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<SellerStackParamList, 'SuspendedSales'>;
 
@@ -36,6 +36,8 @@ interface SuspendedSale {
 }
 
 export function SuspendedSalesScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [sales, setSales] = useState<SuspendedSale[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -190,7 +192,7 @@ export function SuspendedSalesScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any, _shadow = shadow) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   list: { padding: 16, gap: 10, flexGrow: 1 },
   card: {

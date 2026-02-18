@@ -8,7 +8,7 @@ import {
   Package,
   User,
 } from 'lucide-react-native';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 import { useCartStore } from '@/store';
 import {
   MainTabParamList,
@@ -48,14 +48,14 @@ const OrdersStack = createNativeStackNavigator<OrdersStackParamList>();
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-const defaultScreenOptions = {
-  headerStyle: { backgroundColor: colors.white },
-  headerTintColor: colors.foreground,
-  headerTitleStyle: { fontWeight: '600' as const },
-  headerShadowVisible: false,
-};
-
 function HomeStackNavigator() {
+  const { colors } = useTheme();
+  const defaultScreenOptions = {
+    headerStyle: { backgroundColor: colors.card },
+    headerTintColor: colors.foreground,
+    headerTitleStyle: { fontWeight: '600' as const },
+    headerShadowVisible: false,
+  };
   return (
     <HomeStack.Navigator screenOptions={defaultScreenOptions}>
       <HomeStack.Screen
@@ -85,6 +85,13 @@ function HomeStackNavigator() {
 }
 
 function CategoriesStackNavigator() {
+  const { colors } = useTheme();
+  const defaultScreenOptions = {
+    headerStyle: { backgroundColor: colors.card },
+    headerTintColor: colors.foreground,
+    headerTitleStyle: { fontWeight: '600' as const },
+    headerShadowVisible: false,
+  };
   return (
     <CategoriesStack.Navigator screenOptions={defaultScreenOptions}>
       <CategoriesStack.Screen
@@ -116,6 +123,13 @@ function CategoriesStackNavigator() {
 }
 
 function CartStackNavigator() {
+  const { colors } = useTheme();
+  const defaultScreenOptions = {
+    headerStyle: { backgroundColor: colors.card },
+    headerTintColor: colors.foreground,
+    headerTitleStyle: { fontWeight: '600' as const },
+    headerShadowVisible: false,
+  };
   return (
     <CartStack.Navigator screenOptions={defaultScreenOptions}>
       <CartStack.Screen
@@ -133,6 +147,13 @@ function CartStackNavigator() {
 }
 
 function OrdersStackNavigator() {
+  const { colors } = useTheme();
+  const defaultScreenOptions = {
+    headerStyle: { backgroundColor: colors.card },
+    headerTintColor: colors.foreground,
+    headerTitleStyle: { fontWeight: '600' as const },
+    headerShadowVisible: false,
+  };
   return (
     <OrdersStack.Navigator screenOptions={defaultScreenOptions}>
       <OrdersStack.Screen
@@ -155,6 +176,13 @@ function OrdersStackNavigator() {
 }
 
 function ProfileStackNavigator() {
+  const { colors } = useTheme();
+  const defaultScreenOptions = {
+    headerStyle: { backgroundColor: colors.card },
+    headerTintColor: colors.foreground,
+    headerTitleStyle: { fontWeight: '600' as const },
+    headerShadowVisible: false,
+  };
   return (
     <ProfileStack.Navigator screenOptions={defaultScreenOptions}>
       <ProfileStack.Screen
@@ -197,36 +225,33 @@ function ProfileStackNavigator() {
 }
 
 function CartBadge() {
+  const { colors } = useTheme();
   const totalItems = useCartStore((s) => s.totalItems());
   if (totalItems === 0) return null;
   return (
-    <View style={badgeStyles.container}>
-      <Text style={badgeStyles.text}>{totalItems > 99 ? '99+' : totalItems}</Text>
+    <View style={{
+      position: 'absolute',
+      right: -6,
+      top: -4,
+      backgroundColor: colors.destructive,
+      borderRadius: 10,
+      minWidth: 18,
+      height: 18,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 4,
+    }}>
+      <Text style={{
+        color: '#ffffff',
+        fontSize: 10,
+        fontWeight: '700',
+      }}>{totalItems > 99 ? '99+' : totalItems}</Text>
     </View>
   );
 }
 
-const badgeStyles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    right: -6,
-    top: -4,
-    backgroundColor: colors.destructive,
-    borderRadius: 10,
-    minWidth: 18,
-    height: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 4,
-  },
-  text: {
-    color: colors.white,
-    fontSize: 10,
-    fontWeight: '700',
-  },
-});
-
 export function MainNavigator() {
+  const { colors } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={{

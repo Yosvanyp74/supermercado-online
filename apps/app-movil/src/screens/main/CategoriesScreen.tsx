@@ -11,13 +11,15 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CategoriesStackParamList } from '@/navigation/types';
 import { Loading, EmptyState } from '@/components';
 import { categoriesApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 import { Grid3X3 } from 'lucide-react-native';
 import { getImageUrl } from '@/config/env';
 
 type Props = NativeStackScreenProps<CategoriesStackParamList, 'Categories'>;
 
 export function CategoriesScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -97,7 +99,7 @@ export function CategoriesScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.gray[50],

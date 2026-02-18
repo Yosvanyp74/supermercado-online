@@ -18,7 +18,7 @@ import { HomeStackParamList } from '@/navigation/types';
 import { ProductCard, Loading } from '@/components';
 import { useAuthStore, useCartStore } from '@/store';
 import { productsApi, categoriesApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 import { getImageUrl } from '@/config/env';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Home'>;
@@ -26,6 +26,8 @@ type Props = NativeStackScreenProps<HomeStackParamList, 'Home'>;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export function HomeScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const insets = useSafeAreaInsets();
   const { user, isSeller, isAdmin, isDelivery } = useAuthStore();
   const [categories, setCategories] = useState<any[]>([]);
@@ -248,7 +250,7 @@ export function HomeScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.gray[50],

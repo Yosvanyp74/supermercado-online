@@ -13,11 +13,13 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Save, Plus, Minus } from 'lucide-react-native';
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi } from '@/api';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminInventoryAdjust'>;
 
 export function AdminInventoryAdjustScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { productId, productName, currentStock } = route.params;
   const [quantity, setQuantity] = useState('');
   const [reason, setReason] = useState('');
@@ -140,7 +142,7 @@ export function AdminInventoryAdjustScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   form: { padding: 16 },
   productInfo: {

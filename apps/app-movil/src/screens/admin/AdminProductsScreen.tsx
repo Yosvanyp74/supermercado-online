@@ -15,11 +15,13 @@ import { Plus, Search, Edit, Trash2 } from 'lucide-react-native';
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi } from '@/api';
 import { getImageUrl } from '@/config';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminProducts'>;
 
 export function AdminProductsScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [products, setProducts] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -190,7 +192,7 @@ export function AdminProductsScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   searchRow: {
     flexDirection: 'row',

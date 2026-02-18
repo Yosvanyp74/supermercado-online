@@ -7,11 +7,13 @@ import { ProfileStackParamList } from '@/navigation/types';
 import { ProductCard, Loading, EmptyState, Button } from '@/components';
 import { wishlistApi } from '@/api';
 import { useCartStore } from '@/store';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Wishlist'>;
 
 export function WishlistScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -99,7 +101,7 @@ export function WishlistScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   list: { padding: 12 },
   cardWrapper: { flex: 1, maxWidth: '50%' },

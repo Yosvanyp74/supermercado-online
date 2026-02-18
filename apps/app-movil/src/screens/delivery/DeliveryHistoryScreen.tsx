@@ -18,7 +18,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { DeliveryStackParamList } from '@/navigation/types';
 import { Loading } from '@/components';
 import { deliveryApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<DeliveryStackParamList, 'DeliveryHistory'>;
 
@@ -28,12 +28,6 @@ const STATUS_ICONS: Record<string, any> = {
   RETURNED: RotateCcw,
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  DELIVERED: colors.success,
-  FAILED: colors.destructive,
-  RETURNED: colors.warning,
-};
-
 const STATUS_LABELS: Record<string, string> = {
   DELIVERED: 'Entregue',
   FAILED: 'Falhou',
@@ -41,6 +35,13 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export function DeliveryHistoryScreen({}: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
+  const STATUS_COLORS: Record<string, string> = {
+    DELIVERED: colors.success,
+    FAILED: colors.destructive,
+    RETURNED: colors.warning,
+  };
   const [deliveries, setDeliveries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -176,7 +177,7 @@ export function DeliveryHistoryScreen({}: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.delivery.background,

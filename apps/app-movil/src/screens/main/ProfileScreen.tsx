@@ -22,15 +22,21 @@ import {
   Package,
   Shield,
   Truck,
+  Sun,
+  Moon,
+  Smartphone,
 } from 'lucide-react-native';
 import { ProfileStackParamList } from '@/navigation/types';
 import { useAuthStore } from '@/store';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
+import type { ThemeMode } from '@/theme';
 import { getImageUrl } from '@/config/env';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Profile'>;
 
 export function ProfileScreen({ navigation }: Props) {
+  const { colors, mode, setMode, isDark } = useTheme();
+  const styles = createStyles(colors);
   const { user, logout, isSeller, isAdmin, isDelivery } = useAuthStore();
 
   const handleLogout = () => {
@@ -145,6 +151,41 @@ export function ProfileScreen({ navigation }: Props) {
         ))}
       </View>
 
+      {/* Theme */}
+      <View style={[styles.menuCard, shadow.sm, { marginTop: 16 }]}>
+        <Text style={styles.sectionTitle}>Aparência</Text>
+        <View style={styles.themeRow}>
+          {([
+            { key: 'light' as ThemeMode, icon: Sun, label: 'Claro' },
+            { key: 'dark' as ThemeMode, icon: Moon, label: 'Escuro' },
+            { key: 'system' as ThemeMode, icon: Smartphone, label: 'Sistema' },
+          ]).map((opt) => (
+            <TouchableOpacity
+              key={opt.key}
+              style={[
+                styles.themeOption,
+                mode === opt.key && styles.themeOptionActive,
+              ]}
+              onPress={() => setMode(opt.key)}
+              activeOpacity={0.6}
+            >
+              <opt.icon
+                size={20}
+                color={mode === opt.key ? colors.primary[600] : colors.mutedForeground}
+              />
+              <Text
+                style={[
+                  styles.themeOptionLabel,
+                  mode === opt.key && styles.themeOptionLabelActive,
+                ]}
+              >
+                {opt.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
       {/* Logout */}
       <TouchableOpacity
         style={[styles.logoutButton, shadow.sm]}
@@ -159,7 +200,7 @@ export function ProfileScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50], padding: 16 },
   profileCard: {
     backgroundColor: colors.white,
@@ -244,5 +285,43 @@ const styles = StyleSheet.create({
     color: colors.gray[400],
     marginTop: 24,
     marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.mutedForeground,
+    textTransform: 'uppercase',
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 8,
+    letterSpacing: 0.5,
+  },
+  themeRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+    paddingBottom: 14,
+    gap: 8,
+  },
+  themeOption: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: colors.muted,
+    gap: 6,
+  },
+  themeOptionActive: {
+    backgroundColor: colors.accent,
+    borderWidth: 1.5,
+    borderColor: colors.primary[600],
+  },
+  themeOptionLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: colors.mutedForeground,
+  },
+  themeOptionLabelActive: {
+    color: colors.primary[600],
+    fontWeight: '600',
   },
 });

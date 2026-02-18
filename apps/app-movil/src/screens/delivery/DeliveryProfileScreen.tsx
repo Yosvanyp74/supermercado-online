@@ -20,11 +20,13 @@ import { DeliveryStackParamList } from '@/navigation/types';
 import { Loading } from '@/components';
 import { deliveryApi } from '@/api';
 import { useAuthStore } from '@/store';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<DeliveryStackParamList, 'DeliveryProfile'>;
 
 export function DeliveryProfileScreen({}: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { user } = useAuthStore();
   const [stats, setStats] = useState({
     total: 0,
@@ -190,7 +192,7 @@ export function DeliveryProfileScreen({}: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.delivery.background,

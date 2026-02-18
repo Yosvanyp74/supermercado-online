@@ -5,11 +5,13 @@ import { Package } from 'lucide-react-native';
 import { OrdersStackParamList } from '@/navigation/types';
 import { OrderCard, Loading, EmptyState, Button } from '@/components';
 import { ordersApi } from '@/api';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<OrdersStackParamList, 'Orders'>;
 
 export function OrdersScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -79,7 +81,7 @@ export function OrdersScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   list: { padding: 16 },
 });

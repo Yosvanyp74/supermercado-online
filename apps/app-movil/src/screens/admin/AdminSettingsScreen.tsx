@@ -24,7 +24,7 @@ import {
 } from 'lucide-react-native';
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminSettings'>;
 
@@ -49,6 +49,8 @@ const DEFAULT_PREFS: NotifPref = {
 };
 
 export function AdminSettingsScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [prefs, setPrefs] = useState<NotifPref>(DEFAULT_PREFS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -199,7 +201,7 @@ export function AdminSettingsScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   section: { paddingHorizontal: 16, marginTop: 16 },

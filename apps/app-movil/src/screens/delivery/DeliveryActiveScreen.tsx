@@ -17,7 +17,7 @@ import {
 import { DeliveryStackParamList } from '@/navigation/types';
 import { Loading } from '@/components';
 import { deliveryApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<DeliveryStackParamList, 'DeliveryActive'>;
 
@@ -27,13 +27,14 @@ const STATUS_LABELS: Record<string, string> = {
   IN_TRANSIT: 'Em Trânsito',
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  ASSIGNED: colors.delivery.primary,
-  PICKED_UP: '#f59e0b',
-  IN_TRANSIT: '#3b82f6',
-};
-
 export function DeliveryActiveScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
+  const STATUS_COLORS: Record<string, string> = {
+    ASSIGNED: colors.delivery.primary,
+    PICKED_UP: '#f59e0b',
+    IN_TRANSIT: '#3b82f6',
+  };
   const [deliveries, setDeliveries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -164,7 +165,7 @@ export function DeliveryActiveScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.delivery.background,

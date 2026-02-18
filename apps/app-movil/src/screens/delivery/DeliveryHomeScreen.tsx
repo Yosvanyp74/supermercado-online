@@ -25,11 +25,13 @@ import { DeliveryStackParamList } from '@/navigation/types';
 import { Loading } from '@/components';
 import { deliveryApi } from '@/api';
 import { useAuthStore } from '@/store';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<DeliveryStackParamList, 'DeliveryHome'>;
 
 export function DeliveryHomeScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const rootNavigation = useNavigation<any>();
   const { user } = useAuthStore();
 
@@ -252,7 +254,7 @@ export function DeliveryHomeScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.delivery.background,

@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -26,6 +26,8 @@ export function Input({
   secureTextEntry,
   ...props
 }: InputProps) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -57,7 +59,7 @@ export function Input({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     marginBottom: 16,
   },

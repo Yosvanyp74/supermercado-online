@@ -5,12 +5,13 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { AppNavigator } from '@/navigation';
-import { useAuthStore } from '@/store';
+import { useAuthStore, useThemeStore } from '@/store';
 import { Loading } from '@/components';
-import { colors } from '@/theme';
+import { ThemeProvider, useTheme } from '@/theme';
 
-export default function App() {
+function AppContent() {
   const { isLoading, loadUser } = useAuthStore();
+  const { colors, isDark } = useTheme();
 
   useEffect(() => {
     loadUser();
@@ -21,24 +22,38 @@ export default function App() {
   }
 
   return (
+    <NavigationContainer
+      theme={{
+        dark: isDark,
+        colors: {
+          primary: colors.primary[600],
+          background: colors.background,
+          card: colors.card,
+          text: colors.foreground,
+          border: colors.border,
+          notification: colors.destructive,
+        },
+      }}
+    >
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <AppNavigator />
+    </NavigationContainer>
+  );
+}
+
+export default function App() {
+  const { loadTheme } = useThemeStore();
+
+  useEffect(() => {
+    loadTheme();
+  }, []);
+
+  return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <NavigationContainer
-          theme={{
-            dark: false,
-            colors: {
-              primary: colors.primary[600],
-              background: colors.background,
-              card: colors.white,
-              text: colors.foreground,
-              border: colors.border,
-              notification: colors.destructive,
-            },
-          }}
-        >
-          <StatusBar style="dark" />
-          <AppNavigator />
-        </NavigationContainer>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
         <Toast />
       </SafeAreaProvider>
     </GestureHandlerRootView>

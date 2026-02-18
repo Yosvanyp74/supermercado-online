@@ -1,7 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SellerStackParamList } from './types';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 import { SellerHomeScreen } from '@/screens/seller/SellerHomeScreen';
 import { ProductScannerScreen } from '@/screens/seller/ProductScannerScreen';
@@ -20,14 +20,14 @@ import { ReadyForDeliveryScreen } from '@/screens/seller/ReadyForDeliveryScreen'
 
 const Stack = createNativeStackNavigator<SellerStackParamList>();
 
-const sellerScreenOptions = {
-  headerStyle: { backgroundColor: colors.seller.primary },
-  headerTintColor: colors.white,
-  headerTitleStyle: { fontWeight: '600' as const },
-  headerShadowVisible: false,
-};
-
 export function SellerNavigator() {
+  const { colors } = useTheme();
+  const sellerScreenOptions = {
+    headerStyle: { backgroundColor: colors.seller.primary },
+    headerTintColor: '#ffffff',
+    headerTitleStyle: { fontWeight: '600' as const },
+    headerShadowVisible: false,
+  };
   return (
     <Stack.Navigator screenOptions={sellerScreenOptions}>
       <Stack.Screen

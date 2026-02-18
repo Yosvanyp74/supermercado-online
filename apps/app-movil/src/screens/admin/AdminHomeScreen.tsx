@@ -30,11 +30,13 @@ import {
 import { AdminStackParamList } from '@/navigation/types';
 import { Loading } from '@/components';
 import { adminApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminHome'>;
 
 export function AdminHomeScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const rootNavigation = useNavigation<any>();
   const [stats, setStats] = useState<any>(null);
   const [marginStats, setMarginStats] = useState<any>(null);
@@ -291,7 +293,7 @@ export function AdminHomeScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.gray[50],

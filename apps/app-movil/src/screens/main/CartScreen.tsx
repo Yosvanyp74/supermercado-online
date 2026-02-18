@@ -10,11 +10,13 @@ import { ShoppingCart } from 'lucide-react-native';
 import { CartStackParamList } from '@/navigation/types';
 import { CartItemCard, Button, EmptyState } from '@/components';
 import { useCartStore } from '@/store';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<CartStackParamList, 'Cart'>;
 
 export function CartScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { items, subtotal, total, couponCode, couponDiscount, updateQuantity, removeItem } =
     useCartStore();
 
@@ -83,7 +85,7 @@ export function CartScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.gray[50],

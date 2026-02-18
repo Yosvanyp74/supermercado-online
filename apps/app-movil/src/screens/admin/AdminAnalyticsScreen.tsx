@@ -20,7 +20,7 @@ import {
 import { AdminStackParamList } from '@/navigation/types';
 import { Loading } from '@/components';
 import { adminApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminAnalytics'>;
 
@@ -31,6 +31,8 @@ const PERIODS = [
 ];
 
 export function AdminAnalyticsScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [sales, setSales] = useState<any>(null);
   const [topProducts, setTopProducts] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any>(null);
@@ -243,7 +245,7 @@ export function AdminAnalyticsScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   periodRow: {
     flexDirection: 'row',

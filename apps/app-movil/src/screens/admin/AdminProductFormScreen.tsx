@@ -17,11 +17,13 @@ import { Camera, Save, X } from 'lucide-react-native';
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi, productsApi, categoriesApi } from '@/api';
 import { getImageUrl } from '@/config';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminProductForm'>;
 
 export function AdminProductFormScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const productId = route.params?.productId;
   const isEdit = !!productId;
 
@@ -472,7 +474,7 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   imageSection: {

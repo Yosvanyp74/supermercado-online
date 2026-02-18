@@ -22,7 +22,7 @@ import {
 } from 'lucide-react-native';
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminNotifications'>;
 
@@ -31,10 +31,12 @@ const TYPE_ICONS: Record<string, { icon: any; color: string; bg: string }> = {
   DELIVERY: { icon: Package, color: '#10b981', bg: '#d1fae5' },
   STOCK: { icon: AlertTriangle, color: '#f59e0b', bg: '#fef3c7' },
   SYSTEM: { icon: Info, color: '#6b7280', bg: '#f3f4f6' },
-  DEFAULT: { icon: Bell, color: colors.admin.primary, bg: colors.admin.light },
 };
 
 export function AdminNotificationsScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
+  const TYPE_ICONS_DEFAULT = { icon: Bell, color: colors.admin.primary, bg: colors.admin.light };
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -93,7 +95,7 @@ export function AdminNotificationsScreen({ navigation }: Props) {
 
   const getTypeConfig = (type?: string) => {
     if (type && TYPE_ICONS[type.toUpperCase()]) return TYPE_ICONS[type.toUpperCase()];
-    return TYPE_ICONS.DEFAULT;
+    return TYPE_ICONS_DEFAULT;
   };
 
   const renderNotification = ({ item }: { item: any }) => {
@@ -178,7 +180,7 @@ export function AdminNotificationsScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   headerBar: {
     flexDirection: 'row',

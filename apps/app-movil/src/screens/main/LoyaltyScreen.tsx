@@ -11,12 +11,14 @@ import { Star, Gift, Trophy } from 'lucide-react-native';
 import { ProfileStackParamList } from '@/navigation/types';
 import { Button, Loading, Badge } from '@/components';
 import { loyaltyApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Loyalty'>;
 
 export function LoyaltyScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [points, setPoints] = useState(0);
   const [history, setHistory] = useState<any[]>([]);
   const [rewards, setRewards] = useState<any[]>([]);
@@ -121,7 +123,7 @@ export function LoyaltyScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   pointsCard: {
     backgroundColor: colors.primary[600],

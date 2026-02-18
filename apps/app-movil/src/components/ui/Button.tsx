@@ -7,7 +7,7 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 interface ButtonProps {
   title: string;
@@ -34,6 +34,8 @@ export function Button({
   textStyle,
   fullWidth = false,
 }: ButtonProps) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const buttonStyles = [
     styles.base,
     styles[variant],
@@ -73,7 +75,7 @@ export function Button({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   base: {
     flexDirection: 'row',
     alignItems: 'center',

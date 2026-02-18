@@ -23,7 +23,7 @@ import {
 import { DeliveryStackParamList } from '@/navigation/types';
 import { Loading } from '@/components';
 import { deliveryApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<DeliveryStackParamList, 'DeliveryAvailableOrders'>;
 
@@ -58,6 +58,8 @@ interface AvailableOrder {
 }
 
 export function DeliveryAvailableOrdersScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [orders, setOrders] = useState<AvailableOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -299,7 +301,7 @@ export function DeliveryAvailableOrdersScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.delivery.background,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AdminStackParamList } from './types';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 import { AdminHomeScreen } from '@/screens/admin/AdminHomeScreen';
 import { AdminProductsScreen } from '@/screens/admin/AdminProductsScreen';
@@ -28,14 +28,14 @@ import { AdminSettingsScreen } from '@/screens/admin/AdminSettingsScreen';
 
 const Stack = createNativeStackNavigator<AdminStackParamList>();
 
-const adminScreenOptions = {
-  headerStyle: { backgroundColor: colors.admin.primary },
-  headerTintColor: colors.white,
-  headerTitleStyle: { fontWeight: '600' as const },
-  headerShadowVisible: false,
-};
-
 export function AdminNavigator() {
+  const { colors } = useTheme();
+  const adminScreenOptions = {
+    headerStyle: { backgroundColor: colors.admin.primary },
+    headerTintColor: '#ffffff',
+    headerTitleStyle: { fontWeight: '600' as const },
+    headerShadowVisible: false,
+  };
   return (
     <Stack.Navigator screenOptions={adminScreenOptions}>
       <Stack.Screen

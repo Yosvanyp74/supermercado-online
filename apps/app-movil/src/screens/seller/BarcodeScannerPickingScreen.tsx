@@ -12,7 +12,7 @@ import Toast from 'react-native-toast-message';
 import { SellerStackParamList } from '@/navigation/types';
 import { Button } from '@/components';
 import { sellerApi } from '@/api';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<
   SellerStackParamList,
@@ -20,6 +20,8 @@ type Props = NativeStackScreenProps<
 >;
 
 export function BarcodeScannerPickingScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { pickingOrderId, pickingItemId, expectedBarcode, productName } = route.params;
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
@@ -131,7 +133,7 @@ export function BarcodeScannerPickingScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.black },
   camera: { flex: 1 },
   overlay: {

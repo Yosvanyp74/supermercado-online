@@ -13,7 +13,7 @@ import Toast from 'react-native-toast-message';
 import { SellerStackParamList } from '@/navigation/types';
 import { useSellerStore } from '@/store';
 import { sellerApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<SellerStackParamList, 'CustomerSearch'>;
 
@@ -26,6 +26,8 @@ interface Customer {
 }
 
 export function CustomerSearchScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
@@ -124,7 +126,7 @@ export function CustomerSearchScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any, _shadow = shadow) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   searchBar: {
     flexDirection: 'row',

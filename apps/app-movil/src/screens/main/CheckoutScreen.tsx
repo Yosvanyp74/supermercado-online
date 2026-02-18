@@ -24,11 +24,13 @@ import { CartStackParamList } from '@/navigation/types';
 import { Button, Input } from '@/components';
 import { useAuthStore, useCartStore } from '@/store';
 import { ordersApi, usersApi, couponsApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<CartStackParamList, 'Checkout'>;
 
 export function CheckoutScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { user } = useAuthStore();
   const { items, subtotal, total, couponCode, couponDiscount, applyCoupon, clearCart } =
     useCartStore();
@@ -348,7 +350,7 @@ export function CheckoutScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   scroll: { paddingBottom: 220 },
   section: {

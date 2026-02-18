@@ -11,11 +11,13 @@ import { Bell, Check } from 'lucide-react-native';
 import { ProfileStackParamList } from '@/navigation/types';
 import { Loading, EmptyState, Button } from '@/components';
 import { notificationsApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Notifications'>;
 
 export function NotificationsScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -108,7 +110,7 @@ export function NotificationsScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   markAllButton: {
     flexDirection: 'row',

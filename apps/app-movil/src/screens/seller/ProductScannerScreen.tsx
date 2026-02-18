@@ -15,11 +15,13 @@ import { SellerStackParamList } from '@/navigation/types';
 import { Button } from '@/components';
 import { sellerApi } from '@/api';
 import { useSellerStore } from '@/store';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<SellerStackParamList, 'ProductScanner'>;
 
 export function ProductScannerScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [manualMode, setManualMode] = useState(false);
@@ -148,7 +150,7 @@ export function ProductScannerScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.black },
   camera: { flex: 1 },
   overlay: {

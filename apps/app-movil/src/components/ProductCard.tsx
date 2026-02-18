@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Heart, ShoppingCart } from 'lucide-react-native';
 import { getImageUrl } from '@/config';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 interface ProductCardProps {
   id: string;
@@ -33,6 +33,8 @@ export function ProductCard({
   isWishlisted = false,
   compact = false,
 }: ProductCardProps) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const discount = originalPrice
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
     : 0;
@@ -124,7 +126,7 @@ export function ProductCard({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any, _shadow = shadow) => StyleSheet.create({
   card: {
     backgroundColor: colors.white,
     borderRadius: 12,

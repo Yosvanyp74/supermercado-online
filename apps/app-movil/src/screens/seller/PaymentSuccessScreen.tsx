@@ -4,7 +4,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CheckCircle } from 'lucide-react-native';
 import { SellerStackParamList } from '@/navigation/types';
 import { Button } from '@/components';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<SellerStackParamList, 'PaymentSuccess'>;
 
@@ -20,6 +20,8 @@ const methodLabels: Record<string, string> = {
 };
 
 export function PaymentSuccessScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { saleId, total, paymentMethod, change } = route.params;
 
   return (
@@ -72,7 +74,7 @@ export function PaymentSuccessScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,

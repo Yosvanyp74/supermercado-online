@@ -13,11 +13,13 @@ import { ProfileStackParamList } from '@/navigation/types';
 import { Button, Input } from '@/components';
 import { useAuthStore } from '@/store';
 import { usersApi } from '@/api';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'AddAddress'>;
 
 export function AddAddressScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { user } = useAuthStore();
   const existingAddress = route.params?.address;
 
@@ -178,7 +180,7 @@ export function AddAddressScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,

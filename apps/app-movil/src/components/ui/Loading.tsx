@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 interface LoadingProps {
   message?: string;
@@ -8,6 +8,8 @@ interface LoadingProps {
 }
 
 export function Loading({ message, fullScreen = false }: LoadingProps) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   if (fullScreen) {
     return (
       <View style={styles.fullScreen}>
@@ -36,6 +38,8 @@ export function EmptyState({
   description?: string;
   action?: React.ReactNode;
 }) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   return (
     <View style={styles.emptyContainer}>
       {icon && <View style={styles.emptyIcon}>{icon}</View>}
@@ -46,7 +50,7 @@ export function EmptyState({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   fullScreen: {
     flex: 1,
     justifyContent: 'center',

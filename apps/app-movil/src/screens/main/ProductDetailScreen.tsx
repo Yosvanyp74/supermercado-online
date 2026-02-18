@@ -23,12 +23,14 @@ import { HomeStackParamList } from '@/navigation/types';
 import { Button, Badge, Loading } from '@/components';
 import { productsApi, wishlistApi, reviewsApi } from '@/api';
 import { useCartStore } from '@/store';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'ProductDetail'>;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export function ProductDetailScreen({ route, navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { productId } = route.params;
   const [product, setProduct] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
@@ -259,7 +261,7 @@ export function ProductDetailScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,

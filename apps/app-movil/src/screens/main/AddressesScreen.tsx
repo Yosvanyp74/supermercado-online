@@ -15,11 +15,13 @@ import { ProfileStackParamList } from '@/navigation/types';
 import { Button, Loading, EmptyState } from '@/components';
 import { useAuthStore } from '@/store';
 import { usersApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Addresses'>;
 
 export function AddressesScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { user } = useAuthStore();
   const [addresses, setAddresses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -121,7 +123,7 @@ export function AddressesScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   list: { padding: 16, paddingBottom: 100 },
   card: {

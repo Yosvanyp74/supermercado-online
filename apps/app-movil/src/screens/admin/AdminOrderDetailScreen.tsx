@@ -14,7 +14,7 @@ import { CheckCircle, Clock, Truck, Package, XCircle } from 'lucide-react-native
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi } from '@/api';
 import { getImageUrl } from '@/config';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminOrderDetail'>;
 
@@ -39,6 +39,8 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export function AdminOrderDetailScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { orderId } = route.params;
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -218,7 +220,7 @@ export function AdminOrderDetailScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   card: {

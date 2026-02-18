@@ -15,7 +15,7 @@ import { HomeStackParamList } from '@/navigation/types';
 import { ProductCard, Loading, EmptyState } from '@/components';
 import { productsApi, categoriesApi } from '@/api';
 import { useCartStore } from '@/store';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 import { ShoppingBag } from 'lucide-react-native';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'ProductList'>;
@@ -23,6 +23,8 @@ type Props = NativeStackScreenProps<HomeStackParamList, 'ProductList'>;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export function ProductListScreen({ route, navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { categoryId, search } = route.params || {};
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -209,7 +211,7 @@ export function ProductListScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.gray[50],

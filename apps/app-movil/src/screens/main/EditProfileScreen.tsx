@@ -18,12 +18,14 @@ import { ProfileStackParamList } from '@/navigation/types';
 import { Button, Input } from '@/components';
 import { useAuthStore } from '@/store';
 import { usersApi } from '@/api';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 import { getImageUrl } from '@/config/env';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'EditProfile'>;
 
 export function EditProfileScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { user, setUser } = useAuthStore();
   const [firstName, setFirstName] = useState(user?.firstName || '');
   const [lastName, setLastName] = useState(user?.lastName || '');
@@ -173,7 +175,7 @@ export function EditProfileScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.white },
   content: { padding: 16 },
   avatarSection: {

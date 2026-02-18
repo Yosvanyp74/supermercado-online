@@ -24,11 +24,13 @@ import { Button } from '@/components';
 import { useSellerStore } from '@/store';
 import { sellerApi } from '@/api';
 import { getImageUrl } from '@/config';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<SellerStackParamList, 'ActiveSale'>;
 
 export function ActiveSaleScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const {
     activeItems,
     customerId,
@@ -184,7 +186,7 @@ export function ActiveSaleScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any, _shadow = shadow) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   actionsBar: {
     flexDirection: 'row',

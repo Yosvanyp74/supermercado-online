@@ -17,7 +17,7 @@ import Toast from 'react-native-toast-message';
 import { SellerStackParamList } from '@/navigation/types';
 import { Button } from '@/components';
 import { sellerApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<SellerStackParamList, 'OrderCompletion'>;
 
@@ -33,6 +33,8 @@ interface CompletionSummary {
 }
 
 export function OrderCompletionScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { pickingOrderId } = route.params;
   const [summary, setSummary] = useState<CompletionSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -197,7 +199,7 @@ export function OrderCompletionScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any, _shadow = shadow) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   loadingContainer: {
     flex: 1,

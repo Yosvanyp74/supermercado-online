@@ -26,7 +26,7 @@ import * as Location from 'expo-location';
 import { DeliveryStackParamList } from '@/navigation/types';
 import { Loading } from '@/components';
 import { deliveryApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<DeliveryStackParamList, 'DeliveryDetail'>;
 
@@ -39,16 +39,17 @@ const STATUS_LABELS: Record<string, string> = {
   FAILED: 'Falhou',
   RETURNED: 'Devolvido',
 };
-const STATUS_COLORS: Record<string, string> = {
-  ASSIGNED: colors.delivery.primary,
-  PICKED_UP: '#f59e0b',
-  IN_TRANSIT: '#3b82f6',
-  DELIVERED: colors.success,
-  FAILED: colors.destructive,
-  RETURNED: colors.gray[500],
-};
-
 export function DeliveryDetailScreen({ route, navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
+  const STATUS_COLORS: Record<string, string> = {
+    ASSIGNED: colors.delivery.primary,
+    PICKED_UP: '#f59e0b',
+    IN_TRANSIT: '#3b82f6',
+    DELIVERED: colors.success,
+    FAILED: colors.destructive,
+    RETURNED: colors.gray[500],
+  };
   const { deliveryId } = route.params;
   const [delivery, setDelivery] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -414,7 +415,7 @@ export function DeliveryDetailScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.delivery.background,

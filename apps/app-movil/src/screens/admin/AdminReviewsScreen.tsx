@@ -22,11 +22,13 @@ import {
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi } from '@/api';
 import { getImageUrl } from '@/config';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminReviews'>;
 
 export function AdminReviewsScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [reviews, setReviews] = useState<any[]>([]);
   const [productSearch, setProductSearch] = useState('');
   const [selectedProductId, setSelectedProductId] = useState('');
@@ -232,7 +234,7 @@ export function AdminReviewsScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   searchSection: { padding: 12 },
   searchLabel: { fontSize: 13, fontWeight: '600', color: colors.gray[600], marginBottom: 6 },

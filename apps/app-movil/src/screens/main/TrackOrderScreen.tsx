@@ -5,7 +5,7 @@ import { MapPin, Package, Truck, CheckCircle } from 'lucide-react-native';
 import { OrdersStackParamList } from '@/navigation/types';
 import { Loading } from '@/components';
 import { ordersApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<OrdersStackParamList, 'TrackOrder'>;
 
@@ -17,6 +17,8 @@ const stages = [
 ];
 
 export function TrackOrderScreen({ route }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { orderId } = route.params;
   const [tracking, setTracking] = useState<any>(null);
   const [order, setOrder] = useState<any>(null);
@@ -120,7 +122,7 @@ export function TrackOrderScreen({ route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50], padding: 16 },
   card: {
     backgroundColor: colors.white,

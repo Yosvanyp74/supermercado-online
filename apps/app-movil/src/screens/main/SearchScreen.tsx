@@ -14,12 +14,14 @@ import { HomeStackParamList } from '@/navigation/types';
 import { ProductCard } from '@/components';
 import { productsApi } from '@/api';
 import { useCartStore } from '@/store';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Search'>;
 
 export function SearchScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -115,7 +117,7 @@ export function SearchScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.gray[50],

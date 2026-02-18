@@ -13,7 +13,7 @@ import { Calendar, DollarSign, Clock } from 'lucide-react-native';
 import { SellerStackParamList } from '@/navigation/types';
 import { Loading, EmptyState } from '@/components';
 import { sellerApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<SellerStackParamList, 'SalesHistory'>;
 
@@ -38,6 +38,8 @@ const methodLabels: Record<string, string> = {
 };
 
 export function SalesHistoryScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -139,7 +141,7 @@ export function SalesHistoryScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any, _shadow = shadow) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   list: { padding: 16, gap: 10, flexGrow: 1 },
   saleCard: {

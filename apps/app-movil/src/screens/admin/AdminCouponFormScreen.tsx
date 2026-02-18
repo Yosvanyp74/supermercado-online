@@ -14,11 +14,13 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Save } from 'lucide-react-native';
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi } from '@/api';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminCouponForm'>;
 
 export function AdminCouponFormScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const couponId = route.params?.couponId;
   const isEdit = !!couponId;
 
@@ -214,7 +216,7 @@ export function AdminCouponFormScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   form: { padding: 16 },

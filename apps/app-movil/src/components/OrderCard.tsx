@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 import { Badge } from './ui/Badge';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 interface OrderCardProps {
   id: string;
@@ -37,6 +37,8 @@ export function OrderCard({
   createdAt,
   onPress,
 }: OrderCardProps) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const statusInfo = statusMap[status] || { label: status, variant: 'default' as const };
   const date = new Date(createdAt).toLocaleDateString('pt-BR');
 
@@ -63,7 +65,7 @@ export function OrderCard({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   card: {
     backgroundColor: colors.white,
     borderRadius: 12,

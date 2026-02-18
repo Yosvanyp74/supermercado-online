@@ -21,40 +21,41 @@ import { SellerStackParamList } from '@/navigation/types';
 import { Button } from '@/components';
 import { sellerApi } from '@/api';
 import { useSellerStore } from '@/store';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<SellerStackParamList, 'Payment'>;
 
 type PaymentMethod = 'CASH' | 'CREDIT_CARD' | 'DEBIT_CARD' | 'PIX';
 
-const paymentMethods: {
-  key: PaymentMethod;
-  label: string;
-  icon: React.ReactNode;
-}[] = [
-  {
-    key: 'CASH',
-    label: 'Dinheiro',
-    icon: <Banknote size={24} color={colors.seller.primary} />,
-  },
-  {
-    key: 'CREDIT_CARD',
-    label: 'Cartão de Crédito',
-    icon: <CreditCard size={24} color={colors.seller.primary} />,
-  },
-  {
-    key: 'DEBIT_CARD',
-    label: 'Cartão de Débito',
-    icon: <DollarSign size={24} color={colors.seller.primary} />,
-  },
-  {
-    key: 'PIX',
-    label: 'PIX',
-    icon: <Smartphone size={24} color={colors.seller.primary} />,
-  },
-];
-
 export function PaymentScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
+  const paymentMethods: {
+    key: PaymentMethod;
+    label: string;
+    icon: React.ReactNode;
+  }[] = [
+    {
+      key: 'CASH',
+      label: 'Dinheiro',
+      icon: <Banknote size={24} color={colors.seller.primary} />,
+    },
+    {
+      key: 'CREDIT_CARD',
+      label: 'Cartão de Crédito',
+      icon: <CreditCard size={24} color={colors.seller.primary} />,
+    },
+    {
+      key: 'DEBIT_CARD',
+      label: 'Cartão de Débito',
+      icon: <DollarSign size={24} color={colors.seller.primary} />,
+    },
+    {
+      key: 'PIX',
+      label: 'PIX',
+      icon: <Smartphone size={24} color={colors.seller.primary} />,
+    },
+  ];
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(
     null
   );
@@ -203,7 +204,7 @@ export function PaymentScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any, _shadow = shadow) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   content: { padding: 16, gap: 20 },
   totalCard: {

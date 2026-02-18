@@ -11,7 +11,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Clock, CheckCircle, Truck, Package, XCircle } from 'lucide-react-native';
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminOrders'>;
 
@@ -36,6 +36,8 @@ const FILTER_OPTIONS = [
 ];
 
 export function AdminOrdersScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [orders, setOrders] = useState<any[]>([]);
   const [filter, setFilter] = useState('');
   const [page, setPage] = useState(1);
@@ -163,7 +165,7 @@ export function AdminOrdersScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   filterRow: { paddingHorizontal: 12, paddingVertical: 10, gap: 8 },
   filterChip: {

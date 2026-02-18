@@ -12,7 +12,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { User, Mail, Phone, Shield, Ban } from 'lucide-react-native';
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminUserDetail'>;
 
@@ -27,6 +27,8 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 export function AdminUserDetailScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { userId } = route.params;
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -164,7 +166,7 @@ export function AdminUserDetailScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   card: {

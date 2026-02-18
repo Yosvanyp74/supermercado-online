@@ -1,7 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { DeliveryStackParamList } from './types';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 import { DeliveryHomeScreen } from '@/screens/delivery/DeliveryHomeScreen';
 import { DeliveryAvailableOrdersScreen } from '@/screens/delivery/DeliveryAvailableOrdersScreen';
@@ -12,14 +12,14 @@ import { DeliveryProfileScreen } from '@/screens/delivery/DeliveryProfileScreen'
 
 const Stack = createNativeStackNavigator<DeliveryStackParamList>();
 
-const deliveryScreenOptions = {
-  headerStyle: { backgroundColor: colors.delivery.primary },
-  headerTintColor: colors.white,
-  headerTitleStyle: { fontWeight: '600' as const },
-  headerShadowVisible: false,
-};
-
 export function DeliveryNavigator() {
+  const { colors } = useTheme();
+  const deliveryScreenOptions = {
+    headerStyle: { backgroundColor: colors.delivery.primary },
+    headerTintColor: '#ffffff',
+    headerTitleStyle: { fontWeight: '600' as const },
+    headerShadowVisible: false,
+  };
   return (
     <Stack.Navigator screenOptions={deliveryScreenOptions}>
       <Stack.Screen

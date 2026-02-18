@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Minus, Plus, Trash2 } from 'lucide-react-native';
 import { getImageUrl } from '@/config';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 interface CartItemProps {
   id: string;
@@ -24,6 +24,8 @@ export function CartItemCard({
   onUpdateQuantity,
   onRemove,
 }: CartItemProps) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const imgUri = getImageUrl(image);
   const imageSource = imgUri
     ? { uri: imgUri }
@@ -70,7 +72,7 @@ export function CartItemCard({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     backgroundColor: colors.white,

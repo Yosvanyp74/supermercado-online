@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 interface BadgeProps {
   text: string;
@@ -10,6 +10,8 @@ interface BadgeProps {
 }
 
 export function Badge({ text, variant = 'default', size = 'sm', style }: BadgeProps) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   return (
     <View style={[styles.base, styles[variant], styles[`size_${size}`], style]}>
       <Text style={[styles.text, styles[`text_${variant}`], styles[`textSize_${size}`]]}>
@@ -19,7 +21,7 @@ export function Badge({ text, variant = 'default', size = 'sm', style }: BadgePr
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   base: {
     borderRadius: 9999,
     alignSelf: 'flex-start',

@@ -17,34 +17,35 @@ import Toast from 'react-native-toast-message';
 import { SellerStackParamList } from '@/navigation/types';
 import { Button } from '@/components';
 import { sellerApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<SellerStackParamList, 'ManualItemPick'>;
 
 type PickStatus = 'picked' | 'substituted' | 'not_found';
 
-const statusOptions: { key: PickStatus; label: string; icon: React.ReactNode; color: string }[] = [
-  {
-    key: 'picked',
-    label: 'Coletado',
-    icon: <CheckCircle size={24} color={colors.primary[500]} />,
-    color: colors.primary[50],
-  },
-  {
-    key: 'substituted',
-    label: 'Substituído',
-    icon: <RefreshCw size={24} color={colors.warning} />,
-    color: '#FEF3C7',
-  },
-  {
-    key: 'not_found',
-    label: 'Não Encontrado',
-    icon: <XCircle size={24} color={colors.destructive} />,
-    color: '#FEE2E2',
-  },
-];
-
 export function ManualItemPickScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
+  const statusOptions: { key: PickStatus; label: string; icon: React.ReactNode; color: string }[] = [
+    {
+      key: 'picked',
+      label: 'Coletado',
+      icon: <CheckCircle size={24} color={colors.primary[500]} />,
+      color: colors.primary[50],
+    },
+    {
+      key: 'substituted',
+      label: 'Substituído',
+      icon: <RefreshCw size={24} color={colors.warning} />,
+      color: '#FEF3C7',
+    },
+    {
+      key: 'not_found',
+      label: 'Não Encontrado',
+      icon: <XCircle size={24} color={colors.destructive} />,
+      color: '#FEE2E2',
+    },
+  ];
   const { pickingOrderId, pickingItemId, productName, quantity } = route.params;
   const [status, setStatus] = useState<PickStatus | null>(null);
   const [substituteProduct, setSubstituteProduct] = useState('');
@@ -160,7 +161,7 @@ export function ManualItemPickScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any, _shadow = shadow) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   content: { padding: 16, gap: 20 },
   productCard: {

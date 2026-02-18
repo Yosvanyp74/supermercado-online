@@ -16,11 +16,13 @@ import { Save, Camera, X, ImageIcon } from 'lucide-react-native';
 import { AdminStackParamList } from '@/navigation/types';
 import { adminApi, categoriesApi } from '@/api';
 import { getImageUrl } from '@/config';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<AdminStackParamList, 'AdminCategoryForm'>;
 
 export function AdminCategoryFormScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const categoryId = route.params?.categoryId;
   const isEdit = !!categoryId;
 
@@ -206,7 +208,7 @@ export function AdminCategoryFormScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   form: { padding: 16 },

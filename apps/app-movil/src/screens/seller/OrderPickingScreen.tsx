@@ -23,7 +23,7 @@ import Toast from 'react-native-toast-message';
 import { SellerStackParamList } from '@/navigation/types';
 import { Button, Loading } from '@/components';
 import { sellerApi } from '@/api';
-import { colors, shadow } from '@/theme';
+import { shadow, useTheme } from '@/theme';
 
 type Props = NativeStackScreenProps<SellerStackParamList, 'OrderPicking'>;
 
@@ -40,6 +40,8 @@ interface PickingItem {
 }
 
 export function OrderPickingScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const { pickingOrderId } = route.params;
   const [items, setItems] = useState<PickingItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -242,7 +244,7 @@ export function OrderPickingScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any, _shadow = shadow) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.gray[50] },
   progressContainer: {
     backgroundColor: colors.white,

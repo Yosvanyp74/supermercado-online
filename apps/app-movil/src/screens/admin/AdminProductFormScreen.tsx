@@ -158,6 +158,10 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
       Alert.alert('Erro', 'Rol estratégico é obrigatório');
       return;
     }
+    if (!selectedCategoryId) {
+      Alert.alert('Erro', 'Selecione uma categoria');
+      return;
+    }
 
     setSaving(true);
     try {
@@ -177,13 +181,16 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
         uploadedImageUrl = uploadData.url || uploadData.path;
       }
 
+      // Auto-generate SKU if not provided
+      const sku = form.sku.trim() || `SKU-${Date.now().toString(36).toUpperCase()}`;
+
       const productData: Record<string, unknown> = {
         name: form.name.trim(),
         description: form.description.trim() || undefined,
         costPrice: Number(form.costPrice),
         productRole: form.productRole,
         compareAtPrice: form.compareAtPrice ? Number(form.compareAtPrice) : undefined,
-        sku: form.sku.trim() || undefined,
+        sku,
         barcode: form.barcode.trim() || undefined,
         stock: form.stock ? Number(form.stock) : 0,
         minStock: form.minStock ? Number(form.minStock) : 5,
@@ -209,7 +216,9 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
       }
       navigation.goBack();
     } catch (err: any) {
-      Alert.alert('Erro', err?.response?.data?.message || 'Não foi possível salvar');
+      const msg = err?.response?.data?.message;
+      const errorText = Array.isArray(msg) ? msg.join('\n') : (msg || 'Não foi possível salvar');
+      Alert.alert('Erro', String(errorText));
     } finally {
       setSaving(false);
     }

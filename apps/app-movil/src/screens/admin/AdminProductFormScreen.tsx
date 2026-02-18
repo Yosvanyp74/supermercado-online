@@ -418,24 +418,16 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
         )}
 
         {/* Category picker */}
-        <Text style={styles.label}>Categoria</Text>
+        <Text style={styles.label}>Categoria *</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
-          <TouchableOpacity
-            style={[styles.categoryChip, !selectedCategoryId && styles.categoryChipActive]}
-            onPress={() => setSelectedCategoryId('')}
-          >
-            <Text style={[styles.categoryChipText, !selectedCategoryId && styles.categoryChipTextActive]}>
-              Nenhuma
-            </Text>
-          </TouchableOpacity>
-          {categories.map((cat) => (
+          {flattenCategories(categories).map((cat) => (
             <TouchableOpacity
               key={cat.id}
               style={[styles.categoryChip, selectedCategoryId === cat.id && styles.categoryChipActive]}
               onPress={() => setSelectedCategoryId(cat.id)}
             >
               <Text style={[styles.categoryChipText, selectedCategoryId === cat.id && styles.categoryChipTextActive]}>
-                {cat.name}
+                {cat.prefix}{cat.name}
               </Text>
             </TouchableOpacity>
           ))}
@@ -493,6 +485,16 @@ export function AdminProductFormScreen({ navigation, route }: Props) {
       </View>
     </ScrollView>
   );
+}
+
+function flattenCategories(categories: any[], prefix = '', result: any[] = []): any[] {
+  for (const cat of categories) {
+    result.push({ ...cat, prefix });
+    if (cat.children?.length) {
+      flattenCategories(cat.children, '↳ ', result);
+    }
+  }
+  return result;
 }
 
 const createStyles = (colors: any) => StyleSheet.create({

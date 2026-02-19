@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useSocket } from '@/components/SocketProvider';
+import Toast from 'react-native-toast-message';
 import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Package } from 'lucide-react-native';
@@ -10,6 +12,7 @@ import { useTheme } from '@/theme';
 type Props = NativeStackScreenProps<OrdersStackParamList, 'Orders'>;
 
 export function OrdersScreen({ navigation }: Props) {
+  const socket = useSocket();
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const [orders, setOrders] = useState<any[]>([]);
@@ -28,9 +31,27 @@ export function OrdersScreen({ navigation }: Props) {
     }
   }, []);
 
+
   useEffect(() => {
     loadOrders();
   }, [loadOrders]);
+
+  // Suscribirse a cambios de estado de pedido en tiempo real
+  useEffect(() => {
+    if (!socket) return;
+    const handleOrderStatusChanged = (payload: any) => {
+      loadOrders();
+      Toast.show({
+        type: 'info',
+        text1: payload?.title || 'Pedido atualizado',
+        text2: payload?.body || 'O status do seu pedido mudou.',
+      });
+    };
+    socket.on('orderStatusChanged', handleOrderStatusChanged);
+    return () => {
+      socket.off('orderStatusChanged', handleOrderStatusChanged);
+    };
+  }, [socket, loadOrders]);
 
   useEffect(() => {
     const unsub = navigation.addListener('focus', loadOrders);

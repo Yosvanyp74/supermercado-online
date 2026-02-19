@@ -1,4 +1,6 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import Toast from 'react-native-toast-message';
+import { useSocket } from '@/components/SocketProvider';
 import {
   View,
   Text,
@@ -58,6 +60,8 @@ interface AvailableOrder {
 }
 
 export function DeliveryAvailableOrdersScreen({ navigation }: Props) {
+  const isMounted = useRef(true);
+  const socket = useSocket();
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const [orders, setOrders] = useState<AvailableOrder[]>([]);
@@ -65,10 +69,18 @@ export function DeliveryAvailableOrdersScreen({ navigation }: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
 
-  const loadOrders = useCallback(async () => {
+  const loadOrders = useCallback(async (showToast = false) => {
     try {
       const res = await deliveryApi.getAvailable();
-      setOrders(Array.isArray(res.data) ? res.data : []);
+      const ordersArr = Array.isArray(res.data) ? res.data : [];
+      setOrders(ordersArr);
+      if (showToast) {
+        Toast.show({
+          type: 'info',
+          text1: `Pedidos disponíveis: ${ordersArr.length}`,
+          text2: 'Lista atualizada após evento socket',
+        });
+      }
     } catch {
       // ignore
     } finally {
@@ -77,12 +89,36 @@ export function DeliveryAvailableOrdersScreen({ navigation }: Props) {
     }
   }, []);
 
-  useEffect(() => {
-    loadOrders();
-  }, [loadOrders]);
 
   useEffect(() => {
-    const unsub = navigation.addListener('focus', loadOrders);
+    isMounted.current = true;
+    loadOrders();
+    return () => { isMounted.current = false; };
+  }, [loadOrders]);
+
+  // WebSocket: refrescar lista en tiempo real
+  useEffect(() => {
+    if (!socket) return;
+    const handleOrderReady = (payload: any) => {
+      console.log('Socket event recebido (delivery available):', payload);
+      loadOrders(true);
+    };
+    const handleOrderAccepted = (payload: any) => {
+      console.log('Socket event recebido (delivery accepted):', payload);
+      loadOrders(true);
+    };
+    socket.on('orderReadyForPickup', handleOrderReady);
+    socket.on('deliveryAssigned', handleOrderAccepted);
+    return () => {
+      socket.off('orderReadyForPickup', handleOrderReady);
+      socket.off('deliveryAssigned', handleOrderAccepted);
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    const unsub = navigation.addListener('focus', () => {
+      loadOrders();
+    });
     return unsub;
   }, [navigation, loadOrders]);
 

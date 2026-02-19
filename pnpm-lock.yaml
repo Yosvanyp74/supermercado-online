@@ -110,6 +110,9 @@ importers:
       react-redux:
         specifier: ^9.2.0
         version: 9.2.0(@types/react@19.1.17)(react@19.1.0)(redux@5.0.1)
+      socket.io-client:
+        specifier: ^4.8.3
+        version: 4.8.3
       zod:
         specifier: ^3.24.0
         version: 3.25.76
@@ -346,6 +349,9 @@ importers:
       recharts:
         specifier: ^2.15.0
         version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      socket.io-client:
+        specifier: ^4.8.3
+        version: 4.8.3
       sonner:
         specifier: ^1.7.0
         version: 1.7.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

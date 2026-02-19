@@ -6,7 +6,7 @@
  *   - Stok Center: 10.43.101.154
  *   - iPhone:      172.20.10.3
  */
-export const DEV_MACHINE_IP = '192.168.0.3';
+export const DEV_MACHINE_IP = '10.43.101.154';
 
 export const DEV_API_URL = `http://${DEV_MACHINE_IP}:3000/api`;
 export const DEV_SERVER_URL = `http://${DEV_MACHINE_IP}:3000`;

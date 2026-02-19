@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { useSocket } from '@/components/SocketProvider';
 import {
   View,
   Text,
@@ -36,6 +37,8 @@ interface PendingOrder {
 }
 
 export function OrderQueueScreen({ navigation }: Props) {
+  const isMounted = useRef(true);
+  const socket = useSocket();
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const [orders, setOrders] = useState<PendingOrder[]>([]);
@@ -55,11 +58,39 @@ export function OrderQueueScreen({ navigation }: Props) {
     }
   }, []);
 
+
   useFocusEffect(
     useCallback(() => {
+      isMounted.current = true;
       loadOrders();
+      return () => { isMounted.current = false; };
     }, [loadOrders])
   );
+
+  // WebSocket: refrescar lista en tiempo real
+  useEffect(() => {
+    if (!socket) return;
+    const handleOrderEvent = (payload: any) => {
+      // Log para depuración
+      console.log('Socket event recibido (seller queue):', payload);
+      loadOrders();
+      Toast.show({
+        type: 'info',
+        text1: 'Novo pedido ou atualização',
+        text2: payload?.message || 'Há uma atualização nos pedidos.',
+      });
+    };
+    socket.on('newOrder', handleOrderEvent);
+    socket.on('orderStatusChanged', handleOrderEvent);
+    socket.on('orderCancelled', handleOrderEvent);
+    socket.on('orderReadyForPickup', handleOrderEvent);
+    return () => {
+      socket.off('newOrder', handleOrderEvent);
+      socket.off('orderStatusChanged', handleOrderEvent);
+      socket.off('orderCancelled', handleOrderEvent);
+      socket.off('orderReadyForPickup', handleOrderEvent);
+    };
+  }, [socket]);
 
   const handleAcceptOrder = async (order: PendingOrder) => {
     try {

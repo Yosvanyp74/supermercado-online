@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { SocketProvider } from '@/components/SocketProvider';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -52,7 +53,9 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider>
-          <AppContent />
+          <SocketProvider>
+            <AppContent />
+          </SocketProvider>
         </ThemeProvider>
         <Toast />
       </SafeAreaProvider>

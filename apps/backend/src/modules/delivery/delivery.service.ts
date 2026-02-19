@@ -3,14 +3,21 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+
 import { PrismaService } from '../../prisma/prisma.service';
 import { DeliveryStatus, OrderStatus } from '@prisma/client';
 import { AssignDeliveryDto } from './dto/assign-delivery.dto';
 import { RateDeliveryDto } from './dto/rate-delivery.dto';
+import { NotificationsService } from '../notifications/notifications.service';
+import { Inject, forwardRef } from '@nestjs/common';
 
 @Injectable()
 export class DeliveryService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => NotificationsService))
+    private notificationsService: NotificationsService,
+  ) {}
 
   async assignDelivery(dto: AssignDeliveryDto) {
     const order = await this.prisma.order.findUnique({
@@ -58,6 +65,18 @@ export class DeliveryService {
       }),
     ]);
 
+    // Notificar a admins, managers y sellers
+    if (order && deliveryPerson) {
+      await this.notificationsService.notifyDeliveryAssigned({
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        deliveryPerson: {
+          id: deliveryPerson.id,
+          firstName: deliveryPerson.firstName,
+          lastName: deliveryPerson.lastName,
+        },
+      });
+    }
     return delivery;
   }
 
@@ -158,6 +177,18 @@ export class DeliveryService {
       }),
     ]);
 
+    // Notificar a admins, managers y sellers
+    if (order && deliveryPerson) {
+      await this.notificationsService.notifyDeliveryAssigned({
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        deliveryPerson: {
+          id: deliveryPerson.id,
+          firstName: deliveryPerson.firstName,
+          lastName: deliveryPerson.lastName,
+        },
+      });
+    }
     return delivery;
   }
 

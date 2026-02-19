@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getSocket, disconnectSocket } from '@/lib/socket';
+import { useAuthStore } from '@/store/auth-store';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Search, Eye, MoreHorizontal } from 'lucide-react';
@@ -37,6 +39,8 @@ export default function OrdersPage() {
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('all');
+  const queryClient = useQueryClient();
+  const accessToken = useAuthStore((s) => s.accessToken);
 
   const { data, isLoading } = useQuery({
     queryKey: ['orders', page, statusFilter],
@@ -50,8 +54,34 @@ export default function OrdersPage() {
       }),
   });
 
+
   const orders = data?.data?.data || data?.data?.orders || data?.data || [];
   const totalPages = data?.data?.meta?.totalPages || data?.data?.totalPages || 1;
+
+  // Real-time WebSocket subscription
+  useEffect(() => {
+    if (!accessToken) return;
+    const socket = getSocket(accessToken);
+
+    const handleOrderEvent = (payload: any) => {
+      // Refetch orders on relevant events
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    };
+
+    socket.on('newOrder', handleOrderEvent);
+    socket.on('orderStatusChanged', handleOrderEvent);
+    socket.on('orderCancelled', handleOrderEvent);
+    socket.on('orderReadyForPickup', handleOrderEvent);
+
+    return () => {
+      socket.off('newOrder', handleOrderEvent);
+      socket.off('orderStatusChanged', handleOrderEvent);
+      socket.off('orderCancelled', handleOrderEvent);
+      socket.off('orderReadyForPickup', handleOrderEvent);
+      // Optionally disconnect if needed
+      // disconnectSocket();
+    };
+  }, [accessToken, queryClient]);
 
   return (
     <div className="space-y-6">

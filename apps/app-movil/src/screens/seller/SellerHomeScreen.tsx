@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import Toast from 'react-native-toast-message';
+import { useSocket } from '@/components/SocketProvider';
 import {
   View,
   Text,
@@ -30,6 +32,8 @@ import { shadow, useTheme } from '@/theme';
 type Props = NativeStackScreenProps<SellerStackParamList, 'SellerHome'>;
 
 export function SellerHomeScreen({ navigation }: Props) {
+  const isMounted = useRef(true);
+  const socket = useSocket();
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const rootNavigation = useNavigation<any>();
@@ -67,9 +71,37 @@ export function SellerHomeScreen({ navigation }: Props) {
     }
   };
 
+
   useEffect(() => {
+    isMounted.current = true;
     loadData();
+    return () => { isMounted.current = false; };
   }, []);
+
+  // WebSocket: refrescar datos en tiempo real
+  useEffect(() => {
+    if (!socket) return;
+    const handleOrderEvent = (payload: any) => {
+      // Log para depuración
+      console.log('Socket event recibido (seller):', payload);
+      loadData();
+      Toast.show({
+        type: 'info',
+        text1: 'Novo pedido ou atualização',
+        text2: payload?.message || 'Há uma atualização nos pedidos.',
+      });
+    };
+    socket.on('newOrder', handleOrderEvent);
+    socket.on('orderStatusChanged', handleOrderEvent);
+    socket.on('orderCancelled', handleOrderEvent);
+    socket.on('orderReadyForPickup', handleOrderEvent);
+    return () => {
+      socket.off('newOrder', handleOrderEvent);
+      socket.off('orderStatusChanged', handleOrderEvent);
+      socket.off('orderCancelled', handleOrderEvent);
+      socket.off('orderReadyForPickup', handleOrderEvent);
+    };
+  }, [socket]);
 
   useEffect(() => {
     const unsub = navigation.addListener('focus', loadData);

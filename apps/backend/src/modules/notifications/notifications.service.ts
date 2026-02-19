@@ -12,6 +12,52 @@ export class NotificationsService {
     private gateway: NotificationsGateway,
   ) {}
 
+  /**
+   * DELIVERY_ASSIGNED: notify admins, managers, sellers
+   */
+  async notifyDeliveryAssigned(payload: {
+    orderId: string;
+    orderNumber: string;
+    deliveryPerson: { id: string; firstName: string; lastName: string };
+  }) {
+    const title = 'Pedido asignado a repartidor';
+    const body = `El pedido ${payload.orderNumber} fue asignado a ${payload.deliveryPerson.firstName} ${payload.deliveryPerson.lastName}`;
+    const data = {
+      orderId: payload.orderId,
+      orderNumber: payload.orderNumber,
+      deliveryPerson: payload.deliveryPerson,
+    };
+
+    // Persistir notificación para staff
+    const staffUsers = await this.prisma.user.findMany({
+      where: { role: { in: [Role.ADMIN, Role.MANAGER, Role.SELLER] }, isActive: true },
+      select: { id: true },
+    });
+    if (staffUsers.length > 0) {
+      await this.prisma.notification.createMany({
+        data: staffUsers.map((u: { id: string }) => ({
+          userId: u.id,
+          type: NotificationType.DELIVERY_UPDATE,
+          title,
+          body,
+          data,
+        })),
+      });
+    }
+    // Emitir evento en tiempo real
+    this.gateway.emitToRoles(
+      [Role.ADMIN, Role.MANAGER, Role.SELLER],
+      'deliveryAssigned',
+      {
+        type: NotificationType.DELIVERY_UPDATE,
+        title,
+        body,
+        data,
+      },
+    );
+
+  }
+
   async findAll(
     userId: string,
     params: { page?: number; limit?: number; isRead?: boolean },

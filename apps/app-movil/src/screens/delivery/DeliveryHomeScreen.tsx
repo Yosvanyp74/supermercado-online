@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import Toast from 'react-native-toast-message';
+import { useSocket } from '@/components/SocketProvider';
 import {
   View,
   Text,
@@ -30,20 +32,35 @@ import { shadow, useTheme } from '@/theme';
 type Props = NativeStackScreenProps<DeliveryStackParamList, 'DeliveryHome'>;
 
 export function DeliveryHomeScreen({ navigation }: Props) {
+  const isMounted = useRef(true);
+  const socket = useSocket();
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const rootNavigation = useNavigation<any>();
   const { user } = useAuthStore();
 
   const [activeDeliveries, setActiveDeliveries] = useState<any[]>([]);
+  const [availableCount, setAvailableCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadData = async () => {
+  const loadData = async (showToast = false) => {
     try {
-      const res = await deliveryApi.getActive().catch(() => ({ data: [] }));
-      const data = res.data?.data || res.data;
-      setActiveDeliveries(Array.isArray(data) ? data : []);
+      const [activeRes, availableRes] = await Promise.all([
+        deliveryApi.getActive().catch(() => ({ data: [] })),
+        deliveryApi.getAvailable().catch(() => ({ data: [] })),
+      ]);
+      const activeData = activeRes.data?.data || activeRes.data;
+      setActiveDeliveries(Array.isArray(activeData) ? activeData : []);
+      const availableData = Array.isArray(availableRes.data) ? availableRes.data : [];
+      setAvailableCount(availableData.length);
+      if (showToast) {
+        Toast.show({
+          type: 'info',
+          text1: `Pedidos disponíveis: ${availableData.length}`,
+          text2: 'Lista atualizada após evento socket',
+        });
+      }
     } catch {
       // ignore
     } finally {
@@ -52,12 +69,36 @@ export function DeliveryHomeScreen({ navigation }: Props) {
     }
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
 
   useEffect(() => {
-    const unsub = navigation.addListener('focus', loadData);
+    isMounted.current = true;
+    loadData();
+    return () => { isMounted.current = false; };
+  }, []);
+
+  // WebSocket: refrescar datos en tiempo real
+  useEffect(() => {
+    if (!socket) return;
+    const handleOrderReady = (payload: any) => {
+      console.log('Socket event recebido (delivery):', payload);
+      loadData(true);
+    };
+    const handleOrderAccepted = (payload: any) => {
+      console.log('Socket event recebido (delivery accepted):', payload);
+      loadData(true);
+    };
+    socket.on('orderReadyForPickup', handleOrderReady);
+    socket.on('deliveryAssigned', handleOrderAccepted);
+    return () => {
+      socket.off('orderReadyForPickup', handleOrderReady);
+      socket.off('deliveryAssigned', handleOrderAccepted);
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    const unsub = navigation.addListener('focus', () => {
+      loadData();
+    });
     return unsub;
   }, [navigation]);
 
@@ -80,6 +121,7 @@ export function DeliveryHomeScreen({ navigation }: Props) {
       color: '#15803d',
       bg: '#f0fdf4',
       onPress: () => navigation.navigate('DeliveryAvailableOrders'),
+      badge: availableCount > 0 ? availableCount : undefined,
     },
     {
       icon: Package,

@@ -270,4 +270,48 @@ export class NotificationsService {
       data: { ...data, status: 'READY_FOR_PICKUP' },
     });
   }
+
+  /**
+   * ORDER_CANCELLED: notify admins, managers, sellers
+   */
+  async notifyOrderCancelled(order: {
+    id: string;
+    orderNumber: string;
+    customer: { firstName: string; lastName: string };
+    reason?: string;
+  }) {
+    const title = 'Pedido Cancelado';
+    const body = `Pedido ${order.orderNumber} cancelado por ${order.customer.firstName} ${order.customer.lastName}` + (order.reason ? `: ${order.reason}` : '');
+    const payload = {
+      type: NotificationType.ORDER_STATUS,
+      title,
+      body,
+      data: { orderId: order.id, orderNumber: order.orderNumber, reason: order.reason },
+    };
+
+    // Persist for all admins, managers, sellers
+    const staffUsers = await this.prisma.user.findMany({
+      where: { role: { in: [Role.ADMIN, Role.MANAGER, Role.SELLER] }, isActive: true },
+      select: { id: true },
+    });
+
+    if (staffUsers.length > 0) {
+      await this.prisma.notification.createMany({
+        data: staffUsers.map((u) => ({
+          userId: u.id,
+          type: NotificationType.ORDER_STATUS,
+          title,
+          body,
+          data: { orderId: order.id, orderNumber: order.orderNumber, reason: order.reason },
+        })),
+      });
+    }
+
+    // Real-time push to role rooms
+    this.gateway.emitToRoles(
+      [Role.ADMIN, Role.MANAGER, Role.SELLER],
+      'orderStatusChanged',
+      payload,
+    );
+  }
 }

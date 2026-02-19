@@ -533,6 +533,21 @@ export class OrdersService {
         include: orderInclude,
       });
 
+      // Notificar a admin, manager y seller sobre la cancelación
+      const customer = await tx.user.findUnique({
+        where: { id: userId },
+        select: { firstName: true, lastName: true },
+      });
+      // Llamada fuera de la transacción para evitar bloqueos
+      setTimeout(() => {
+        this.notificationsService.notifyOrderCancelled({
+          id: cancelled.id,
+          orderNumber: cancelled.orderNumber,
+          customer: { firstName: customer?.firstName || '', lastName: customer?.lastName || '' },
+          reason: reason || 'Cancelado pelo cliente',
+        }).catch(() => {});
+      }, 0);
+
       return cancelled;
     });
   }

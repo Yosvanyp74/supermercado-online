@@ -1324,6 +1324,71 @@
         ]
       }
     },
+    "/api/orders/{id}": {
+      "delete": {
+        "operationId": "OrdersController_deleteOrder",
+        "summary": "Eliminar pedido (admin)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pedido eliminado com sucesso"
+          },
+          "404": {
+            "description": "Pedido não encontrado"
+          }
+        },
+        "tags": [
+          "orders"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "OrdersController_findOne",
+        "summary": "Obter detalhes de um pedido",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pedido retornado com sucesso"
+          },
+          "403": {
+            "description": "Sem permissão para ver este pedido"
+          },
+          "404": {
+            "description": "Pedido não encontrado"
+          }
+        },
+        "tags": [
+          "orders"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/orders": {
       "post": {
         "operationId": "OrdersController_create",
@@ -1512,41 +1577,6 @@
         "responses": {
           "200": {
             "description": "Pedidos do usuário retornados com sucesso"
-          }
-        },
-        "tags": [
-          "orders"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/orders/{id}": {
-      "get": {
-        "operationId": "OrdersController_findOne",
-        "summary": "Obter detalhes de um pedido",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Pedido retornado com sucesso"
-          },
-          "403": {
-            "description": "Sem permissão para ver este pedido"
-          },
-          "404": {
-            "description": "Pedido não encontrado"
           }
         },
         "tags": [

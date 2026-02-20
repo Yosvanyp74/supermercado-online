@@ -177,7 +177,7 @@ export class DeliveryService {
       }),
     ]);
 
-    // Notificar a admins, managers y sellers
+    // Notificar a admins, managers, sellers y cliente
     if (order && deliveryPerson) {
       await this.notificationsService.notifyDeliveryAssigned({
         orderId: order.id,
@@ -187,6 +187,13 @@ export class DeliveryService {
           firstName: deliveryPerson.firstName,
           lastName: deliveryPerson.lastName,
         },
+      });
+      // Notificar al cliente sobre cambio de estado
+      await this.notificationsService.notifyOrderStatusChanged({
+        id: order.id,
+        orderNumber: order.orderNumber,
+        customerId: order.customerId,
+        status: 'OUT_FOR_DELIVERY',
       });
     }
     return delivery;
@@ -331,6 +338,16 @@ export class DeliveryService {
           notes: 'Pedido entregue com sucesso',
         },
       });
+      // Notificar al cliente y staff sobre entrega
+      const order = await this.prisma.order.findUnique({ where: { id: delivery.orderId } });
+      if (order) {
+        await this.notificationsService.notifyOrderStatusChanged({
+          id: order.id,
+          orderNumber: order.orderNumber,
+          customerId: order.customerId,
+          status: 'DELIVERED',
+        });
+      }
     }
 
     return updatedDelivery;

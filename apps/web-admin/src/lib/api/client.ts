@@ -124,6 +124,7 @@ export const ordersApi = {
     api.patch(`/orders/${id}/status`, data),
   cancel: (id: string) => api.post(`/orders/${id}/cancel`),
   getTracking: (id: string) => api.get(`/orders/${id}/tracking`),
+  deleteOrder: (id: string) => api.delete(`/orders/${id}`),
 };
 
 // ============ INVENTORY ============

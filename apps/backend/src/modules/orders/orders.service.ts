@@ -1,3 +1,4 @@
+// ...existing code...
 import {
   Injectable,
   NotFoundException,
@@ -62,6 +63,31 @@ export class OrdersService {
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
   ) {}
+
+  /**
+   * Elimina un pedido y todas sus dependencias en el orden correcto (solo admin)
+   */
+  async deleteOrderCascade(orderId: string, userId: string) {
+    // Solo admin puede ejecutar (por seguridad extra)
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || user.role !== 'ADMIN') {
+      throw new ForbiddenException('Apenas administradores podem deletar pedidos');
+    }
+    // Verifica que el pedido existe
+    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    if (!order) {
+      throw new NotFoundException('Pedido não encontrado');
+    }
+    // Borrado en cascada seguro
+    await this.prisma.pickingItem.deleteMany({ where: { pickingOrder: { orderId } } });
+    await this.prisma.orderStatusHistory.deleteMany({ where: { orderId } });
+    await this.prisma.orderItem.deleteMany({ where: { orderId } });
+    await this.prisma.pickingOrder.deleteMany({ where: { orderId } });
+    await this.prisma.payment.deleteMany({ where: { orderId } });
+    await this.prisma.delivery.deleteMany({ where: { orderId } });
+    await this.prisma.order.delete({ where: { id: orderId } });
+    return { success: true };
+  }
 
   private generateOrderNumber(): string {
     const timestamp = Date.now().toString(36).toUpperCase();

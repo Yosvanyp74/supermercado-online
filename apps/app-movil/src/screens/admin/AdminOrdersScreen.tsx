@@ -57,7 +57,6 @@ export function AdminOrdersScreen({ navigation }: Props) {
         status: status || undefined,
         sortBy: 'createdAt',
         sortOrder: 'desc',
-        _ts: Date.now(),
       });
       const items = data.data || data.items || data;
       if (pageNum === 1) {
@@ -104,8 +103,8 @@ export function AdminOrdersScreen({ navigation }: Props) {
     let socket = getSocket(token);
     // Logs de conexión/desconexión/errores
     const onConnect = () => console.log('Socket conectado:', socket.id);
-    const onDisconnect = (reason) => console.log('Socket desconectado:', reason);
-    const onError = (err) => console.log('Socket error:', err);
+    const onDisconnect = (reason: string) => console.log('Socket desconectado:', reason);
+    const onError = (err: any) => console.log('Socket error:', err);
 
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);

@@ -1,3 +1,4 @@
+import { Delete } from '@nestjs/common';
 import {
   Controller,
   Get,
@@ -25,12 +26,25 @@ import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { CurrentUser, Roles } from '../../common/decorators';
 import { RolesGuard } from '../../common/guards';
 
+
 @ApiTags('orders')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
+
+  @Delete(':id')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Eliminar pedido (admin)' })
+  @ApiResponse({ status: 200, description: 'Pedido eliminado com sucesso' })
+  @ApiResponse({ status: 404, description: 'Pedido não encontrado' })
+  async deleteOrder(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.ordersService.deleteOrderCascade(id, userId);
+  }
 
   @Post()
   @Roles(Role.CUSTOMER)

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getSocket, disconnectSocket } from '@/lib/socket';
 import { useAuthStore } from '@/store/auth-store';
+import { useState as useReactState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Search, Eye, MoreHorizontal } from 'lucide-react';
@@ -41,6 +42,20 @@ export default function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const queryClient = useQueryClient();
   const accessToken = useAuthStore((s) => s.accessToken);
+  const user = useAuthStore((s) => s.user);
+  const [deleteDialog, setDeleteDialog] = useReactState<{ open: boolean; orderId?: string }>({ open: false });
+  const deleteMutation = useMutation({
+    mutationFn: (orderId: string) => ordersApi.deleteOrder(orderId),
+    onSuccess: () => {
+      toast.success('Pedido eliminado com sucesso');
+      setDeleteDialog({ open: false });
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+    onError: (err: any) => {
+      toast.error('Erro ao eliminar pedido');
+      setDeleteDialog({ open: false });
+    },
+  });
 
   const { data, isLoading } = useQuery({
     queryKey: ['orders', page, statusFilter],
@@ -153,7 +168,7 @@ export default function OrdersPage() {
                         <TableCell>
                           <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="flex gap-2">
                           <Button
                             variant="ghost"
                             size="icon"
@@ -161,10 +176,44 @@ export default function OrdersPage() {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
+                          {user?.role === 'ADMIN' && (
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              disabled={deleteMutation.status === 'pending' && deleteDialog.orderId === order.id}
+                              onClick={() => setDeleteDialog({ open: true, orderId: order.id })}
+                              title="Eliminar pedido"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-4 w-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </Button>
+                          )}
                         </TableCell>
                       </TableRow>
                     );
                   })}
+                        {/* Diálogo de confirmação para eliminar pedido */}
+                        {deleteDialog.open && (
+                          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+                              <h2 className="text-lg font-semibold mb-2">Confirmar eliminação</h2>
+                              <p className="mb-4">Tem certeza que deseja eliminar este pedido? Esta ação não pode ser desfeita.</p>
+                              <div className="flex justify-end gap-2">
+                                <Button variant="outline" onClick={() => setDeleteDialog({ open: false })} disabled={deleteMutation.status === 'pending'}>
+                                  Cancelar
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  onClick={() => deleteDialog.orderId && deleteMutation.mutate(deleteDialog.orderId)}
+                                  disabled={deleteMutation.status === 'pending'}
+                                >
+                                  {deleteMutation.status === 'pending' ? 'Eliminando...' : 'Eliminar'}
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                   {(!Array.isArray(orders) || orders.length === 0) && (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center text-muted-foreground py-8">

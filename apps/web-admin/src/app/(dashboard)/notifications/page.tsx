@@ -1,6 +1,9 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { getSocket } from '@/lib/socket';
+import { useAuthStore } from '@/store/auth-store';
 import { Bell, Check, CheckCheck, Trash2, Info, AlertTriangle, Package, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { PageLoading } from '@/components/ui/loading';
 import { notificationsApi } from '@/lib/api/client';
+import { useNotificationsStore } from '@/store/notifications-store';
 import { formatDate } from '@/lib/utils';
 
 const ICON_MAP: Record<string, any> = {
@@ -17,21 +21,42 @@ const ICON_MAP: Record<string, any> = {
 
 export default function NotificationsPage() {
   const queryClient = useQueryClient();
+  const accessToken = useAuthStore((s) => s.accessToken);
 
   const { data, isLoading } = useQuery({
     queryKey: ['notifications'],
     queryFn: () => notificationsApi.findAll(),
   });
 
+  // Actualizar la lista en tiempo real
+  useEffect(() => {
+    if (!accessToken) return;
+    const socket = getSocket(accessToken);
+    const handleNotification = () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    };
+    socket.on('notification', handleNotification);
+    return () => {
+      socket.off('notification', handleNotification);
+    };
+  }, [accessToken, queryClient]);
+
+  const markAsRead = useNotificationsStore((s) => s.markAsRead);
+  const markAllAsReadStore = useNotificationsStore((s) => s.markAllAsRead);
+
   const markReadMutation = useMutation({
     mutationFn: (id: string) => notificationsApi.markAsRead(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notifications'] }),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      if (id) markAsRead(id);
+    },
   });
 
   const markAllReadMutation = useMutation({
     mutationFn: () => notificationsApi.markAllAsRead(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      markAllAsReadStore();
       toast.success('Todas marcadas como lidas');
     },
   });

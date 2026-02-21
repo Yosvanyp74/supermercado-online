@@ -18,6 +18,7 @@ import { useAuthStore } from '@/store/auth-store';
 import { useUIStore } from '@/store/ui-store';
 import { useQuery } from '@tanstack/react-query';
 import { notificationsApi } from '@/lib/api/client';
+import { useNotificationsStore } from '@/store/notifications-store';
 import { getInitials } from '@/lib/utils';
 
 export function Header() {
@@ -25,13 +26,23 @@ export function Header() {
   const { user, clearAuth } = useAuthStore();
   const { toggleSidebar, sidebarCollapsed } = useUIStore();
 
+
+  // Zustand notifications store for real-time badge (reactive)
+  const unreadCount = useNotificationsStore(
+    (s) => s.notifications.filter((n) => !n.read).length
+  );
+
+  // Always poll backend for unread count (robust fallback)
   const { data: unreadData } = useQuery({
     queryKey: ['unread-notifications'],
     queryFn: () => notificationsApi.getUnreadCount(),
     refetchInterval: 30000,
   });
 
-  const unreadCount = unreadData?.data?.count || 0;
+  // Si Zustand tiene datos, usa el contador local; si no, usa el backend
+  const effectiveUnreadCount = unreadCount > 0
+    ? unreadCount
+    : (unreadData?.data?.count || 0);
 
   const handleLogout = () => {
     clearAuth();
@@ -49,6 +60,7 @@ export function Header() {
       <div className="flex items-center gap-2">
         <ThemeToggle />
 
+
         <Button
           variant="ghost"
           size="icon"
@@ -56,12 +68,12 @@ export function Header() {
           onClick={() => router.push('/notifications')}
         >
           <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
+          {(effectiveUnreadCount > 0 || (unreadData?.data?.count > 0)) && (
             <Badge
               variant="destructive"
               className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
             >
-              {unreadCount > 9 ? '9+' : unreadCount}
+              {(effectiveUnreadCount > 0 ? effectiveUnreadCount : unreadData?.data?.count) > 9 ? '9+' : (effectiveUnreadCount > 0 ? effectiveUnreadCount : unreadData?.data?.count)}
             </Badge>
           )}
         </Button>

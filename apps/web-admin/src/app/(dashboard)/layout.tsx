@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { notificationsApi } from '@/lib/api/client';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
@@ -9,14 +11,50 @@ import { useUIStore } from '@/store/ui-store';
 import { cn } from '@/lib/utils';
 import { PageLoading } from '@/components/ui/loading';
 
+import { useNotificationsStore } from '@/store/notifications-store';
+import { getSocket, disconnectSocket } from '@/lib/socket';
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { isAuthenticated, hydrate, user } = useAuthStore();
   const { sidebarCollapsed } = useUIStore();
 
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const addNotification = useNotificationsStore((s) => s.addNotification);
+  const notifications = useNotificationsStore((s) => s.notifications);
+  const clearNotifications = useNotificationsStore((s) => s.clearNotifications);
+  const queryClient = useQueryClient();
+
   useEffect(() => {
     hydrate();
   }, [hydrate]);
+
+  // Hidratar notificaciones no leídas al cargar
+  useEffect(() => {
+    async function hydrateNotifications() {
+      try {
+        if (!accessToken) return;
+        const res = await notificationsApi.findAll({ isRead: false });
+        clearNotifications();
+        const notifs = res?.data?.data || res?.data || [];
+        notifs.forEach((n: any) => {
+          addNotification({
+            id: n.id,
+            type: n.type,
+            message: n.message || n.body,
+            createdAt: n.createdAt,
+            data: n.data,
+            read: n.isRead || n.read || false,
+          });
+        });
+      } catch (e) {
+        // ignore
+      }
+    }
+    hydrateNotifications();
+    // Solo al montar
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessToken]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -26,6 +64,36 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
     }
   }, [router]);
+
+  // Global socket connection for notifications
+  useEffect(() => {
+    if (!accessToken) return;
+    const socket = getSocket(accessToken);
+
+    const handleNotification = (payload: any) => {
+      // Solo agregar si el id existe y no está ya en el store
+      if (!payload.id) return;
+      const exists = notifications.some((n: any) => n.id === payload.id);
+      if (exists) return;
+      addNotification({
+        id: payload.id,
+        type: payload.type,
+        message: payload.message || payload.body,
+        createdAt: payload.createdAt,
+        data: payload.data,
+        read: false,
+      });
+      // Solo actualiza el store, la lista se actualiza en la página de notificaciones
+    };
+
+    socket.on('notification', handleNotification);
+
+    return () => {
+      socket.off('notification', handleNotification);
+      // Optionally disconnect if needed
+      // disconnectSocket();
+    };
+  }, [accessToken, addNotification]);
 
   if (typeof window !== 'undefined' && !localStorage.getItem('accessToken')) {
     return <PageLoading />;

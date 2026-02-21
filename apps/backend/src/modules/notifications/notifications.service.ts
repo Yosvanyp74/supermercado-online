@@ -34,15 +34,25 @@ export class NotificationsService {
       select: { id: true },
     });
     if (staffUsers.length > 0) {
-      await this.prisma.notification.createMany({
-        data: staffUsers.map((u: { id: string }) => ({
-          userId: u.id,
+      for (const u of staffUsers) {
+        const notif = await this.prisma.notification.create({
+          data: {
+            userId: u.id,
+            type: NotificationType.DELIVERY_UPDATE,
+            title,
+            body,
+            data,
+          },
+        });
+        this.gateway.emitToUser(u.id, 'notification', {
+          id: notif.id,
           type: NotificationType.DELIVERY_UPDATE,
-          title,
-          body,
+          message: body,
+          createdAt: notif.createdAt,
           data,
-        })),
-      });
+          read: false,
+        });
+      }
     }
     // Emitir evento en tiempo real
     this.gateway.emitToRoles(
@@ -198,15 +208,25 @@ export class NotificationsService {
     });
 
     if (staffUsers.length > 0) {
-      await this.prisma.notification.createMany({
-        data: staffUsers.map((u) => ({
-          userId: u.id,
+      for (const u of staffUsers) {
+        const notif = await this.prisma.notification.create({
+          data: {
+            userId: u.id,
+            type: NotificationType.NEW_ORDER,
+            title,
+            body,
+            data: { orderId: order.id, orderNumber: order.orderNumber },
+          },
+        });
+        this.gateway.emitToUser(u.id, 'notification', {
+          id: notif.id,
           type: NotificationType.NEW_ORDER,
-          title,
-          body,
+          message: body,
+          createdAt: notif.createdAt,
           data: { orderId: order.id, orderNumber: order.orderNumber },
-        })),
-      });
+          read: false,
+        });
+      }
     }
 
     // Real-time push to role rooms
@@ -254,6 +274,15 @@ export class NotificationsService {
       body,
       data: payload.data,
     });
+    // Emitir evento 'notification' al usuario
+    this.gateway.emitToUser(order.customerId, 'notification', {
+      id: undefined,
+      type: NotificationType.ORDER_STATUS,
+      message: body,
+      createdAt: new Date().toISOString(),
+      data: payload.data,
+      read: false,
+    });
 
     // Real-time push to customer
     this.gateway.emitToUser(order.customerId, 'orderStatusChanged', payload);
@@ -278,15 +307,25 @@ export class NotificationsService {
     });
 
     if (deliveryUsers.length > 0) {
-      await this.prisma.notification.createMany({
-        data: deliveryUsers.map((u) => ({
-          userId: u.id,
+      for (const u of deliveryUsers) {
+        const notif = await this.prisma.notification.create({
+          data: {
+            userId: u.id,
+            type: NotificationType.DELIVERY_UPDATE,
+            title,
+            body,
+            data,
+          },
+        });
+        this.gateway.emitToUser(u.id, 'notification', {
+          id: notif.id,
           type: NotificationType.DELIVERY_UPDATE,
-          title,
-          body,
+          message: body,
+          createdAt: notif.createdAt,
           data,
-        })),
-      });
+          read: false,
+        });
+      }
     }
 
     // Real-time push to delivery role
@@ -301,12 +340,20 @@ export class NotificationsService {
     const customerTitle = 'Pedido Pronto!';
     const customerBody = `Seu pedido ${order.orderNumber} está pronto para retirada`;
 
-    await this.create({
+    const customerNotif = await this.create({
       userId: order.customerId,
       type: NotificationType.ORDER_STATUS,
       title: customerTitle,
       body: customerBody,
       data,
+    });
+    this.gateway.emitToUser(order.customerId, 'notification', {
+      id: customerNotif.id,
+      type: NotificationType.ORDER_STATUS,
+      message: customerBody,
+      createdAt: customerNotif.createdAt,
+      data: { ...data, status: 'READY_FOR_PICKUP' },
+      read: false,
     });
 
     this.gateway.emitToUser(order.customerId, 'orderStatusChanged', {
@@ -342,15 +389,25 @@ export class NotificationsService {
     });
 
     if (staffUsers.length > 0) {
-      await this.prisma.notification.createMany({
-        data: staffUsers.map((u) => ({
-          userId: u.id,
+      for (const u of staffUsers) {
+        const notif = await this.prisma.notification.create({
+          data: {
+            userId: u.id,
+            type: NotificationType.ORDER_STATUS,
+            title,
+            body,
+            data: { orderId: order.id, orderNumber: order.orderNumber, reason: order.reason },
+          },
+        });
+        this.gateway.emitToUser(u.id, 'notification', {
+          id: notif.id,
           type: NotificationType.ORDER_STATUS,
-          title,
-          body,
+          message: body,
+          createdAt: notif.createdAt,
           data: { orderId: order.id, orderNumber: order.orderNumber, reason: order.reason },
-        })),
-      });
+          read: false,
+        });
+      }
     }
 
     // Real-time push to role rooms

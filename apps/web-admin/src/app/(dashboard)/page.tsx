@@ -1,6 +1,9 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { getSocket } from '@/lib/socket';
+import { useAuthStore } from '@/store/auth-store';
 import {
   DollarSign,
   ShoppingCart,
@@ -100,6 +103,27 @@ function StatsCard({
 }
 
 export default function DashboardPage() {
+  const queryClient = useQueryClient();
+  const accessToken = useAuthStore((s) => s.accessToken);
+    // Efecto para actualizar dashboard y pedidos recientes en tiempo real
+    useEffect(() => {
+      if (!accessToken) return;
+      const socket = getSocket(accessToken);
+      const handleOrderEvent = () => {
+        queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
+        queryClient.invalidateQueries({ queryKey: ['recent-orders'] });
+      };
+      socket.on('newOrder', handleOrderEvent);
+      socket.on('orderStatusChanged', handleOrderEvent);
+      socket.on('orderCancelled', handleOrderEvent);
+      socket.on('orderReadyForPickup', handleOrderEvent);
+      return () => {
+        socket.off('newOrder', handleOrderEvent);
+        socket.off('orderStatusChanged', handleOrderEvent);
+        socket.off('orderCancelled', handleOrderEvent);
+        socket.off('orderReadyForPickup', handleOrderEvent);
+      };
+    }, [accessToken, queryClient]);
   const { data: dashboard, isLoading: dashLoading } = useQuery({
     queryKey: ['admin-dashboard'],
     queryFn: () => analyticsApi.getDashboard(),

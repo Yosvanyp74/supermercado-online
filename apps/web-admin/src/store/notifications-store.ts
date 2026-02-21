@@ -9,14 +9,18 @@ export interface Notification {
   read?: boolean;
 }
 
+
 interface NotificationsState {
   notifications: Notification[];
   addNotification: (notification: Notification) => void;
   markAsRead: (id: string) => void;
+  markAllAsRead: () => void;
   clearNotifications: () => void;
+  getUnreadCount: () => number;
+  getUnreadNotifications: () => Notification[];
 }
 
-export const useNotificationsStore = create<NotificationsState>((set) => ({
+export const useNotificationsStore = create<NotificationsState>((set, get) => ({
   notifications: [],
   addNotification: (notification) => set((state) => ({
     notifications: [notification, ...state.notifications],
@@ -26,5 +30,10 @@ export const useNotificationsStore = create<NotificationsState>((set) => ({
       n.id === id ? { ...n, read: true } : n
     ),
   })),
+  markAllAsRead: () => set((state) => ({
+    notifications: state.notifications.map((n) => ({ ...n, read: true })),
+  })),
   clearNotifications: () => set({ notifications: [] }),
+  getUnreadCount: () => get().notifications.filter((n) => !n.read).length,
+  getUnreadNotifications: () => get().notifications.filter((n) => !n.read),
 }));

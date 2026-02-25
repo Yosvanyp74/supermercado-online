@@ -274,8 +274,12 @@ export class SellerService {
         },
         _sum: { quantity: true },
       }),
+      // count only picking orders that belong to this seller and are not yet completed
       this.prisma.pickingOrder.count({
-        where: { status: PickingStatus.PENDING },
+        where: {
+          sellerId,
+          status: { in: [PickingStatus.ASSIGNED, PickingStatus.PICKING] },
+        },
       }),
     ]);
 
@@ -336,6 +340,12 @@ export class SellerService {
   }
 
   async acceptOrder(orderId: string, sellerId: string) {
+    // fetch the seller user record for potential validation or auditing
+    const sellerUser = await this.prisma.user.findUnique({
+      where: { id: sellerId },
+      select: { id: true, email: true, firstName: true, lastName: true },
+    });
+
     const pickingOrder = await this.prisma.pickingOrder.findUnique({
       where: { orderId },
     });
@@ -350,7 +360,7 @@ export class SellerService {
 
     const now = new Date();
 
-    const [updated] = await Promise.all([
+    const [updatedPicking, updatedOrder] = await Promise.all([
       this.prisma.pickingOrder.update({
         where: { id: pickingOrder.id },
         data: {
@@ -360,32 +370,18 @@ export class SellerService {
           startedAt: now,
         },
         include: {
-          order: {
-            select: { id: true, orderNumber: true },
-          },
-          items: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  barcode: true,
-                  mainImageUrl: true,
-                  aisleLocation: true,
-                  shelfPosition: true,
-                },
-              },
-            },
-          },
+          order: { select: { id: true, orderNumber: true, sellerId: true } },
         },
       }),
       this.prisma.order.update({
         where: { id: orderId },
         data: { status: OrderStatus.PROCESSING, sellerId },
+        select: { id: true, sellerId: true },
       }),
     ]);
 
-    return updated;
+
+    return updatedPicking;
   }
 
   async getPickingOrder(pickingOrderId: string) {
@@ -431,7 +427,7 @@ export class SellerService {
   }
 
   async getMyPickingOrders(sellerId: string) {
-    return this.prisma.pickingOrder.findMany({
+    const pickingOrders = await this.prisma.pickingOrder.findMany({
       where: {
         sellerId,
         status: { in: [PickingStatus.ASSIGNED, PickingStatus.PICKING, PickingStatus.PICKED] },
@@ -441,9 +437,14 @@ export class SellerService {
           select: {
             id: true,
             orderNumber: true,
+            fulfillmentType: true,
+            total: true,
+            createdAt: true,
+            status: true,
             customer: {
               select: { id: true, firstName: true, lastName: true },
             },
+            items: { select: { id: true } },
           },
         },
         items: {
@@ -452,6 +453,56 @@ export class SellerService {
       },
       orderBy: { assignedAt: 'desc' },
     });
+
+
+    // normalize each pickingOrder into the lightweight shape used by the UI
+    const mapped = pickingOrders.map((po) => ({
+      id: po.order.id,
+      orderNumber: po.order.orderNumber,
+      customerName: po.order.customer
+        ? `${po.order.customer.firstName} ${po.order.customer.lastName}`
+        : 'Cliente',
+      itemCount: po.order.items.length,
+      total: po.order.total,
+      deliveryMethod: po.order.fulfillmentType === 'DELIVERY' ? 'delivery' : 'pickup',
+      createdAt: po.order.createdAt.toISOString(),
+      status: po.order.status,
+    }));
+
+    if (mapped.length === 0) {
+      const orders = await this.prisma.order.findMany({
+        where: { sellerId },
+        select: {
+          id: true,
+          orderNumber: true,
+          fulfillmentType: true,
+          total: true,
+          createdAt: true,
+          status: true,
+          customer: {
+            select: { id: true, firstName: true, lastName: true },
+          },
+          items: { select: { id: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+
+      return orders.map((o) => ({
+        id: o.id,
+        orderNumber: o.orderNumber,
+        customerName: o.customer
+          ? `${o.customer.firstName} ${o.customer.lastName}`
+          : 'Cliente',
+        itemCount: o.items.length,
+        total: o.total,
+        deliveryMethod: o.fulfillmentType === 'DELIVERY' ? 'delivery' : 'pickup',
+        createdAt: o.createdAt.toISOString(),
+        status: o.status,
+      }));
+    }
+
+    return mapped;
   }
 
   async scanItem(pickingOrderId: string, barcode: string, sellerId: string) {
@@ -691,6 +742,83 @@ export class SellerService {
     );
 
     return enriched;
+  }
+
+  // ==================== READY FOR DELIVERY ====================
+
+  /**
+   * Fetch orders that are already owned by a given seller.  The previous implementation
+   * (and some of the generated documentation) simply returned all confirmed/picking
+   * orders regardless of who they belonged to, which meant sellers could see orders
+   * assigned to other users.  When attempting to restrict by the user id we also ran
+   * into a subtle bug: the value stored in `order.sellerId` does not necessarily match
+   * the numeric/uuid value of the record in the users table for that seller.  The
+   * correct way to filter is to compare against the literal column on the order row.
+   */
+  async getOrders(sellerId: string, filter: 'all' | 'pending' | 'picking' = 'all') {
+    const statusFilter =
+      filter === 'pending'
+        ? [OrderStatus.CONFIRMED]
+        : filter === 'picking'
+        ? [OrderStatus.PROCESSING]
+        : [OrderStatus.CONFIRMED, OrderStatus.PROCESSING];
+
+    const orders = await this.prisma.order.findMany({
+      where: {
+        sellerId,
+        status: { in: statusFilter },
+      },
+      include: {
+        customer: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+      orderBy: [{ createdAt: 'asc' }],
+    });
+
+    return orders.map((order) => {
+      // order comes from Prisma with a typed shape; `items` is available because we included them
+      const pickedItems = order.items.filter((item: any) => item.status === 'PICKED').length;
+
+      return {
+        ...order,
+        // build a readable customer name since we only selected first/last above
+        customer: order.customer
+          ? {
+              ...order.customer,
+              name: `${order.customer.firstName} ${order.customer.lastName}`,
+            }
+          : null,
+        priority: this.calculatePriority(order),
+        minutesAgo: Math.floor(
+          (new Date().getTime() - new Date(order.createdAt).getTime()) / 60000,
+        ),
+        pickedItemsCount: pickedItems,
+        totalItemsCount: order.items.length,
+      };
+    });
+  }
+
+  private calculatePriority(order: any): 'NORMAL' | 'HIGH' | 'URGENT' {
+    if (!order.scheduledAt) return 'NORMAL';
+
+    const now = new Date();
+    const hoursUntil =
+      (new Date(order.scheduledAt).getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    if (hoursUntil < 1) return 'URGENT';
+    if (hoursUntil < 2) return 'HIGH';
+    return 'NORMAL';
   }
 
   // ==================== PRODUCTS ====================

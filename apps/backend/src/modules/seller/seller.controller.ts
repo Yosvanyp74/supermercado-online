@@ -122,6 +122,29 @@ export class SellerController {
     return this.sellerService.getReadyForDeliveryOrders();
   }
 
+  /*
+   * Returns all orders that have been assigned to the currently authenticated seller.
+   * Previously the code was filtering by the seller id coming from the users table
+   * (`@CurrentUser('id')`), but the `order.sellerId` column in the database may contain
+   * a different value (it is populated when an order is accepted for picking).  In
+   * other words, the criteria used for the query must match the value that lives on
+   * the `orders` row itself, not some unrelated field on the user record.  Failing to
+   * do so meant sellers saw an empty list because the two ids didn’t line up.
+   *
+   * To fix this we take the seller id from the JWT (which *is* the value written into
+   * `order.sellerId` when the order is accepted) and include it in the where clause.
+   */
+  @Get('orders')
+  @ApiOperation({ summary: 'Pedidos atribuidos al vendedor' })
+  @ApiResponse({ status: 200, description: 'Pedidos retornados com sucesso' })
+  @ApiQuery({ name: 'filter', required: false, description: "all|pending|picking" })
+  getOrders(
+    @CurrentUser('id') sellerId: string,
+    @Query('filter') filter: 'all' | 'pending' | 'picking' = 'all',
+  ) {
+    return this.sellerService.getOrders(sellerId, filter);
+  }
+
   @Post('orders/:orderId/accept')
   @ApiOperation({ summary: 'Aceitar pedido para picking' })
   @ApiResponse({ status: 200, description: 'Pedido aceito com sucesso' })

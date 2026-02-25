@@ -56,14 +56,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken]);
 
+  // redirect unauthenticated users or those with wrong role
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        router.push('/login');
-      }
+    // wait until store is hydrated (hydrate effect above picks up tokens)
+    if (!user) {
+      router.push('/login');
+      return;
     }
-  }, [router]);
+
+    // if logged user is a seller, send them to their dashboard
+    if (user.role === 'SELLER') {
+      router.push('/vendedor');
+      return;
+    }
+
+    // other roles are permitted to stay (ADMIN, MANAGER, EMPLOYEE, etc.)
+  }, [user, router]);
 
   // Global socket connection for notifications
   useEffect(() => {

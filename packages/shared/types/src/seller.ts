@@ -100,5 +100,7 @@ export interface SellerStats {
   averageTicket: number;
   itemsSold: number;
   goalProgress: number;
+  /** number of picking orders currently assigned to this seller (not yet completed) */
   pendingPickingOrders: number;
+  availableOrdersCount: number;
 }

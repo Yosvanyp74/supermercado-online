@@ -40,17 +40,16 @@ export default function LoginPage() {
       const response = await authApi.login(data);
       const { user, accessToken, refreshToken } = response.data;
 
+      // Only allow admin roles
+      const allowedRoles = ['ADMIN', 'MANAGER', 'EMPLOYEE'];
+      if (!allowedRoles.includes(user.role)) {
+        toast.error('Acesso negado. Este painel é apenas para administradores.');
+        return;
+      }
+
       setAuth(user, accessToken, refreshToken);
       toast.success('Login realizado com sucesso!');
-
-      // redirigir según rol
-      if (user.role === 'SELLER') {
-        router.push('/vendedor');
-      } else if (['ADMIN', 'MANAGER', 'EMPLOYEE'].includes(user.role)) {
-        router.push('/');
-      } else {
-        toast.error('Acesso negado. Você não tem permissão para acessar o painel');
-      }
+      router.push('/');
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Erro ao fazer login');
     } finally {

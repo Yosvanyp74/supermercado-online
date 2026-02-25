@@ -2391,6 +2391,36 @@
         ]
       }
     },
+    "/api/seller/orders": {
+      "get": {
+        "operationId": "SellerController_getOrders",
+        "summary": "Pedidos atribuidos al vendedor",
+        "parameters": [
+          {
+            "name": "filter",
+            "required": false,
+            "in": "query",
+            "description": "all|pending|picking",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pedidos retornados com sucesso"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/seller/orders/{orderId}/accept": {
       "post": {
         "operationId": "SellerController_acceptOrder",

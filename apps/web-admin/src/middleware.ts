@@ -20,26 +20,15 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for auth token in cookies or localStorage (cookies for SSR)
+  // Check for auth token in cookies (if you ever store it there)
   const token = request.cookies.get('accessToken')?.value;
 
-  // If no token, redirect to login
-  // Note: Since we use localStorage for auth (Zustand), the main auth check
-  // happens client-side in the dashboard layout. This middleware provides
-  // an additional layer for cookie-based auth if configured.
-  // The client-side check in (dashboard)/layout.tsx handles the primary auth flow.
-
+  // simply let everything pass; client layouts handle redirects
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };

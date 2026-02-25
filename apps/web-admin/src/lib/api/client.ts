@@ -201,6 +201,18 @@ export const analyticsApi = {
   getMarginDashboard: () => api.get('/analytics/margin'),
 };
 
+// ============ SELLER ==========
+export const sellerApi = {
+  getStats: () => api.get('/seller/stats'),
+  getPendingOrders: (params?: { limit?: number }) =>
+    api.get('/seller/orders/pending', { params }),
+  getOrders: (params?: { filter?: 'all' | 'pending' | 'picking' }) =>
+    api.get('/seller/orders', { params }),
+  getMyPickingOrders: () => api.get('/seller/picking'),
+  acceptOrder: (orderId: string) => api.post(`/seller/orders/${orderId}/accept`),
+  // further seller endpoints can be added here
+};
+
 // ============ NOTIFICATIONS ============
 export const notificationsApi = {
   findAll: (params?: { page?: number; limit?: number; isRead?: boolean }) =>

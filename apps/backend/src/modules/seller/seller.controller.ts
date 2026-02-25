@@ -134,6 +134,14 @@ export class SellerController {
    * To fix this we take the seller id from the JWT (which *is* the value written into
    * `order.sellerId` when the order is accepted) and include it in the where clause.
    */
+  @Get('orders/:id')
+  @ApiOperation({ summary: 'Detalhes de um pedido (seller)' })
+  @ApiResponse({ status: 200, description: 'Pedido retornado com sucesso' })
+  @ApiResponse({ status: 404, description: 'Pedido não encontrado' })
+  getOrderDetail(@Param('id') id: string) {
+    return this.sellerService.getOrderDetail(id);
+  }
+
   @Get('orders')
   @ApiOperation({ summary: 'Pedidos atribuidos al vendedor' })
   @ApiResponse({ status: 200, description: 'Pedidos retornados com sucesso' })

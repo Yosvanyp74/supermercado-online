@@ -7,12 +7,12 @@ import { useState, useEffect } from 'react';
 import { sellerApi } from '@/lib/api/client';
 import { Package, Clock, Loader2, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
-import { getSocket } from '@/lib/socket';
 import { useAuthStore } from '@/store/auth-store';
 
 // shape used in UI for both pending and picking orders
 interface Order {
   id: string;
+  pickingOrderId?: string;
   orderNumber: string;
   customerName: string;
   itemCount: number;
@@ -31,25 +31,7 @@ export default function PedidosPage() {
   const queryClient = useQueryClient();
   const accessToken = useAuthStore((s) => s.accessToken);
 
-  // real‑time updates via socket
-  useEffect(() => {
-    if (!accessToken) return;
-    const socket = getSocket(accessToken);
-    const invalidate = () => {
-      queryClient.invalidateQueries(['seller-orders']);
-    };
-    socket.on('newOrder', invalidate);
-    socket.on('orderStatusChanged', invalidate);
-    socket.on('deliveryAssigned', invalidate);
-    socket.on('orderCancelled', invalidate);
 
-    return () => {
-      socket.off('newOrder', invalidate);
-      socket.off('orderStatusChanged', invalidate);
-      socket.off('deliveryAssigned', invalidate);
-      socket.off('orderCancelled', invalidate);
-    };
-  }, [accessToken, queryClient]);
 
   const { data: orders, isLoading } = useQuery<Order[]>({
     queryKey: ['seller-orders', filter],
@@ -120,12 +102,15 @@ export default function PedidosPage() {
         </div>
       ) : orders && orders.length > 0 ? (
         <div className="grid gap-4">
-          {orders.map((order) => (
-            <Link
-              key={order.id}
-              href={`/vendedor/pedidos/${order.id}`}
-              className="bg-white rounded-lg shadow-sm hover:shadow-md transition p-6 border border-gray-200"
-            >
+          {orders.map((order) => {
+            // Use pickingOrderId for picking orders, fallback to id for pending
+            const detailId = order.pickingOrderId || order.id;
+            return (
+              <Link
+                key={detailId}
+                href={`/vendedor/pedidos/${detailId}`}
+                className="bg-white rounded-lg shadow-sm hover:shadow-md transition p-6 border border-gray-200"
+              >
               <div className="flex justify-between items-center">
                 <div>
                   <p className="font-semibold">Pedido #{order.orderNumber}</p>
@@ -145,8 +130,9 @@ export default function PedidosPage() {
                   )}
                 </div>
               </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow-sm p-12 text-center">

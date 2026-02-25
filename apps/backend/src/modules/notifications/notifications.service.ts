@@ -417,4 +417,31 @@ export class NotificationsService {
       payload,
     );
   }
+
+  /**
+   * ITEM_PICKED: notify sellers that a single item was picked
+   */
+  async notifyItemPicked(data: {
+    orderId: string;
+    itemId: string;
+    productName: string;
+  }) {
+    // we don't persist a notification for each item in this example, just push event
+    this.gateway.emitToRoles(
+      [Role.SELLER],
+      'order:item-picked',
+      data,
+    );
+  }
+
+  /**
+   * PICKING_COMPLETED: notify sellers when an entire picking order is finished
+   */
+  async notifyPickingCompleted(data: { orderId: string; orderNumber: string }) {
+    this.gateway.emitToRoles(
+      [Role.SELLER],
+      'order:picking-completed',
+      data,
+    );
+  }
 }

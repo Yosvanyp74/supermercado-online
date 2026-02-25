@@ -2391,6 +2391,38 @@
         ]
       }
     },
+    "/api/seller/orders/{id}": {
+      "get": {
+        "operationId": "SellerController_getOrderDetail",
+        "summary": "Detalhes de um pedido (seller)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pedido retornado com sucesso"
+          },
+          "404": {
+            "description": "Pedido não encontrado"
+          }
+        },
+        "tags": [
+          "seller"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/seller/orders": {
       "get": {
         "operationId": "SellerController_getOrders",

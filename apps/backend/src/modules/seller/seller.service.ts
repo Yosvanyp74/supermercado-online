@@ -8,10 +8,14 @@ import { PickingStatus, OrderStatus, InventoryMovementType, PaymentMethod } from
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { QuickCreateCustomerDto } from './dto/quick-create-customer.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class SellerService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   // ==================== POS / SALES ====================
 
@@ -392,6 +396,9 @@ export class SellerService {
           select: {
             id: true,
             orderNumber: true,
+            total: true,
+            fulfillmentType: true,
+            createdAt: true,
             customer: {
               select: { id: true, firstName: true, lastName: true, phone: true },
             },
@@ -458,6 +465,7 @@ export class SellerService {
     // normalize each pickingOrder into the lightweight shape used by the UI
     const mapped = pickingOrders.map((po) => ({
       id: po.order.id,
+      pickingOrderId: po.id,
       orderNumber: po.order.orderNumber,
       customerName: po.order.customer
         ? `${po.order.customer.firstName} ${po.order.customer.lastName}`
@@ -580,7 +588,6 @@ export class SellerService {
         status: allPicked ? PickingStatus.PICKED : undefined,
       },
     });
-
     return {
       success: true,
       message: `Produto "${matchingItem.product.name}" coletado com sucesso`,
@@ -635,6 +642,12 @@ export class SellerService {
         status: allPicked ? PickingStatus.PICKED : undefined,
       },
     });
+    // emit socket notification so UIs can react in real time
+    await this.notificationsService.notifyItemPicked({
+      orderId: pickingItem.pickingOrder.orderId,
+      itemId: pickingItemId,
+      productName: pickingItem.product.name,
+    });
 
     return {
       success: true,
@@ -686,6 +699,12 @@ export class SellerService {
         data: { status: OrderStatus.READY_FOR_PICKUP },
       }),
     ]);
+
+    // emit event so front‑end can react
+    await this.notificationsService.notifyPickingCompleted({
+      orderId: pickingOrderId,
+      orderNumber: updated.order.orderNumber,
+    });
 
     return updated;
   }
@@ -910,5 +929,37 @@ export class SellerService {
     });
 
     return customer;
+  }
+
+  // detalle de pedido (phase 2)
+  async getOrderDetail(orderId: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        customer: {
+          select: { firstName: true, lastName: true, phone: true, email: true },
+        },
+        deliveryAddress: true,
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                barcode: true,
+                mainImageUrl: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'asc' },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Pedido não encontrado');
+    }
+
+    return order;
   }
 }

@@ -209,6 +209,11 @@ export const sellerApi = {
   getOrders: (params?: { filter?: 'all' | 'pending' | 'picking' }) =>
     api.get('/seller/orders', { params }),
   getMyPickingOrders: () => api.get('/seller/picking'),
+  getPickingOrder: (pickingOrderId: string) => api.get(`/seller/picking/${pickingOrderId}`),
+  scanItem: (itemId: string, barcode: string) =>
+    api.post(`/seller/picking/items/${itemId}/pick`, { barcode }),
+  completePickingOrder: (orderId: string) =>
+    api.post(`/seller/orders/${orderId}/complete-picking`),
   acceptOrder: (orderId: string) => api.post(`/seller/orders/${orderId}/accept`),
   // further seller endpoints can be added here
 };

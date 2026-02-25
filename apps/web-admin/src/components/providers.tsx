@@ -9,6 +9,7 @@ import { getSocket, disconnectSocket } from '@/lib/socket';
 import { useAuthStore } from '@/store/auth-store';
 import { useNotificationsStore } from '@/store/notifications-store';
 import { toast } from 'sonner';
+import { SessionProvider } from 'next-auth/react';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -55,11 +56,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, [accessToken, addNotification]);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <QueryClientProvider client={queryClient}>
-        {children}
-        <Toaster position="top-right" richColors closeButton />
-      </QueryClientProvider>
-    </ThemeProvider>
+    <SessionProvider>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <QueryClientProvider client={queryClient}>
+          {children}
+          <Toaster position="top-right" richColors closeButton />
+        </QueryClientProvider>
+      </ThemeProvider>
+    </SessionProvider>
   );
 }

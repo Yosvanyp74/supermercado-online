@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { sellerApi } from '@/lib/api/client';
+import { getSocket, disconnectSocket } from '@/lib/socket';
+import { useAuthStore } from '@/store/auth-store';
 
 interface OrderItem {
   id: string;
@@ -36,6 +38,7 @@ interface OrderItem {
   status: 'PENDING' | 'PICKED';
   location?: string;
   pickedAt?: string;
+  isPicked: boolean;
 }
 
 interface PickingOrderDetail {
@@ -67,19 +70,38 @@ interface PickingOrderDetail {
   status: string;
 }
 
-export default function PickingOrderDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function PickingOrderDetailPage({ params }: { params: { id: string } }) {
   const [barcodeInput, setBarcodeInput] = useState('');
   const barcodeInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
   const router = useRouter();
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const socketRef = useRef<any>(null);
 
   useEffect(() => {
     barcodeInputRef.current?.focus();
   }, []);
+
+  // WebSocket connection and event listener
+  useEffect(() => {
+    if (!accessToken) return;
+    socketRef.current = getSocket(accessToken);
+    // Listen for pickingItemUpdated event for this order
+    const handlePickingItemUpdated = (payload: any) => {
+      if (payload?.pickingOrderId === params.id) {
+        // Refetch order data when an item is updated
+        queryClient.invalidateQueries({ queryKey: ['order', params.id] });
+        toast.info('🟢 Item atualizado em tempo real!', {
+          description: payload?.productName || 'Item atualizado',
+        });
+      }
+    };
+    socketRef.current.on('pickingItemUpdated', handlePickingItemUpdated);
+    return () => {
+      socketRef.current?.off('pickingItemUpdated', handlePickingItemUpdated);
+      disconnectSocket();
+    };
+  }, [accessToken, params.id, queryClient]);
 
   const { data: order, isLoading } = useQuery<PickingOrderDetail>({
     queryKey: ['order', params.id],
@@ -87,12 +109,15 @@ export default function PickingOrderDetailPage({
       const res = await sellerApi.getPickingOrder(params.id);
       return res.data;
     },
-    refetchInterval: 5000,
   });
 
   const pickItemMutation = useMutation({
-    mutationFn: async (data: { itemId: string; barcode: string }) => {
-      const res = await sellerApi.scanItem(data.itemId, data.barcode);
+    mutationFn: async (data: { barcode: string }) => {
+      console.log('[SCAN DEBUG] Llamando a scanItem con:', {
+        pickingOrderId: params.id,
+        barcode: data.barcode,
+      });
+      const res = await sellerApi.scanItem(params.id, data.barcode);
       return res.data;
     },
     onSuccess: (data) => {
@@ -145,10 +170,14 @@ export default function PickingOrderDetailPage({
   });
 
   const handleBarcodeSubmit = (e: React.FormEvent) => {
+      console.log('[SCAN DEBUG] handleBarcodeSubmit ejecutado', barcodeInput);
     e.preventDefault();
     if (!barcodeInput.trim()) return;
+    const normalize = (str: string) => str.replace(/\s+/g, '').toLowerCase();
     const item = order?.items.find(
-      (i) => i.status === 'PENDING' && i.product.barcode === barcodeInput.trim(),
+      (i) =>
+        !i.isPicked &&
+        normalize(i.product.barcode) === normalize(barcodeInput),
     );
     if (!item) {
       const audio = new Audio('/sounds/beep-error.mp3');
@@ -159,7 +188,7 @@ export default function PickingOrderDetailPage({
       setBarcodeInput('');
       return;
     }
-    pickItemMutation.mutate({ itemId: item.id, barcode: barcodeInput.trim() });
+    pickItemMutation.mutate({ barcode: barcodeInput.trim() });
   };
 
   if (isLoading) {
@@ -421,10 +450,10 @@ export default function PickingOrderDetailPage({
                     Qty: {item.quantity}
                   </p>
                   <p className="text-sm text-gray-600">
-                    R$ {item.unitPrice.toFixed(2)} c/u
+                    R$ {typeof item.unitPrice === 'number' && !isNaN(item.unitPrice) ? item.unitPrice.toFixed(2) : '0.00'} c/u
                   </p>
                   <p className="text-sm font-semibold text-gray-900 mt-1">
-                    Total: R$ {(item.quantity * item.unitPrice).toFixed(2)}
+                    Total: R$ {typeof item.unitPrice === 'number' && !isNaN(item.unitPrice) ? (item.quantity * item.unitPrice).toFixed(2) : '0.00'}
                   </p>
                 </div>
               </div>

@@ -4,6 +4,8 @@ export const dynamic = 'force-dynamic';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { useRouter } from 'next/navigation';
 import { sellerApi } from '@/lib/api/client';
 import { Package, Clock, Loader2, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -28,8 +30,11 @@ interface Order {
 
 export default function PedidosPage() {
   const [filter, setFilter] = useState<'all' | 'pending' | 'picking'>('all');
+  const [confirmOrderId, setConfirmOrderId] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
   const queryClient = useQueryClient();
   const accessToken = useAuthStore((s) => s.accessToken);
+  const router = useRouter();
 
 
 
@@ -38,31 +43,23 @@ export default function PedidosPage() {
     queryFn: async () => {
       if (filter === 'pending') {
         const res = await sellerApi.getPendingOrders();
-        // same shape as Order
         return res.data;
       }
-
       if (filter === 'picking') {
         const res = await sellerApi.getMyPickingOrders();
-        // backend now returns simplified Order shape already, so just return it
         return res.data as Order[];
       }
-
-      // all: combine both sets (pending + picking)
       const [pend, pick] = await Promise.all([
         sellerApi.getPendingOrders(),
         sellerApi.getMyPickingOrders(),
       ]);
-      // pick.data already in the correct shape
       return [...pend.data, ...pick.data as Order[]];
     },
-    refetchInterval: 10000,
   });
-
 
   return (
     <div className="space-y-6">
-          {/* Header */}
+      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Pedidos Online</h1>
         <p className="text-gray-600 mt-1">
@@ -93,7 +90,6 @@ export default function PedidosPage() {
         })}
       </div>
 
-
       {/* Orders List */}
       {isLoading ? (
         <div className="flex items-center justify-center py-20">
@@ -103,36 +99,68 @@ export default function PedidosPage() {
       ) : orders && orders.length > 0 ? (
         <div className="grid gap-4">
           {orders.map((order) => {
-            // Use pickingOrderId for picking orders, fallback to id for pending
+            const isPicking = !!order.pickingOrderId;
             const detailId = order.pickingOrderId || order.id;
+            const handleClick = async () => {
+              if (isPicking) {
+                router.push(`/vendedor/pedidos/${detailId}`);
+              } else {
+                setConfirmOrderId(order.id);
+              }
+            };
             return (
-              <Link
+              <button
                 key={detailId}
-                href={`/vendedor/pedidos/${detailId}`}
-                className="bg-white rounded-lg shadow-sm hover:shadow-md transition p-6 border border-gray-200"
+                onClick={handleClick}
+                className="w-full text-left bg-white rounded-lg shadow-sm hover:shadow-md transition p-6 border border-gray-200"
+                style={{ cursor: 'pointer' }}
               >
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-semibold">Pedido #{order.orderNumber}</p>
-                  <p className="text-sm text-gray-600">{order.customerName}</p>
-                  <p className="text-sm text-gray-600">
-                    {order.itemCount} items • R$ {(
-                      order.total ?? 0
-                    ).toFixed(2)}
-                  </p>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-semibold">Pedido #{order.orderNumber}</p>
+                    <p className="text-sm text-gray-600">{order.customerName}</p>
+                    <p className="text-sm text-gray-600">
+                      {order.itemCount} items • R$ {(order.total ?? 0).toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Há {Math.floor((Date.now() - new Date(order.createdAt).getTime()) / 60000)} min
+                    {filter === 'picking' && order.pickedItemsCount != null && (
+                      <span className="ml-2 text-xs text-gray-400">
+                        ({order.pickedItemsCount}/{order.totalItemsCount})
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500">
-                  Há {Math.floor((Date.now() - new Date(order.createdAt).getTime()) / 60000)} min
-                  {filter === 'picking' && order.pickedItemsCount != null && (
-                    <span className="ml-2 text-xs text-gray-400">
-                      ({order.pickedItemsCount}/{order.totalItemsCount})
-                    </span>
-                  )}
-                </div>
-              </div>
-              </Link>
+              </button>
             );
           })}
+          {/* Confirmación elegante para aceptar pedido */}
+          <ConfirmDialog
+            open={!!confirmOrderId}
+            title="Aceptar pedido"
+            description="¿Desea aceptar este pedido y comenzar la preparación?"
+            confirmText="Aceptar"
+            cancelText="Cancelar"
+            onCancel={() => setConfirmOrderId(null)}
+            onConfirm={async () => {
+              if (!confirmOrderId) return;
+              setConfirming(true);
+              try {
+                const res = await sellerApi.acceptOrder(confirmOrderId);
+                const pickingOrderId = res.data.pickingOrderId || res.data.id || confirmOrderId;
+                setConfirmOrderId(null);
+                router.push(`/vendedor/pedidos/${pickingOrderId}`);
+                queryClient.invalidateQueries({ queryKey: ['seller-orders', filter] });
+                queryClient.invalidateQueries({ queryKey: ['picking-orders'] });
+                queryClient.invalidateQueries({ queryKey: ['pending-orders-preview'] });
+              } catch (err) {
+                alert('Erro ao aceitar pedido. Tente novamente.');
+              } finally {
+                setConfirming(false);
+              }
+            }}
+          />
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow-sm p-12 text-center">
@@ -148,3 +176,4 @@ export default function PedidosPage() {
     </div>
   );
 }
+// ...existing code up to ConfirmDialog and su return principal...

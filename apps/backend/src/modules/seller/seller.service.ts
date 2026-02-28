@@ -514,6 +514,7 @@ export class SellerService {
   }
 
   async scanItem(pickingOrderId: string, barcode: string, sellerId: string) {
+      console.log('SCAN DEBUG: barcode recibido:', barcode);
     const pickingOrder = await this.prisma.pickingOrder.findUnique({
       where: { id: pickingOrderId },
       include: {
@@ -537,10 +538,19 @@ export class SellerService {
 
     // Find the picking item that matches the scanned barcode
     const matchingItem = pickingOrder.items.find(
-      (item) => item.product.barcode === barcode && !item.isPicked,
+      (item) => {
+        console.log('SCAN DEBUG: comparando contra item', {
+          itemId: item.id,
+          productId: item.product.id,
+          productBarcode: item.product.barcode,
+          isPicked: item.isPicked,
+        });
+        return item.product.barcode === barcode && !item.isPicked;
+      },
     );
 
     if (!matchingItem) {
+        console.log('SCAN DEBUG: No se encontró matchingItem. Barcodes esperados en items pendientes:', pickingOrder.items.filter(i => !i.isPicked).map(i => ({itemId: i.id, productId: i.product.id, barcode: i.product.barcode})));
       // Check if the barcode exists in the order but is already picked
       const alreadyPicked = pickingOrder.items.find(
         (item) => item.product.barcode === barcode && item.isPicked,

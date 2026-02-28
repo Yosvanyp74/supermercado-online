@@ -14,7 +14,9 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { useRouter } from 'next/navigation';
 import { getSocket } from '@/lib/socket';
 import { useAuthStore } from '@/store/auth-store';
 
@@ -43,6 +45,8 @@ interface PendingOrder {
 }
 
 export default function VendedorHomePage() {
+  const router = useRouter();
+  const [confirmOrderId, setConfirmOrderId] = useState<string | null>(null);
   // Fetch de estadísticas
   const queryClient = useQueryClient();
   const accessToken = useAuthStore((s) => s.accessToken);
@@ -226,33 +230,56 @@ export default function VendedorHomePage() {
               <p className="mt-2 text-sm text-gray-600">Carregando pedidos...</p>
             </div>
           ) : pendingOrders && pendingOrders.length > 0 ? (
-            pendingOrders.map((order) => (
-              <Link
-                key={order.id}
-                href={`/vendedor/pedidos/${order.id}`}
-                className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <Package className="text-blue-600" size={24} />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">Pedido #{order.orderNumber}</p>
-                    <p className="text-sm text-gray-600">
-                      {order.customerName || 'Cliente'} • {order.itemCount} items
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="text-right">
-                  <p className="font-semibold text-gray-900">R$ {order.total.toFixed(2)}</p>
-                  <p className="text-sm text-gray-600 flex items-center gap-1 justify-end">
-                    <Clock size={14} />
-                    Há {Math.floor((Date.now() - new Date(order.createdAt).getTime())/60000)} min
-                  </p>
-                </div>
-              </Link>
-            ))
+            pendingOrders.map((order) => {
+              return (
+                <>
+                  <button
+                    key={order.id}
+                    onClick={() => setConfirmOrderId(order.id)}
+                    className="w-full text-left flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition bg-white border-0"
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="bg-blue-100 p-2 rounded-lg">
+                        <Package className="text-blue-600" size={24} />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">Pedido #{order.orderNumber}</p>
+                        <p className="text-sm text-gray-600">
+                          {order.customerName || 'Cliente'} • {order.itemCount} items
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-gray-900">R$ {order.total.toFixed(2)}</p>
+                      <p className="text-sm text-gray-600 flex items-center gap-1 justify-end">
+                        <Clock size={14} />
+                        Há {Math.floor((Date.now() - new Date(order.createdAt).getTime())/60000)} min
+                      </p>
+                    </div>
+                  </button>
+                  <ConfirmDialog
+                    open={confirmOrderId === order.id}
+                    title={`Aceitar pedido #${order.orderNumber}?`}
+                    description={`Confirme que deseja aceitar este pedido.`}
+                    confirmText="Aceitar"
+                    cancelText="Cancelar"
+                    onConfirm={async () => {
+                      try {
+                        const res = await sellerApi.acceptOrder(order.id);
+                        const pickingOrderId = res.data.pickingOrderId || res.data.id || order.id;
+                        router.push(`/vendedor/pedidos/${pickingOrderId}`);
+                      } catch (err) {
+                        alert('Erro ao aceitar pedido. Tente novamente.');
+                      } finally {
+                        setConfirmOrderId(null);
+                      }
+                    }}
+                    onCancel={() => setConfirmOrderId(null)}
+                  />
+                </>
+              );
+            })
           ) : (
             <div className="px-6 py-12 text-center">
               <Package size={48} className="mx-auto text-gray-400 mb-3" />
@@ -285,32 +312,36 @@ export default function VendedorHomePage() {
               <p className="mt-2 text-sm text-gray-600">Carregando pedidos...</p>
             </div>
           ) : pickingOrders && pickingOrders.length > 0 ? (
-            pickingOrders.map((order) => (
-              <Link
-                key={order.id}
-                href={`/vendedor/pedidos/${order.id}`}
-                className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <Package className="text-blue-600" size={24} />
+            pickingOrders.map((order) => {
+              // If pickingOrderId exists, use it; otherwise fallback to order.id
+              const pickingId = (order as any).pickingOrderId || order.id;
+              return (
+                <Link
+                  key={pickingId}
+                  href={`/vendedor/pedidos/${pickingId}`}
+                  className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="bg-blue-100 p-2 rounded-lg">
+                      <Package className="text-blue-600" size={24} />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Pedido #{order.orderNumber}</p>
+                      <p className="text-sm text-gray-600">
+                        {order.customerName || 'Cliente'} • {order.itemCount} items
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-gray-900">Pedido #{order.orderNumber}</p>
-                    <p className="text-sm text-gray-600">
-                      {order.customerName || 'Cliente'} • {order.itemCount} items
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-900">R$ {order.total.toFixed(2)}</p>
+                    <p className="text-sm text-gray-600 flex items-center gap-1 justify-end">
+                      <Clock size={14} />
+                      Há {Math.floor((Date.now() - new Date(order.createdAt).getTime())/60000)} min
                     </p>
                   </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-gray-900">R$ {order.total.toFixed(2)}</p>
-                  <p className="text-sm text-gray-600 flex items-center gap-1 justify-end">
-                    <Clock size={14} />
-                    Há {Math.floor((Date.now() - new Date(order.createdAt).getTime())/60000)} min
-                  </p>
-                </div>
-              </Link>
-            ))
+                </Link>
+              );
+            })
           ) : (
             <div className="px-6 py-12 text-center">
               <Package size={48} className="mx-auto text-gray-400 mb-3" />

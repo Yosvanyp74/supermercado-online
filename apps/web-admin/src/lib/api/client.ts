@@ -210,8 +210,8 @@ export const sellerApi = {
     api.get('/seller/orders', { params }),
   getMyPickingOrders: () => api.get('/seller/picking'),
   getPickingOrder: (pickingOrderId: string) => api.get(`/seller/picking/${pickingOrderId}`),
-  scanItem: (itemId: string, barcode: string) =>
-    api.post(`/seller/picking/items/${itemId}/pick`, { barcode }),
+  scanItem: (pickingOrderId: string, barcode: string) =>
+    api.post(`/seller/picking/${pickingOrderId}/scan`, { barcode }),
   completePickingOrder: (orderId: string) =>
     api.post(`/seller/orders/${orderId}/complete-picking`),
   acceptOrder: (orderId: string) => api.post(`/seller/orders/${orderId}/accept`),

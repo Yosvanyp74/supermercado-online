@@ -36,7 +36,6 @@ export function Header() {
   const { data: unreadData } = useQuery({
     queryKey: ['unread-notifications'],
     queryFn: () => notificationsApi.getUnreadCount(),
-    refetchInterval: 30000,
   });
 
   // Si Zustand tiene datos, usa el contador local; si no, usa el backend

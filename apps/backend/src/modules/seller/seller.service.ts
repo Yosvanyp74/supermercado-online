@@ -380,10 +380,19 @@ export class SellerService {
       this.prisma.order.update({
         where: { id: orderId },
         data: { status: OrderStatus.PROCESSING, sellerId },
-        select: { id: true, sellerId: true },
+        include: { customer: true },
       }),
     ]);
 
+    // Emitir notificación al cliente por cambio de estado
+    if (updatedOrder && updatedOrder.customer) {
+      await this.notificationsService.notifyOrderStatusChanged({
+        id: updatedOrder.id,
+        orderNumber: updatedPicking.order.orderNumber,
+        customerId: updatedOrder.customer.id,
+        status: OrderStatus.PROCESSING,
+      }).catch(() => {});
+    }
 
     return updatedPicking;
   }

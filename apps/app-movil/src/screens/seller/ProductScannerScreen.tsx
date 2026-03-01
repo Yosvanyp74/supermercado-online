@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Modal } from 'react-native';
 import {
   View,
   Text,
@@ -24,6 +25,9 @@ export function ProductScannerScreen({ navigation }: Props) {
   const styles = createStyles(colors);
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [scannedProduct, setScannedProduct] = useState<any>(null);
+  const [quantity, setQuantity] = useState('1');
   const [manualMode, setManualMode] = useState(false);
   const [barcode, setBarcode] = useState('');
   const { addProduct } = useSellerStore();
@@ -31,22 +35,32 @@ export function ProductScannerScreen({ navigation }: Props) {
   const handleBarCodeScanned = async ({ data }: { data: string }) => {
     if (scanned) return;
     setScanned(true);
-
     try {
       const { data: product } = await sellerApi.getProductByBarcode(data);
-      addProduct({
-        productId: product.id,
-        name: product.name,
-        price: product.price,
-        barcode: data,
-        image: product.images?.[0]?.url || product.mainImageUrl,
-      });
-      Toast.show({ type: 'success', text1: `${product.name} adicionado` });
-      setTimeout(() => setScanned(false), 1500);
+      setScannedProduct(product);
+      setQuantity('1');
+      setModalVisible(true);
     } catch {
       Alert.alert('Produto não encontrado', `Código: ${data}`);
       setScanned(false);
     }
+  };
+
+  const handleAddProduct = () => {
+    if (!scannedProduct) return;
+    const qty = Math.max(1, parseInt(quantity, 10) || 1);
+    addProduct({
+      productId: scannedProduct.id,
+      name: scannedProduct.name,
+      price: scannedProduct.price,
+      barcode: scannedProduct.barcode || (typeof scannedProduct === 'object' && scannedProduct.id ? scannedProduct.id : undefined),
+      image: scannedProduct.images?.[0]?.url || scannedProduct.mainImageUrl,
+      quantity: qty,
+    });
+    Toast.show({ type: 'success', text1: `${scannedProduct.name} adicionado (${qty})` });
+    setModalVisible(false);
+    setScannedProduct(null);
+    setTimeout(() => setScanned(false), 800);
   };
 
   const handleManualSearch = async () => {
@@ -117,6 +131,47 @@ export function ProductScannerScreen({ navigation }: Props) {
             <Keyboard size={20} color={colors.white} />
             <Text style={styles.manualButtonText}>Digitar código</Text>
           </TouchableOpacity>
+          {/* Modal para seleccionar cantidad */}
+          <Modal
+            visible={modalVisible}
+            transparent
+            animationType="fade"
+            onRequestClose={() => {
+              setModalVisible(false);
+              setScanned(false);
+            }}
+          >
+            <View style={{ flex:1, justifyContent:'center', alignItems:'center', backgroundColor:'rgba(0,0,0,0.4)' }}>
+              <View style={{ backgroundColor:'#fff', borderRadius:16, padding:24, width:300, alignItems:'center' }}>
+                <Text style={{ fontSize:18, fontWeight:'bold', marginBottom:12 }}>{scannedProduct?.name}</Text>
+                <Text style={{ fontSize:14, color:'#888', marginBottom:16 }}>Quantidade:</Text>
+                <TextInput
+                  style={{ borderWidth:1, borderColor:'#ccc', borderRadius:8, width:80, textAlign:'center', fontSize:20, marginBottom:20, padding:8 }}
+                  keyboardType="number-pad"
+                  value={quantity}
+                  onChangeText={setQuantity}
+                  autoFocus
+                />
+                <View style={{ flexDirection:'row', gap:12 }}>
+                  <TouchableOpacity
+                    style={{ backgroundColor:'#eee', borderRadius:8, paddingVertical:10, paddingHorizontal:18, marginRight:8 }}
+                    onPress={() => {
+                      setModalVisible(false);
+                      setScanned(false);
+                    }}
+                  >
+                    <Text style={{ color:'#333', fontWeight:'600' }}>Cancelar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ backgroundColor:colors.seller.primary, borderRadius:8, paddingVertical:10, paddingHorizontal:18 }}
+                    onPress={handleAddProduct}
+                  >
+                    <Text style={{ color:'#fff', fontWeight:'600' }}>Adicionar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </>
       ) : (
         <View style={styles.manualContainer}>

@@ -26,6 +26,7 @@ interface SellerState {
     price: number;
     barcode?: string;
     image?: string;
+    quantity?: number;
   }) => void;
   updateItemQuantity: (productId: string, quantity: number) => void;
   removeProduct: (productId: string) => void;
@@ -52,19 +53,20 @@ export const useSellerStore = create<SellerState>((set, get) => ({
 
   addProduct: (product) => {
     const { activeItems } = get();
+    const qty = product.quantity && product.quantity > 0 ? product.quantity : 1;
     const existing = activeItems.find((i) => i.productId === product.productId);
 
     if (existing) {
       set({
         activeItems: activeItems.map((i) =>
           i.productId === product.productId
-            ? { ...i, quantity: i.quantity + 1 }
+            ? { ...i, quantity: i.quantity + qty }
             : i,
         ),
       });
     } else {
       set({
-        activeItems: [...activeItems, { ...product, quantity: 1 }],
+        activeItems: [...activeItems, { ...product, quantity: qty }],
       });
     }
   },

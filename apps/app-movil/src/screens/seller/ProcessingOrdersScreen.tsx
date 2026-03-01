@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, RefreshControl, StyleSheet } from 'react-native';
+import { View, Text, FlatList, RefreshControl, StyleSheet, TouchableOpacity } from 'react-native';
 import { sellerApi } from '@/api';
 import { Loading } from '@/components';
 import { useTheme } from '@/theme';
 
+import { useNavigation } from '@react-navigation/native';
+import { SellerStackParamList } from '@/navigation/types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 export default function ProcessingOrdersScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<SellerStackParamList>>();
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const [orders, setOrders] = useState<any[]>([]);
@@ -36,9 +41,14 @@ export default function ProcessingOrdersScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadOrders} />}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <Text style={styles.title}>Pedido #{item.id}</Text>
+            <Text style={styles.title}>Pedido #{item.orderNumber || item.id}</Text>
             <Text style={styles.status}>Status: {item.status}</Text>
-            {/* Agrega más detalles según el modelo de pedido */}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('OrderPicking', { pickingOrderId: item.pickingOrderId })}
+            >
+              <Text style={styles.buttonText}>Iniciar Picking</Text>
+            </TouchableOpacity>
           </View>
         )}
         ListEmptyComponent={<Text style={styles.empty}>Nenhum pedido em processamento.</Text>}
@@ -52,5 +62,17 @@ const createStyles = (colors: any) => StyleSheet.create({
   card: { backgroundColor: colors.white, borderRadius: 12, padding: 16, marginBottom: 12 },
   title: { fontWeight: 'bold', fontSize: 16, marginBottom: 4 },
   status: { color: colors.primary[600] },
+  button: {
+    marginTop: 10,
+    backgroundColor: colors.primary[600],
+    borderRadius: 8,
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: colors.white,
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
   empty: { textAlign: 'center', color: colors.gray[400], marginTop: 40 },
 });

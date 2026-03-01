@@ -17,6 +17,7 @@ import { BarcodeScannerPickingScreen } from '@/screens/seller/BarcodeScannerPick
 import { ManualItemPickScreen } from '@/screens/seller/ManualItemPickScreen';
 import { OrderCompletionScreen } from '@/screens/seller/OrderCompletionScreen';
 import { ReadyForDeliveryScreen } from '@/screens/seller/ReadyForDeliveryScreen';
+import ProcessingOrdersScreen from '@/screens/seller/ProcessingOrdersScreen';
 
 const Stack = createNativeStackNavigator<SellerStackParamList>();
 
@@ -34,6 +35,11 @@ export function SellerNavigator() {
         name="SellerHome"
         component={SellerHomeScreen}
         options={{ title: 'PDV Móvel' }}
+      />
+      <Stack.Screen
+        name="ProcessingOrders"
+        component={ProcessingOrdersScreen}
+        options={{ title: 'Pedidos em Processamento' }}
       />
       <Stack.Screen
         name="ProductScanner"

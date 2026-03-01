@@ -227,6 +227,7 @@ export const sellerApi = {
 
   // Orders / Picking
   getPendingOrders: () => apiClient.get('/seller/orders/pending'),
+  getMyPickingOrders: () => apiClient.get('/seller/picking'),
 
   acceptOrder: (orderId: string) =>
     apiClient.post(`/seller/orders/${orderId}/accept`),

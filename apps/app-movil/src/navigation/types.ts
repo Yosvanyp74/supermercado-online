@@ -58,6 +58,7 @@ export type ProfileStackParamList = {
 
 export type SellerStackParamList = {
   SellerHome: undefined;
+  ProcessingOrders: undefined;
   ProductScanner: undefined;
   ActiveSale: undefined;
   CustomerSearch: undefined;

@@ -46,15 +46,17 @@ export function SellerHomeScreen({ navigation }: Props) {
   const [stats, setStats] = useState<any>(null);
   const [pendingOrders, setPendingOrders] = useState(0);
   const [readyOrders, setReadyOrders] = useState(0);
+  const [processingOrders, setProcessingOrders] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadData = async () => {
     try {
-      const [statsRes, ordersRes, readyRes] = await Promise.all([
+      const [statsRes, ordersRes, readyRes, processingRes] = await Promise.all([
         sellerApi.getStats().catch(() => ({ data: null })),
         sellerApi.getPendingOrders().catch(() => ({ data: [] })),
         sellerApi.getReadyForDeliveryOrders().catch(() => ({ data: [] })),
+        sellerApi.getMyPickingOrders().catch(() => ({ data: [] })),
       ]);
       setStats(statsRes.data);
       setPendingOrders(
@@ -62,6 +64,9 @@ export function SellerHomeScreen({ navigation }: Props) {
       );
       setReadyOrders(
         Array.isArray(readyRes.data) ? readyRes.data.length : 0,
+      );
+      setProcessingOrders(
+        Array.isArray(processingRes.data) ? processingRes.data.length : 0,
       );
     } catch {
       // Ignore
@@ -110,12 +115,13 @@ export function SellerHomeScreen({ navigation }: Props) {
 
   const menuItems = [
     {
-      icon: Scan,
-      label: 'Nova Venda',
-      subtitle: 'Escanear produto',
+      icon: Clock,
+      label: 'Em Processamento',
+      subtitle: `${processingOrders} aceitos`,
       color: colors.primary[600],
       bg: colors.primary[50],
-      onPress: () => navigation.navigate('ProductScanner'),
+      onPress: () => navigation.navigate('ProcessingOrders'),
+      badge: processingOrders > 0 ? processingOrders : undefined,
     },
     {
       icon: ShoppingBag,

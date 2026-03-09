@@ -40,24 +40,19 @@ export default function CategoriesPage() {
                 <Card className="h-44 flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow cursor-pointer group">
                   <CardContent className="p-4">
                     {cat.imageUrl ? (
-                      <div className="w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-3">
+                      <div className="w-28 h-28 rounded-2xl overflow-hidden mx-auto mb-3">
                         <img
                           src={getImageUrl(cat.imageUrl)}
                           alt={cat.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                       </div>
                     ) : (
-                      <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
-                        <Tag className="h-8 w-8 text-primary" />
+                      <div className="w-28 h-28 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
+                        <Tag className="h-10 w-10 text-primary" />
                       </div>
                     )}
                     <p className="text-sm font-medium line-clamp-2">{cat.name}</p>
-                    {cat._count?.products != null && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {cat._count.products} produtos
-                      </p>
-                    )}
                   </CardContent>
                 </Card>
               </Link>

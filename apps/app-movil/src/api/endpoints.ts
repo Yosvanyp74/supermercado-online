@@ -235,8 +235,8 @@ export const sellerApi = {
   getPickingOrder: (pickingOrderId: string) =>
     apiClient.get(`/seller/picking/${pickingOrderId}`),
 
-  scanPickingItem: (pickingOrderId: string, barcode: string) =>
-    apiClient.post(`/seller/picking/${pickingOrderId}/scan`, { barcode }),
+  scanPickingItem: (pickingOrderId: string, barcode: string, quantity: number) =>
+    apiClient.post(`/seller/picking/${pickingOrderId}/scan`, { barcode, quantity }),
 
   manualPickItem: (pickingItemId: string, notes?: string) =>
     apiClient.post(`/seller/picking/${pickingItemId}/manual-pick`, { notes }),

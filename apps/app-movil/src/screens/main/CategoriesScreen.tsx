@@ -78,7 +78,7 @@ export function CategoriesScreen({ navigation }: Props) {
               <Image
                 source={{ uri: getImageUrl(item.imageUrl)! }}
                 style={styles.categoryImage}
-                resizeMode="cover"
+                resizeMode="contain"
               />
             ) : (
               <Text style={styles.emoji}>{item.icon || '📦'}</Text>
@@ -87,11 +87,6 @@ export function CategoriesScreen({ navigation }: Props) {
           <Text style={styles.name} numberOfLines={2}>
             {item.name}
           </Text>
-          {item._count?.products != null && (
-            <Text style={styles.count}>
-              {item._count.products} produtos
-            </Text>
-          )}
         </TouchableOpacity>
       )}
       keyExtractor={(item) => item.id}
@@ -111,14 +106,14 @@ const createStyles = (colors: any) => StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
     borderRadius: 16,
-    padding: 16,
+    padding: 8, // reducido de 16 a 8
     margin: 4,
     alignItems: 'center',
   },
   iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
+    width: 100,
+    height: 100,
+    borderRadius: 28,
     backgroundColor: colors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
@@ -126,9 +121,9 @@ const createStyles = (colors: any) => StyleSheet.create({
     overflow: 'hidden',
   },
   categoryImage: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
+    width: 92,
+    height: 92,
+    borderRadius: 24,
   },
   emoji: {
     fontSize: 32,
@@ -139,9 +134,5 @@ const createStyles = (colors: any) => StyleSheet.create({
     color: colors.foreground,
     textAlign: 'center',
     marginBottom: 4,
-  },
-  count: {
-    fontSize: 12,
-    color: colors.gray[400],
   },
 });

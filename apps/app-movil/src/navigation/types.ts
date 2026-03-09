@@ -78,6 +78,7 @@ export type SellerStackParamList = {
     pickingItemId: string;
     expectedBarcode?: string;
     productName: string;
+    requiredQuantity: number;
   };
   ManualItemPick: {
     pickingOrderId: string;

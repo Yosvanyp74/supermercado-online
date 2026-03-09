@@ -6,7 +6,6 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  Alert,
 } from 'react-native';
 import { getImageUrl } from '@/config';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -21,13 +20,13 @@ import {
 } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 import { SellerStackParamList } from '@/navigation/types';
-import { Button, Loading } from '@/components';
+import { Button } from '@/components';
 import { sellerApi } from '@/api';
-import { shadow, useTheme } from '@/theme';
+import { shadow, useTheme, colors } from '@/theme';
 
 type Props = NativeStackScreenProps<SellerStackParamList, 'OrderPicking'>;
 
-interface PickingItem {
+export interface PickingItem {
   id: string;
   productId: string;
   name: string;
@@ -40,11 +39,40 @@ interface PickingItem {
 }
 
 export function OrderPickingScreen({ navigation, route }: Props) {
-  const { colors } = useTheme();
-  const styles = createStyles(colors);
+  const themeColors = useTheme().colors || colors;
+  const styles = createStyles(themeColors);
   const { pickingOrderId } = route.params;
   const [items, setItems] = useState<PickingItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+
+  const handleComplete = async () => {
+    try {
+      await sellerApi.completePicking(pickingOrderId);
+      Toast.show({ type: 'success', text1: 'Separação concluída!' });
+      navigation.goBack();
+    } catch {
+      Toast.show({ type: 'error', text1: 'Erro ao concluir separação' });
+    }
+  };
+
+  function getStatusIcon(status: string) {
+    switch (status) {
+      case 'picked': return <CheckCircle size={22} color={themeColors.primary[500]} />;
+      case 'substituted': return <RefreshCw size={22} color={themeColors.warning} />;
+      case 'not_found': return <XCircle size={22} color={themeColors.destructive} />;
+      default: return <Circle size={22} color={themeColors.gray[300]} />;
+    }
+  }
+
+  function getStatusColor(status: string): string {
+    switch (status) {
+      case 'picked': return themeColors.primary[50];
+      case 'substituted': return '#FEF3C7';
+      case 'not_found': return '#FEE2E2';
+      default: return themeColors.white;
+    }
+  }
 
   useEffect(() => {
     loadOrderItems();
@@ -56,7 +84,7 @@ export function OrderPickingScreen({ navigation, route }: Props) {
     }, [pickingOrderId])
   );
 
-  const loadOrderItems = async () => {
+  async function loadOrderItems() {
     try {
       const { data } = await sellerApi.getPickingOrder(pickingOrderId);
       const pickingItems: PickingItem[] = (data.items || []).map((item: any) => ({
@@ -66,7 +94,7 @@ export function OrderPickingScreen({ navigation, route }: Props) {
         quantity: item.quantity,
         image: item.product?.images?.[0]?.url || item.product?.mainImageUrl,
         barcode: item.product?.barcode,
-        status: item.isPicked ? 'picked' : 'pending',
+        status: item.isPicked ? 'picked' : ('pending' as const),
         notes: item.notes,
       }));
       setItems(pickingItems);
@@ -75,14 +103,13 @@ export function OrderPickingScreen({ navigation, route }: Props) {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const pickedCount = items.filter(
     (i) => i.status === 'picked' || i.status === 'substituted'
   ).length;
   const totalCount = items.length;
   const progress = totalCount > 0 ? pickedCount / totalCount : 0;
-
   const allDone = items.length > 0 && items.every((i) => i.status !== 'pending');
 
   const handleScanItem = (item: PickingItem) => {
@@ -91,113 +118,51 @@ export function OrderPickingScreen({ navigation, route }: Props) {
       pickingItemId: item.id,
       expectedBarcode: item.barcode,
       productName: item.name,
+      requiredQuantity: item.quantity,
     });
   };
-
-  const handleManualPick = (item: PickingItem) => {
-    navigation.navigate('ManualItemPick', {
-      pickingOrderId,
-      pickingItemId: item.id,
-      productName: item.name,
-      quantity: item.quantity,
-    });
-  };
-
-  const handleComplete = () => {
-    const notFound = items.filter((i) => i.status === 'not_found').length;
-    const subs = items.filter((i) => i.status === 'substituted').length;
-
-    let message = 'Confirmar conclusão da separação?';
-    if (notFound > 0)
-      message += `\n${notFound} item(ns) não encontrado(s)`;
-    if (subs > 0) message += `\n${subs} substituição(ões)`;
-
-    Alert.alert('Concluir Separação', message, [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Concluir',
-        onPress: () =>
-          navigation.navigate('OrderCompletion', { pickingOrderId }),
-      },
-    ]);
-  };
-
-  const getStatusIcon = (status: PickingItem['status']) => {
-    switch (status) {
-      case 'picked':
-        return <CheckCircle size={22} color={colors.primary[500]} />;
-      case 'substituted':
-        return <RefreshCw size={22} color={colors.warning} />;
-      case 'not_found':
-        return <XCircle size={22} color={colors.destructive} />;
-      default:
-        return <Circle size={22} color={colors.gray[300]} />;
-    }
-  };
-
-  const getStatusColor = (status: PickingItem['status']) => {
-    switch (status) {
-      case 'picked':
-        return colors.primary[50];
-      case 'substituted':
-        return '#FEF3C7';
-      case 'not_found':
-        return '#FEE2E2';
-      default:
-        return colors.white;
-    }
-  };
-
-  if (loading) return <Loading />;
 
   const renderItem = ({ item }: { item: PickingItem }) => {
-    const imageUri = getImageUrl(item.image);
-
+    const imageUri = item.image ? getImageUrl(item.image) : undefined;
+    const handleConfirmQty = () => {
+      setItems((prev) =>
+        prev.map((i) => (i.id === item.id ? { ...i, status: 'picked' as const } : i))
+      );
+      // Call API to mark as manually picked
+      sellerApi.manualPickItem(item.id).catch(() => {
+        // Revert on failure
+        setItems((prev) =>
+          prev.map((i) => (i.id === item.id ? { ...i, status: 'pending' as const } : i))
+        );
+        Toast.show({ type: 'error', text1: 'Erro ao confirmar item' });
+      });
+      Toast.show({ type: 'success', text1: `✓ ${item.name} confirmado!` });
+    };
     return (
-      <View
-        style={[
-          styles.itemCard,
-          { backgroundColor: getStatusColor(item.status) },
-        ]}
-      >
+      <View style={[styles.itemCard, { backgroundColor: getStatusColor(item.status) }]}>
         <View style={styles.statusIcon}>{getStatusIcon(item.status)}</View>
-
-        {item.image ? (
-          <Image source={{ uri: imageUri! }} style={styles.itemImage} />
+        {imageUri ? (
+          <Image source={{ uri: imageUri }} style={styles.itemImage} />
         ) : (
           <View style={[styles.itemImage, styles.placeholder]}>
-            <Text style={styles.placeholderText}>
-              {item.name.charAt(0).toUpperCase()}
-            </Text>
+            <Text style={styles.placeholderText}>{item.name.charAt(0).toUpperCase()}</Text>
           </View>
         )}
-
         <View style={styles.itemInfo}>
-          <Text style={styles.itemName} numberOfLines={2}>
-            {item.name}
-          </Text>
+          <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
           <Text style={styles.itemQty}>Qtd: {item.quantity}</Text>
-          {item.substituteProduct && (
+          {item.substituteProduct ? (
             <Text style={styles.subNote}>Sub: {item.substituteProduct}</Text>
-          )}
-          {item.notes && (
-            <Text style={styles.itemNotes}>{item.notes}</Text>
-          )}
+          ) : null}
+          {item.notes ? <Text style={styles.itemNotes}>{item.notes}</Text> : null}
         </View>
-
         {item.status === 'pending' && (
           <View style={styles.itemActions}>
-            <TouchableOpacity
-              style={styles.scanBtn}
-              onPress={() => handleScanItem(item)}
-            >
-              <Scan size={18} color={colors.seller.primary} />
+            <TouchableOpacity style={styles.scanBtn} onPress={() => handleScanItem(item)}>
+              <Scan size={18} color={themeColors.primary[600]} />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.manualBtn}
-              onPress={() => handleManualPick(item)}
-            >
-              <Edit3 size={18} color={colors.gray[600]} />
+            <TouchableOpacity style={styles.manualBtn} onPress={handleConfirmQty}>
+              <Edit3 size={18} color={themeColors.gray[600]} />
             </TouchableOpacity>
           </View>
         )}
@@ -207,7 +172,6 @@ export function OrderPickingScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
-      {/* Progress Bar */}
       <View style={styles.progressContainer}>
         <View style={styles.progressHeader}>
           <Text style={styles.progressLabel}>Progresso</Text>
@@ -216,27 +180,22 @@ export function OrderPickingScreen({ navigation, route }: Props) {
           </Text>
         </View>
         <View style={styles.progressBar}>
-          <View
-            style={[styles.progressFill, { width: `${progress * 100}%` }]}
-          />
+          <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
         </View>
       </View>
-
       <FlatList
         data={items}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
       />
-
-      {/* Complete Button */}
       {allDone && (
         <View style={styles.footer}>
           <Button
             title="Concluir Separação"
             onPress={handleComplete}
-            icon={<CheckCircle size={20} color={colors.white} />}
-            style={{ backgroundColor: colors.primary[600] }}
+            icon={<CheckCircle size={20} color={themeColors.white || colors.white} />}
+            style={{ backgroundColor: themeColors.primary[600] || colors.primary[600] }}
           />
         </View>
       )}
@@ -302,7 +261,7 @@ const createStyles = (colors: any, _shadow = shadow) => StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 8,
-    backgroundColor: colors.seller.light,
+    backgroundColor: (colors as any).seller?.light ?? colors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
   },

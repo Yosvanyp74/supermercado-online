@@ -522,7 +522,7 @@ export class SellerService {
     return mapped;
   }
 
-  async scanItem(pickingOrderId: string, barcode: string, sellerId: string) {
+  async scanItem(pickingOrderId: string, barcode: string, sellerId: string, confirmedQuantity?: number) {
       console.log('SCAN DEBUG: barcode recibido:', barcode);
     const pickingOrder = await this.prisma.pickingOrder.findUnique({
       where: { id: pickingOrderId },
@@ -586,18 +586,21 @@ export class SellerService {
       };
     }
 
+    // Use confirmed quantity from seller, fallback to required quantity
+    const pickedQty = confirmedQuantity ?? matchingItem.quantity;
+
     // Mark item as picked
     const updatedItem = await this.prisma.pickingItem.update({
       where: { id: matchingItem.id },
       data: {
         isPicked: true,
-        pickedQuantity: matchingItem.quantity,
+        pickedQuantity: pickedQty,
         pickedAt: new Date(),
       },
     });
 
-    // Update picked count
-    const newPickedCount = pickingOrder.pickedItems + 1;
+    // Update picked count — increment by confirmed quantity
+    const newPickedCount = pickingOrder.pickedItems + pickedQty;
     const allPicked = newPickedCount >= pickingOrder.totalItems;
 
     await this.prisma.pickingOrder.update({

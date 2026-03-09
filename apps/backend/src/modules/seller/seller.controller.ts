@@ -189,7 +189,7 @@ export class SellerController {
     @Body() dto: ScanItemDto,
     @CurrentUser('id') sellerId: string,
   ) {
-    return this.sellerService.scanItem(pickingOrderId, dto.barcode, sellerId);
+    return this.sellerService.scanItem(pickingOrderId, dto.barcode, sellerId, dto.quantity);
   }
 
   @Post('picking/:pickingItemId/manual-pick')

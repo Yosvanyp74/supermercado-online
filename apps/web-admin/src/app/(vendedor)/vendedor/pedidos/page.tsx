@@ -3,13 +3,11 @@
 export const dynamic = 'force-dynamic';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { useRouter } from 'next/navigation';
 import { sellerApi } from '@/lib/api/client';
-import { Package, Clock, Loader2, CheckCircle } from 'lucide-react';
-import Link from 'next/link';
-import { useAuthStore } from '@/store/auth-store';
+import { Loader2, CheckCircle } from 'lucide-react';
 
 // shape used in UI for both pending and picking orders
 interface Order {
@@ -31,9 +29,7 @@ interface Order {
 export default function PedidosPage() {
   const [filter, setFilter] = useState<'all' | 'pending' | 'picking'>('all');
   const [confirmOrderId, setConfirmOrderId] = useState<string | null>(null);
-  const [confirming, setConfirming] = useState(false);
   const queryClient = useQueryClient();
-  const accessToken = useAuthStore((s) => s.accessToken);
   const router = useRouter();
 
 
@@ -112,8 +108,7 @@ export default function PedidosPage() {
               <button
                 key={detailId}
                 onClick={handleClick}
-                className="w-full text-left bg-white rounded-lg shadow-sm hover:shadow-md transition p-6 border border-gray-200"
-                style={{ cursor: 'pointer' }}
+                className="w-full cursor-pointer text-left bg-white rounded-lg shadow-sm hover:shadow-md transition p-6 border border-gray-200"
               >
                 <div className="flex justify-between items-center">
                   <div>
@@ -145,7 +140,6 @@ export default function PedidosPage() {
             onCancel={() => setConfirmOrderId(null)}
             onConfirm={async () => {
               if (!confirmOrderId) return;
-              setConfirming(true);
               try {
                 const res = await sellerApi.acceptOrder(confirmOrderId);
                 const pickingOrderId = res.data.pickingOrderId || res.data.id || confirmOrderId;
@@ -154,10 +148,8 @@ export default function PedidosPage() {
                 queryClient.invalidateQueries({ queryKey: ['seller-orders', filter] });
                 queryClient.invalidateQueries({ queryKey: ['picking-orders'] });
                 queryClient.invalidateQueries({ queryKey: ['pending-orders-preview'] });
-              } catch (err) {
+              } catch {
                 alert('Erro ao aceitar pedido. Tente novamente.');
-              } finally {
-                setConfirming(false);
               }
             }}
           />
@@ -176,4 +168,4 @@ export default function PedidosPage() {
     </div>
   );
 }
-// ...existing code up to ConfirmDialog and su return principal...
+
